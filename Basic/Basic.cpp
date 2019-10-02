@@ -1,6 +1,6 @@
 #define STRICT
 #include "stdafx.h"
-//#include <vld.h> // vld.h Çì´õÆÄÀÏÀº stdafx.h ´ÙÀ½¿¡ À§Ä¡ÇØ¾ß ÇÕ´Ï´Ù.
+//#include <vld.h> // vld.h ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ stdafx.h ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½Ø¾ï¿½ ï¿½Õ´Ï´ï¿½.
 
 #include "SUBPATH.h"
 #include "StringUtils.h"
@@ -55,7 +55,7 @@ DO_RTC_CATCH _rtc_catch;
 				bool isDETECTED = FALSE;
 				bool isGOTMSG = FALSE;
 				long ctr = 0;
-// Nprotect Á¤ÀÇ
+// Nprotect ï¿½ï¿½ï¿½ï¿½
 #if defined(MY_PARAM) || defined(MYE_PARAM)
 	CNPGameLib npgl("RanOnlineMY");
 //#elif defined(PH_PARAM)
@@ -88,7 +88,7 @@ CBasicApp::CBasicApp() :
 	bMonitoring(FALSE)
 
 {
-	//	Note : ¼ø¼ö °¡»óÇÔ¼ö È£Ãâ °¨Áö ÇÚµé·¯.
+	//	Note : ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ È£ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Úµé·¯.
 	//
 	//_set_purecall_handler(smtm_PurecallHandler);
 	
@@ -228,7 +228,7 @@ BOOL CBasicApp::InitInstance()
 	//strParam_Command
 	//CString strCommand = CString("ranmu") + "_" + "call";
 	//16dots
-	CString strCommand = CString("......") + "." + "app_run......";
+	CString strCommand = CString("......") + "." + "kintil......";
 	//CString strCommand = CString("app") + "_" + "run";
 
 
@@ -268,10 +268,10 @@ BOOL CBasicApp::InitInstance()
 		{
 			strVALUE = strTemp.Right ( strTemp.GetLength()-strKEY.GetLength() );
 
-			//	°ª ÁöÁ¤.
+			//	ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.
 			RANPARAM::SETIDPARAM ( strVALUE.GetString() );
 			
-			//	userid´Â ÀÓÀÇ·Î ÁöÁ¤. ( °ÔÀÓ ¿É¼Ç ÀúÀå¿ë. )
+			//	useridï¿½ï¿½ ï¿½ï¿½ï¿½Ç·ï¿½ ï¿½ï¿½ï¿½ï¿½. ( ï¿½ï¿½ï¿½ï¿½ ï¿½É¼ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½. )
 			RANPARAM::SETUSERID ( "userid" );
 		}
 
@@ -282,10 +282,10 @@ BOOL CBasicApp::InitInstance()
 		{
 			strVALUE = strTemp.Right ( strTemp.GetLength()-strKEY.GetLength() );
 
-			//	°ª ÁöÁ¤.
+			//	ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.
 			RANPARAM::SETIDPARAM ( strVALUE.GetString() );
 			
-			//	userid´Â ÀÓÀÇ·Î ÁöÁ¤. ( °ÔÀÓ ¿É¼Ç ÀúÀå¿ë. )
+			//	useridï¿½ï¿½ ï¿½ï¿½ï¿½Ç·ï¿½ ï¿½ï¿½ï¿½ï¿½. ( ï¿½ï¿½ï¿½ï¿½ ï¿½É¼ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½. )
 			RANPARAM::SETUSERID ( "userid" );
 		}
 
@@ -295,10 +295,10 @@ BOOL CBasicApp::InitInstance()
 		{
 			strVALUE = strTemp.Right ( strTemp.GetLength()-strKEY.GetLength() );
 
-			//	°ª ÁöÁ¤.
+			//	ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.
 			RANPARAM::SETIDPARAM ( strVALUE.GetString() );
 
-			//	userid´Â ÀÓÀÇ·Î ÁöÁ¤. ( °ÔÀÓ ¿É¼Ç ÀúÀå¿ë. )
+			//	useridï¿½ï¿½ ï¿½ï¿½ï¿½Ç·ï¿½ ï¿½ï¿½ï¿½ï¿½. ( ï¿½ï¿½ï¿½ï¿½ ï¿½É¼ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½. )
 			RANPARAM::SETUSERID ( "userid" );
 		}
 
@@ -308,7 +308,7 @@ BOOL CBasicApp::InitInstance()
 		{
 			strVALUE = strTemp.Right ( strTemp.GetLength()-strKEY.GetLength() );
 
-			//	°ª ÁöÁ¤.
+			//	ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.
 			RANPARAM::SETIDPARAM2 ( strVALUE.GetString() );
 		}
 
@@ -318,16 +318,16 @@ BOOL CBasicApp::InitInstance()
 		{
 			strVALUE = strTemp.Right ( strTemp.GetLength()-strKEY.GetLength() );
 
-			//	°ª ÁöÁ¤.
+			//	ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.
 			RANPARAM::SETIDPARAM3 ( strVALUE.GetString() );
 		}
 	}
 
-	//	Note : À¥·Î±×ÀÎÀÌ°í cmd line param À¸·Î Àü´ÞµÇ´Â °ªÀÌ ÀÖÀ» °æ¿ì.
-	//		°ªÀÌ Á¤È®ÇÏ°Ô ÀúÀåµÇ¾î ÀÖ´ÂÁö Ã¼Å©.
+	//	Note : ï¿½ï¿½ï¿½Î±ï¿½ï¿½ï¿½ï¿½Ì°ï¿½ cmd line param ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ÞµÇ´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½.
+	//		ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È®ï¿½Ï°ï¿½ ï¿½ï¿½ï¿½ï¿½Ç¾ï¿½ ï¿½Ö´ï¿½ï¿½ï¿½ Ã¼Å©.
 	if( RANPARAM::emSERVICE_TYPE==EMSERVICE_MALAYSIA_CN || 
 		//RANPARAM::emSERVICE_TYPE==EMSERVICE_MALAYSIA_EN ||
-//		RANPARAM::emSERVICE_TYPE==EMSERVICE_JAPAN ||	// JAPAN ·Î±×ÀÎ ¹æ½Ä º¯°æ
+//		RANPARAM::emSERVICE_TYPE==EMSERVICE_JAPAN ||	// JAPAN ï¿½Î±ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 //		RANPARAM::emSERVICE_TYPE==EMSERVICE_PHILIPPINES ||
 		RANPARAM::emSERVICE_TYPE==EMSERVICE_VIETNAM )
 	{
@@ -356,7 +356,7 @@ BOOL CBasicApp::InitInstance()
 		return FALSE;
 	}
 
-	{	// Note : ÀÎÅÍÆäÀÌ½º ½ºÅ³ ÅØ½ºÆ® ·Îµù
+	{	// Note : ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì½ï¿½ ï¿½ï¿½Å³ ï¿½Ø½ï¿½Æ® ï¿½Îµï¿½
 		TCHAR szFullPath[MAX_PATH] = {0};
 
 		StringCchCopy( szFullPath, MAX_PATH, ((CBasicApp*)AfxGetApp())->m_szAppPath );
@@ -368,7 +368,7 @@ BOOL CBasicApp::InitInstance()
 		CGameTextMan::GetInstance().LoadText(RANPARAM::strGameExText.GetString(), CGameTextMan::EM_GAME_EX_TEXT, RANPARAM::bXML_USE );
 	}
 
-#if defined(MY_PARAM) || defined(MYE_PARAM) || defined(PH_PARAM) //|| defined( VN_PARAM ) || defined(TH_PARAM) || defined ( HK_PARAM ) || defined(TW_PARAM) // Nprotect Á¤ÀÇ
+#if defined(MY_PARAM) || defined(MYE_PARAM) || defined(PH_PARAM) //|| defined( VN_PARAM ) || defined(TH_PARAM) || defined ( HK_PARAM ) || defined(TW_PARAM) // Nprotect ï¿½ï¿½ï¿½ï¿½
 	{
 		DWORD dwResult = npgl.Init();
 		if( dwResult != NPGAMEMON_SUCCESS )
@@ -414,478 +414,478 @@ BOOL CBasicApp::InitInstance()
 
 	return TRUE;
 }
-/*START WINDOW NAME SCANNER*/
-bool TitleWindow(LPCSTR WindowTitle){
-	HWND WinTitle = FindWindowA(NULL,WindowTitle);
-	if( WinTitle > 0){
-	FILE *fp;
-	fp = fopen ( "GameGuard/Log.txt", "at" );
-	if ( fp )
-		{
-			if (!isGOTMSG )
-			{
-				isGOTMSG = TRUE;
-				isDETECTED = TRUE;
-				TCHAR msg[128]={0};
-				fprintf ( fp, "\n W-Scan: %s", WindowTitle );	
-				fclose(fp);
-				dxincommand::bDISP_FPS = FALSE;
-				wsprintf(msg, _T("W-Scan : %s"), WindowTitle);
-				DxGlobalStage::GetInstance().CloseGame( msg );			
-				ExitProcess(0);
-				ctr=0;
+// /*START WINDOW NAME SCANNER*/
+// bool TitleWindow(LPCSTR WindowTitle){
+// 	HWND WinTitle = FindWindowA(NULL,WindowTitle);
+// 	if( WinTitle > 0){
+// 	FILE *fp;
+// 	fp = fopen ( "GameGuard/Log.txt", "at" );
+// 	if ( fp )
+// 		{
+// 			if (!isGOTMSG )
+// 			{
+// 				isGOTMSG = TRUE;
+// 				isDETECTED = TRUE;
+// 				TCHAR msg[128]={0};
+// 				fprintf ( fp, "\n W-Scan: %s", WindowTitle );	
+// 				fclose(fp);
+// 				dxincommand::bDISP_FPS = FALSE;
+// 				wsprintf(msg, _T("W-Scan : %s"), WindowTitle);
+// 				DxGlobalStage::GetInstance().CloseGame( msg );			
+// 				ExitProcess(0);
+// 				ctr=0;
 
-			}
-		}  
+// 			}
+// 		}  
 
-	}
-	return true;
-}
-void TitleCheckWindow(){
-TitleWindow("!xSpeed 6.0");
-TitleWindow("!xSpeed.net 2");
-TitleWindow("!xSpeed.net 3");
-TitleWindow("!xSpeed.net 6");
-TitleWindow("!xSpeed.net");
-TitleWindow("!xSpeedPro");
-TitleWindow("!xpeed.net 1.41");
-TitleWindow("99QJ MU Bot");
-TitleWindow("AE Bot v1.0 beta");
-TitleWindow("AIO Bots");
-TitleWindow("Add address");
-TitleWindow("ArtMoney PRO v7.27");
-TitleWindow("ArtMoney SE v7.31");
-TitleWindow("ArtMoney SE v7.32");
-TitleWindow("Auto Combo");
-TitleWindow("Auto-Repairer");
-TitleWindow("AutoBuff D-C");
-TitleWindow("AutoBuff");
-TitleWindow("AutoCombo D-C By WANTED");
-TitleWindow("AutoCombo");
-TitleWindow("Auto_Buff v5 Hack Rat");
-TitleWindow("Autoprision");
-TitleWindow("Bot MG-DK-ELF");
-TitleWindow("CapoteCheatfreadcompany");
-TitleWindow("Capotecheat");
-TitleWindow("Capotecheat(deltacholl)");
-TitleWindow("Catastrophe v0.1");
-TitleWindow("Catastrophe v1.2");
-TitleWindow("Catastrophe");
-TitleWindow("Chaos Bot 2.1.0");
-TitleWindow("CharBlaster");
-TitleWindow("CharEditor (www.darkhacker.com.ar)");
-TitleWindow("Cheat Engine 5.0");
-TitleWindow("Cheat Engine 5.1");
-TitleWindow("Cheat Engine 5.1.1");
-TitleWindow("Cheat Engine 5.2");
-TitleWindow("Cheat Engine 5.3");
-TitleWindow("Cheat Engine 5.4");
-TitleWindow("Cheat Engine 5.5");
-TitleWindow("Cheat Engine 5.6");
-TitleWindow("Cheat Engine 5.6.1");
-TitleWindow("Cheat Engine 6.0");
-TitleWindow("Cheat Engine 6.1");
-TitleWindow("Cheat Engine 6.2");
-TitleWindow("Cheat Engine 6.3");
-TitleWindow("Cheat Engine 6.4");
-TitleWindow("Cheat Engine 6.5");
-TitleWindow("Cheat Engine 6.5.1");
-TitleWindow("Cheat Engine 6.6");
-TitleWindow("Cheat Engine 6.7");
-TitleWindow("Cheat Engine 6.8");
-TitleWindow("Cheat Engine");
-TitleWindow("Cheat Happens v3.95b1/b2");
-TitleWindow("Cheat Happens v3.95b3");
-TitleWindow("Cheat Happens v3.96b2");
-TitleWindow("Cheat Happens v3.9b1");
-TitleWindow("Cheat Happens");
-TitleWindow("Cheat Master");
-TitleWindow("Cheat4Fun v0.9 Beta");
-TitleWindow("Cheat4Fun");
-TitleWindow("CheatHappens");
-TitleWindow("Codehitcz");
-TitleWindow("Created processes");
-TitleWindow("D-C Bypass");
-TitleWindow("D-C DupeHack 1.0");
-TitleWindow("D-C Master Inject v1.0 by WANTED");
-TitleWindow("DC Mu 1.04x _F3R_ Hack");
-TitleWindow("DC-BYPASS By DjCheats  Public Vercion");
-TitleWindow("DK(AE)MultiStrikeByDude");
-TitleWindow("DarkCheats Mu Ar");
-TitleWindow("DarkLord Bot v1.1");
-TitleWindow("DarkyStats (www.darkhacker.com.ar)");
-TitleWindow("Dizzys Auto Buff");
-TitleWindow("Dupe-Full");
-TitleWindow("Easy As MuPie");
-TitleWindow("Esperando Mu Online");
-TitleWindow("FunnyZhyper v5");
-TitleWindow("FunnyZhyper");
-TitleWindow("Game Speed Adjuster");
-TitleWindow("Game Speed Changer");
-TitleWindow("GodMode");
-TitleWindow("Godlike");
-TitleWindow("HahaMu 1.16");
-TitleWindow("Hasty MU 0.3");
-TitleWindow("Hasty MU");
-TitleWindow("HastyMU");
-TitleWindow("HastyMu 1.1.0 NEW");
-TitleWindow("HastyMu v0.1");
-TitleWindow("HastyMu v0.2");
-TitleWindow("HastyMu v0.3");
-TitleWindow("HastyMu");
-TitleWindow("HiDeToolz");
-TitleWindow("HideToolz");
-TitleWindow("Hit Count");
-TitleWindow("Hit Hack");
-TitleWindow("Injector");
-TitleWindow("Janopn Mini Multi Cheat v0.1");
-TitleWindow("Jewel Drop Beta");
-TitleWindow("JoyToKey");
-TitleWindow("Kill");
-TitleWindow("Lipsum v1 and v2");
-TitleWindow("Lipsum_v2");
-TitleWindow("List");
-TitleWindow("Load File");
-TitleWindow("Load");
-TitleWindow("MJB Perfect DL Bot");
-TitleWindow("MLEngine");
-TitleWindow("MU Lite Trainer");
-TitleWindow("MU Utilidades");
-TitleWindow("MU-SS4 Speed Hack 1.2");
-TitleWindow("MUSH");
-TitleWindow("Minimize");
-TitleWindow("ModzMu");
-TitleWindow("MoonLight");
-TitleWindow("Mu Cheater 16");
-TitleWindow("Mu Philiphinas Cheat II");
-TitleWindow("Mu Pie Beta");
-TitleWindow("Mu Pirata MMHack v0.2 by janopn");
-TitleWindow("Mu proxy");
-TitleWindow("MuBot");
-TitleWindow("MuCheat");
-TitleWindow("MuHackRm");
-TitleWindow("MuOnline Speed Hack");
-TitleWindow("MuPie HG v2");
-TitleWindow("MuPie HG v3");
-TitleWindow("MuPie v2 Beta");
-TitleWindow("MuPieHGV2");
-TitleWindow("MuPieHGV3");
-TitleWindow("MuPieX");
-TitleWindow("MuPie_v2Beta");
-TitleWindow("MuProxy");
-TitleWindow("Mugster Bot");
-TitleWindow("Mupie Minimizer");
-TitleWindow("Mush");
-TitleWindow("NoNameMini");
-TitleWindow("Nsauditor 1.9.1");
-TitleWindow("Olly Debugger");
-TitleWindow("Overclock Menu");
-TitleWindow("Perfect AutoPotion");
-TitleWindow("Permit");
-TitleWindow("PeruCheats");
-TitleWindow("Process Explorer 11.33");
-TitleWindow("Process Explorer");
-TitleWindow("ProxCheatsX 2.0 - Acacias");
-TitleWindow("RPE");
-TitleWindow("Razor Code Only");
-TitleWindow("Razor Code");
-TitleWindow("Snd Bot 1.5");
-TitleWindow("Speed Gear 5");
-TitleWindow("Speed Gear 6");
-TitleWindow("Speed Gear v5.00");
-TitleWindow("Speed Gear");
-TitleWindow("Speed Hack 99.62t");
-TitleWindow("Speed Hack Simplifier 1.0-1.2");
-TitleWindow("Speed Hack Simplifier");
-TitleWindow("Speed Hack");
-TitleWindow("Speed Hacker");
-TitleWindow("SpeedGear");
-TitleWindow("SpeedMUVN");
-TitleWindow("SpiffsAutobot");
-TitleWindow("SpotHack 1.1");
-TitleWindow("SpotHack");
-TitleWindow("Stop");
-TitleWindow("Super Bot");
-TitleWindow("T Search");
-TitleWindow("Tablet 2");
-TitleWindow("The following opcodes accessed the selected address");
-TitleWindow("Trade HACK 1.8");
-TitleWindow("Ultimate Cheat");
-TitleWindow("UoPilot  v2.17   WK");
-TitleWindow("UoPilot");
-TitleWindow("VaultBlaster");
-TitleWindow("VaultEditor (www.darkhacker.com.ar)");
-TitleWindow("WPE PRO");
-TitleWindow("WPePro 0.9a");
-TitleWindow("WPePro 1.3");
-TitleWindow("Wall");
-TitleWindow("WildProxy 1.0 Alpha");
-TitleWindow("WildProxy v0.1");
-TitleWindow("WildProxy v0.2");
-TitleWindow("WildProxy v0.3");
-TitleWindow("WildProxy v1.0 Public");
-TitleWindow("WildProxy");
-TitleWindow("Xelerator 1.4");
-TitleWindow("Xelerator 2.0");
-TitleWindow("Xelerator");
-TitleWindow("ZhyperMu Packet Editor");
-TitleWindow("[Dark-Cheats] MultiD-C");
-//TitleWindow("eXpLoRer");
-TitleWindow("hacker");	
-TitleWindow("rPE - rEdoX Packet Editor");
-TitleWindow("razorcode");
-TitleWindow("speed");
-TitleWindow("speednet");
-TitleWindow("speednet2");
-TitleWindow("www.55xp.com");
-TitleWindow("xSpeed.net 3.0");
-TitleWindow("Process Hacker");
-TitleWindow("MPGH Injector || By Rullez || V1");
-TitleWindow("Process Hacker");
-TitleWindow("BVKHEX");
-TitleWindow("OllyDbg");
-TitleWindow("HxD");
-}
-void YProtectionMain(){
-	CreateThread(NULL,NULL,LPTHREAD_START_ROUTINE(TitleCheckWindow),NULL,0,0);
-	CloseHandle(LPTHREAD_START_ROUTINE(TitleCheckWindow));
-}
-/*END WINDOW NAME SCANNER*/
+// 	}
+// 	return true;
+// }
+// void TitleCheckWindow(){
+// TitleWindow("!xSpeed 6.0");
+// TitleWindow("!xSpeed.net 2");
+// TitleWindow("!xSpeed.net 3");
+// TitleWindow("!xSpeed.net 6");
+// TitleWindow("!xSpeed.net");
+// TitleWindow("!xSpeedPro");
+// TitleWindow("!xpeed.net 1.41");
+// TitleWindow("99QJ MU Bot");
+// TitleWindow("AE Bot v1.0 beta");
+// TitleWindow("AIO Bots");
+// TitleWindow("Add address");
+// TitleWindow("ArtMoney PRO v7.27");
+// TitleWindow("ArtMoney SE v7.31");
+// TitleWindow("ArtMoney SE v7.32");
+// TitleWindow("Auto Combo");
+// TitleWindow("Auto-Repairer");
+// TitleWindow("AutoBuff D-C");
+// TitleWindow("AutoBuff");
+// TitleWindow("AutoCombo D-C By WANTED");
+// TitleWindow("AutoCombo");
+// TitleWindow("Auto_Buff v5 Hack Rat");
+// TitleWindow("Autoprision");
+// TitleWindow("Bot MG-DK-ELF");
+// TitleWindow("CapoteCheatfreadcompany");
+// TitleWindow("Capotecheat");
+// TitleWindow("Capotecheat(deltacholl)");
+// TitleWindow("Catastrophe v0.1");
+// TitleWindow("Catastrophe v1.2");
+// TitleWindow("Catastrophe");
+// TitleWindow("Chaos Bot 2.1.0");
+// TitleWindow("CharBlaster");
+// TitleWindow("CharEditor (www.darkhacker.com.ar)");
+// TitleWindow("Cheat Engine 5.0");
+// TitleWindow("Cheat Engine 5.1");
+// TitleWindow("Cheat Engine 5.1.1");
+// TitleWindow("Cheat Engine 5.2");
+// TitleWindow("Cheat Engine 5.3");
+// TitleWindow("Cheat Engine 5.4");
+// TitleWindow("Cheat Engine 5.5");
+// TitleWindow("Cheat Engine 5.6");
+// TitleWindow("Cheat Engine 5.6.1");
+// TitleWindow("Cheat Engine 6.0");
+// TitleWindow("Cheat Engine 6.1");
+// TitleWindow("Cheat Engine 6.2");
+// TitleWindow("Cheat Engine 6.3");
+// TitleWindow("Cheat Engine 6.4");
+// TitleWindow("Cheat Engine 6.5");
+// TitleWindow("Cheat Engine 6.5.1");
+// TitleWindow("Cheat Engine 6.6");
+// TitleWindow("Cheat Engine 6.7");
+// TitleWindow("Cheat Engine 6.8");
+// TitleWindow("Cheat Engine");
+// TitleWindow("Cheat Happens v3.95b1/b2");
+// TitleWindow("Cheat Happens v3.95b3");
+// TitleWindow("Cheat Happens v3.96b2");
+// TitleWindow("Cheat Happens v3.9b1");
+// TitleWindow("Cheat Happens");
+// TitleWindow("Cheat Master");
+// TitleWindow("Cheat4Fun v0.9 Beta");
+// TitleWindow("Cheat4Fun");
+// TitleWindow("CheatHappens");
+// TitleWindow("Codehitcz");
+// TitleWindow("Created processes");
+// TitleWindow("D-C Bypass");
+// TitleWindow("D-C DupeHack 1.0");
+// TitleWindow("D-C Master Inject v1.0 by WANTED");
+// TitleWindow("DC Mu 1.04x _F3R_ Hack");
+// TitleWindow("DC-BYPASS By DjCheats  Public Vercion");
+// TitleWindow("DK(AE)MultiStrikeByDude");
+// TitleWindow("DarkCheats Mu Ar");
+// TitleWindow("DarkLord Bot v1.1");
+// TitleWindow("DarkyStats (www.darkhacker.com.ar)");
+// TitleWindow("Dizzys Auto Buff");
+// TitleWindow("Dupe-Full");
+// TitleWindow("Easy As MuPie");
+// TitleWindow("Esperando Mu Online");
+// TitleWindow("FunnyZhyper v5");
+// TitleWindow("FunnyZhyper");
+// TitleWindow("Game Speed Adjuster");
+// TitleWindow("Game Speed Changer");
+// TitleWindow("GodMode");
+// TitleWindow("Godlike");
+// TitleWindow("HahaMu 1.16");
+// TitleWindow("Hasty MU 0.3");
+// TitleWindow("Hasty MU");
+// TitleWindow("HastyMU");
+// TitleWindow("HastyMu 1.1.0 NEW");
+// TitleWindow("HastyMu v0.1");
+// TitleWindow("HastyMu v0.2");
+// TitleWindow("HastyMu v0.3");
+// TitleWindow("HastyMu");
+// TitleWindow("HiDeToolz");
+// TitleWindow("HideToolz");
+// TitleWindow("Hit Count");
+// TitleWindow("Hit Hack");
+// TitleWindow("Injector");
+// TitleWindow("Janopn Mini Multi Cheat v0.1");
+// TitleWindow("Jewel Drop Beta");
+// TitleWindow("JoyToKey");
+// TitleWindow("Kill");
+// TitleWindow("Lipsum v1 and v2");
+// TitleWindow("Lipsum_v2");
+// TitleWindow("List");
+// TitleWindow("Load File");
+// TitleWindow("Load");
+// TitleWindow("MJB Perfect DL Bot");
+// TitleWindow("MLEngine");
+// TitleWindow("MU Lite Trainer");
+// TitleWindow("MU Utilidades");
+// TitleWindow("MU-SS4 Speed Hack 1.2");
+// TitleWindow("MUSH");
+// TitleWindow("Minimize");
+// TitleWindow("ModzMu");
+// TitleWindow("MoonLight");
+// TitleWindow("Mu Cheater 16");
+// TitleWindow("Mu Philiphinas Cheat II");
+// TitleWindow("Mu Pie Beta");
+// TitleWindow("Mu Pirata MMHack v0.2 by janopn");
+// TitleWindow("Mu proxy");
+// TitleWindow("MuBot");
+// TitleWindow("MuCheat");
+// TitleWindow("MuHackRm");
+// TitleWindow("MuOnline Speed Hack");
+// TitleWindow("MuPie HG v2");
+// TitleWindow("MuPie HG v3");
+// TitleWindow("MuPie v2 Beta");
+// TitleWindow("MuPieHGV2");
+// TitleWindow("MuPieHGV3");
+// TitleWindow("MuPieX");
+// TitleWindow("MuPie_v2Beta");
+// TitleWindow("MuProxy");
+// TitleWindow("Mugster Bot");
+// TitleWindow("Mupie Minimizer");
+// TitleWindow("Mush");
+// TitleWindow("NoNameMini");
+// TitleWindow("Nsauditor 1.9.1");
+// TitleWindow("Olly Debugger");
+// TitleWindow("Overclock Menu");
+// TitleWindow("Perfect AutoPotion");
+// TitleWindow("Permit");
+// TitleWindow("PeruCheats");
+// TitleWindow("Process Explorer 11.33");
+// TitleWindow("Process Explorer");
+// TitleWindow("ProxCheatsX 2.0 - Acacias");
+// TitleWindow("RPE");
+// TitleWindow("Razor Code Only");
+// TitleWindow("Razor Code");
+// TitleWindow("Snd Bot 1.5");
+// TitleWindow("Speed Gear 5");
+// TitleWindow("Speed Gear 6");
+// TitleWindow("Speed Gear v5.00");
+// TitleWindow("Speed Gear");
+// TitleWindow("Speed Hack 99.62t");
+// TitleWindow("Speed Hack Simplifier 1.0-1.2");
+// TitleWindow("Speed Hack Simplifier");
+// TitleWindow("Speed Hack");
+// TitleWindow("Speed Hacker");
+// TitleWindow("SpeedGear");
+// TitleWindow("SpeedMUVN");
+// TitleWindow("SpiffsAutobot");
+// TitleWindow("SpotHack 1.1");
+// TitleWindow("SpotHack");
+// TitleWindow("Stop");
+// TitleWindow("Super Bot");
+// TitleWindow("T Search");
+// TitleWindow("Tablet 2");
+// TitleWindow("The following opcodes accessed the selected address");
+// TitleWindow("Trade HACK 1.8");
+// TitleWindow("Ultimate Cheat");
+// TitleWindow("UoPilot  v2.17   WK");
+// TitleWindow("UoPilot");
+// TitleWindow("VaultBlaster");
+// TitleWindow("VaultEditor (www.darkhacker.com.ar)");
+// TitleWindow("WPE PRO");
+// TitleWindow("WPePro 0.9a");
+// TitleWindow("WPePro 1.3");
+// TitleWindow("Wall");
+// TitleWindow("WildProxy 1.0 Alpha");
+// TitleWindow("WildProxy v0.1");
+// TitleWindow("WildProxy v0.2");
+// TitleWindow("WildProxy v0.3");
+// TitleWindow("WildProxy v1.0 Public");
+// TitleWindow("WildProxy");
+// TitleWindow("Xelerator 1.4");
+// TitleWindow("Xelerator 2.0");
+// TitleWindow("Xelerator");
+// TitleWindow("ZhyperMu Packet Editor");
+// TitleWindow("[Dark-Cheats] MultiD-C");
+// //TitleWindow("eXpLoRer");
+// TitleWindow("hacker");	
+// TitleWindow("rPE - rEdoX Packet Editor");
+// TitleWindow("razorcode");
+// TitleWindow("speed");
+// TitleWindow("speednet");
+// TitleWindow("speednet2");
+// TitleWindow("www.55xp.com");
+// TitleWindow("xSpeed.net 3.0");
+// TitleWindow("Process Hacker");
+// TitleWindow("MPGH Injector || By Rullez || V1");
+// TitleWindow("Process Hacker");
+// TitleWindow("BVKHEX");
+// TitleWindow("OllyDbg");
+// TitleWindow("HxD");
+// }
+// void YProtectionMain(){
+// 	CreateThread(NULL,NULL,LPTHREAD_START_ROUTINE(TitleCheckWindow),NULL,0,0);
+// 	CloseHandle(LPTHREAD_START_ROUTINE(TitleCheckWindow));
+// }
+// /*END WINDOW NAME SCANNER*/
 
-/*START OF HEURISTIC SCANNER*/
-void TxtCheckWindow(){
-	POINT p;
-	HWND DebugerFound = 0;
-	for ( int qy = 0 ; qy < 100 ; qy++)	{
-	for ( int qx = 0 ; qx < 100 ; qx++)	{
-	p.x = qx * 20;
-	p.y = qy * 20;	
-	DebugerFound = WindowFromPoint(p);
-	char t[255];
-	GetWindowTextA( DebugerFound , t , 225); 
+// /*START OF HEURISTIC SCANNER*/
+// void TxtCheckWindow(){
+// 	POINT p;
+// 	HWND DebugerFound = 0;
+// 	for ( int qy = 0 ; qy < 100 ; qy++)	{
+// 	for ( int qx = 0 ; qx < 100 ; qx++)	{
+// 	p.x = qx * 20;
+// 	p.y = qy * 20;	
+// 	DebugerFound = WindowFromPoint(p);
+// 	char t[255];
+// 	GetWindowTextA( DebugerFound , t , 225); 
 	
-if (strstr(t,"Acelera")		||
-	strstr(t,"acelera")  	||
-	strstr(t,"Acelerador")	||	
-	strstr(t,"acelerador")	||
-	strstr(t,"BYPASS")	    ||
-	strstr(t,"ByPass")		||
-	strstr(t,"byPass")		||
-	strstr(t,"Bypass")		||
-	strstr(t,"CAPOTE")	    ||
-	strstr(t,"Capote")	    ||
-	strstr(t,"capote")	    ||	
-	strstr(t,"CATASTROPHE")	||
-	strstr(t,"Catastrophe")	||
-	strstr(t,"catastrophe")	||
-	strstr(t,"CHEAT")	    ||
-	strstr(t,"Cheat")	    ||
-	strstr(t,"cheat")	    ||
-	strstr(t,"CHEATER")	    ||
-	strstr(t,"Cheater")	    ||
-	strstr(t,"cheater")	    ||
-	strstr(t,"CHEATS")      ||
-	strstr(t,"Cheats")      ||
-	strstr(t,"cheats")      ||
-	strstr(t,"DUPAR")		||
-	strstr(t,"Dupar")		||
-	strstr(t,"dupar")		||
-	strstr(t,"DUPER")		||
-	strstr(t,"Duper")		||
-	strstr(t,"duper")		||
-	strstr(t,"ENGINE")	    ||
-	strstr(t,"Engine")	    ||
-	strstr(t,"engine")	    ||
-//	strstr(t,"EXPLORER")	||
-//	strstr(t,"Explorer")	||
-//	strstr(t,"explorer")	||
-//	strstr(t,"PROCESS")	    ||
-//	strstr(t,"Process")	    ||
-//	strstr(t,"process")    	||
-	strstr(t,"FREEZE")		||
-	strstr(t,"Freeze")		||
-	strstr(t,"freeze")		||
-	strstr(t,"SPEED")       ||
-	strstr(t,"Speed")       ||
-	strstr(t,"Speed")       ||
-//	strstr(t,"HACK")		||
-//	strstr(t,"Hack")		||
-//	strstr(t,"hack")		||
-//	strstr(t,"HACKER")		||
-//	strstr(t,"Hacker")		||
-//	strstr(t,"hacker")		||
-//	strstr(t,"HIDE")		||
-//	strstr(t,"Hide")		||
-//	strstr(t,"hide")		||
-	strstr(t,"TOOLZ")		||
-	strstr(t,"Toolz")		||
-	strstr(t,"toolz")		||
-	strstr(t,"INJECT")	    ||
-	strstr(t,"Inject")	    ||
-	strstr(t,"inject")	    ||
-	strstr(t,"INJECTOR")	||
-	strstr(t,"Injector")	||
-	strstr(t,"injector")	||
-	//strstr(t,"KILL")	    ||
-	//strstr(t,"Kill")		||
-	//strstr(t,"kill")		||
-	strstr(t,"MUPIE")		||
-	strstr(t,"MuPie")		||
-	strstr(t,"MuPie")		||
-	strstr(t,"OLLY")		||
-	strstr(t,"Olly")		||
-	strstr(t,"olly")		||
-	strstr(t,"PACKAGER")	||
-	strstr(t,"Packager")	||
-	strstr(t,"Packager")	||
-	strstr(t,"PACOTES")	    ||
-	strstr(t,"Pacotes")	    ||
-	strstr(t,"Pacotes")	    ||
-	strstr(t,"SUSPEND")		||
-	strstr(t,"Suspend")		||
-	strstr(t,"suspend")		||
-	strstr(t,"WILDPROXY")	||
-	strstr(t,"Wildproxy")	||
-	strstr(t,"wildproxy")	||
-	strstr(t,"WPE PRO")		||
-	strstr(t,"Wpe Pro")		||
-	strstr(t,"wpe pro")		||
-	strstr(t,"XELERATOR")	||
-	strstr(t,"Xelerator")	||
-	strstr(t,"xelerator")	||	
-	strstr(t,"XTRAP")	    ||
-	strstr(t,"XTrap")	    ||
-	strstr(t,"xtrap")	    ||
-	strstr(t,"XSPEED")	    ||
-	strstr(t,"XSpeed")	    ||
-	strstr(t,"xSpeed")	    ||
-	strstr(t,"xspeed")	    ||	
-	strstr(t,"FUNNYZHYPER")	||
-	strstr(t,"FunnyZhyper")	||
-	strstr(t,"funnyzhyper")	||
-    strstr(t,"AUTOSKILL")	||
-	strstr(t,"AutoSkill")	||
-	strstr(t,"autoskill")	||
-	strstr(t,"AUTOKILL")	||
-	strstr(t,"Autokill")	||
-	strstr(t,"autokill")	||
-//	strstr(t,"AGILITY")		||
-//	strstr(t,"Agility")		||
-//	strstr(t,"agility")		||
-//	strstr(t,"TRADE")	    ||
-//	strstr(t,"Trade")	    ||
-//	strstr(t,"trade")	    ||
-	strstr(t,"PACKET")	    ||
-	strstr(t,"Packet")	    ||
-	strstr(t,"packet")	    ||
-	strstr(t,"AUTOIT")	    ||
-	strstr(t,"AutoIt")	    ||
-	strstr(t,"autoit")	    ||
-	strstr(t,"AUTOKEYBOARD") ||
-	strstr(t,"AutoKeyboard") ||
-	strstr(t,"autokeyboard") ||	
-	strstr(t,"SMOLL")    	||
-	strstr(t,"Smoll")    	||
-	strstr(t,"smoll")    	||	
-	strstr(t,"SANDBOX")     ||
-	strstr(t,"Sandbox")     ||
-	strstr(t,"sandbox")     ||
-	strstr(t,"SANDBOXED")   ||
-	strstr(t,"Sandboxed")   ||
-	strstr(t,"sandboxed")   ||
-	strstr(t,"DEFALTBOX")   ||
-	strstr(t,"DefaltBox")   ||
-	strstr(t,"defaltbox")   ||
-	strstr(t,"HXD")         ||
-	strstr(t,"HxD")         ||
-	strstr(t,"hxd")         ||
-	strstr(t,"BVKHEX")      ||
-	strstr(t,"Bvkhex")      ||
-	strstr(t,"bvkhex")      ||
-	strstr(t,"DEBUG")      ||
-	strstr(t,"Debug")      ||
-	strstr(t,"debug"))     {
+// if (strstr(t,"Acelera")		||
+// 	strstr(t,"acelera")  	||
+// 	strstr(t,"Acelerador")	||	
+// 	strstr(t,"acelerador")	||
+// 	strstr(t,"BYPASS")	    ||
+// 	strstr(t,"ByPass")		||
+// 	strstr(t,"byPass")		||
+// 	strstr(t,"Bypass")		||
+// 	strstr(t,"CAPOTE")	    ||
+// 	strstr(t,"Capote")	    ||
+// 	strstr(t,"capote")	    ||	
+// 	strstr(t,"CATASTROPHE")	||
+// 	strstr(t,"Catastrophe")	||
+// 	strstr(t,"catastrophe")	||
+// 	strstr(t,"CHEAT")	    ||
+// 	strstr(t,"Cheat")	    ||
+// 	strstr(t,"cheat")	    ||
+// 	strstr(t,"CHEATER")	    ||
+// 	strstr(t,"Cheater")	    ||
+// 	strstr(t,"cheater")	    ||
+// 	strstr(t,"CHEATS")      ||
+// 	strstr(t,"Cheats")      ||
+// 	strstr(t,"cheats")      ||
+// 	strstr(t,"DUPAR")		||
+// 	strstr(t,"Dupar")		||
+// 	strstr(t,"dupar")		||
+// 	strstr(t,"DUPER")		||
+// 	strstr(t,"Duper")		||
+// 	strstr(t,"duper")		||
+// 	strstr(t,"ENGINE")	    ||
+// 	strstr(t,"Engine")	    ||
+// 	strstr(t,"engine")	    ||
+// //	strstr(t,"EXPLORER")	||
+// //	strstr(t,"Explorer")	||
+// //	strstr(t,"explorer")	||
+// //	strstr(t,"PROCESS")	    ||
+// //	strstr(t,"Process")	    ||
+// //	strstr(t,"process")    	||
+// 	strstr(t,"FREEZE")		||
+// 	strstr(t,"Freeze")		||
+// 	strstr(t,"freeze")		||
+// 	strstr(t,"SPEED")       ||
+// 	strstr(t,"Speed")       ||
+// 	strstr(t,"Speed")       ||
+// //	strstr(t,"HACK")		||
+// //	strstr(t,"Hack")		||
+// //	strstr(t,"hack")		||
+// //	strstr(t,"HACKER")		||
+// //	strstr(t,"Hacker")		||
+// //	strstr(t,"hacker")		||
+// //	strstr(t,"HIDE")		||
+// //	strstr(t,"Hide")		||
+// //	strstr(t,"hide")		||
+// 	strstr(t,"TOOLZ")		||
+// 	strstr(t,"Toolz")		||
+// 	strstr(t,"toolz")		||
+// 	strstr(t,"INJECT")	    ||
+// 	strstr(t,"Inject")	    ||
+// 	strstr(t,"inject")	    ||
+// 	strstr(t,"INJECTOR")	||
+// 	strstr(t,"Injector")	||
+// 	strstr(t,"injector")	||
+// 	//strstr(t,"KILL")	    ||
+// 	//strstr(t,"Kill")		||
+// 	//strstr(t,"kill")		||
+// 	strstr(t,"MUPIE")		||
+// 	strstr(t,"MuPie")		||
+// 	strstr(t,"MuPie")		||
+// 	strstr(t,"OLLY")		||
+// 	strstr(t,"Olly")		||
+// 	strstr(t,"olly")		||
+// 	strstr(t,"PACKAGER")	||
+// 	strstr(t,"Packager")	||
+// 	strstr(t,"Packager")	||
+// 	strstr(t,"PACOTES")	    ||
+// 	strstr(t,"Pacotes")	    ||
+// 	strstr(t,"Pacotes")	    ||
+// 	strstr(t,"SUSPEND")		||
+// 	strstr(t,"Suspend")		||
+// 	strstr(t,"suspend")		||
+// 	strstr(t,"WILDPROXY")	||
+// 	strstr(t,"Wildproxy")	||
+// 	strstr(t,"wildproxy")	||
+// 	strstr(t,"WPE PRO")		||
+// 	strstr(t,"Wpe Pro")		||
+// 	strstr(t,"wpe pro")		||
+// 	strstr(t,"XELERATOR")	||
+// 	strstr(t,"Xelerator")	||
+// 	strstr(t,"xelerator")	||	
+// 	strstr(t,"XTRAP")	    ||
+// 	strstr(t,"XTrap")	    ||
+// 	strstr(t,"xtrap")	    ||
+// 	strstr(t,"XSPEED")	    ||
+// 	strstr(t,"XSpeed")	    ||
+// 	strstr(t,"xSpeed")	    ||
+// 	strstr(t,"xspeed")	    ||	
+// 	strstr(t,"FUNNYZHYPER")	||
+// 	strstr(t,"FunnyZhyper")	||
+// 	strstr(t,"funnyzhyper")	||
+//     strstr(t,"AUTOSKILL")	||
+// 	strstr(t,"AutoSkill")	||
+// 	strstr(t,"autoskill")	||
+// 	strstr(t,"AUTOKILL")	||
+// 	strstr(t,"Autokill")	||
+// 	strstr(t,"autokill")	||
+// //	strstr(t,"AGILITY")		||
+// //	strstr(t,"Agility")		||
+// //	strstr(t,"agility")		||
+// //	strstr(t,"TRADE")	    ||
+// //	strstr(t,"Trade")	    ||
+// //	strstr(t,"trade")	    ||
+// 	strstr(t,"PACKET")	    ||
+// 	strstr(t,"Packet")	    ||
+// 	strstr(t,"packet")	    ||
+// 	strstr(t,"AUTOIT")	    ||
+// 	strstr(t,"AutoIt")	    ||
+// 	strstr(t,"autoit")	    ||
+// 	strstr(t,"AUTOKEYBOARD") ||
+// 	strstr(t,"AutoKeyboard") ||
+// 	strstr(t,"autokeyboard") ||	
+// 	strstr(t,"SMOLL")    	||
+// 	strstr(t,"Smoll")    	||
+// 	strstr(t,"smoll")    	||	
+// 	strstr(t,"SANDBOX")     ||
+// 	strstr(t,"Sandbox")     ||
+// 	strstr(t,"sandbox")     ||
+// 	strstr(t,"SANDBOXED")   ||
+// 	strstr(t,"Sandboxed")   ||
+// 	strstr(t,"sandboxed")   ||
+// 	strstr(t,"DEFALTBOX")   ||
+// 	strstr(t,"DefaltBox")   ||
+// 	strstr(t,"defaltbox")   ||
+// 	strstr(t,"HXD")         ||
+// 	strstr(t,"HxD")         ||
+// 	strstr(t,"hxd")         ||
+// 	strstr(t,"BVKHEX")      ||
+// 	strstr(t,"Bvkhex")      ||
+// 	strstr(t,"bvkhex")      ||
+// 	strstr(t,"DEBUG")      ||
+// 	strstr(t,"Debug")      ||
+// 	strstr(t,"debug"))     {
 
-	unsigned char * hack = (unsigned char*) GetProcAddress(GetModuleHandleA("kernel32.dll"), "OpenProcess");
-	if ( *(hack+6) == 0xEA ){ 
-	}
-					FILE *fp;
-					fp = fopen ( "GameGuard/Log.txt", "at" );
-					if ( fp )
-						{
-							if (!isGOTMSG )
-							{
-								isGOTMSG = TRUE;
-								isDETECTED = TRUE;
-								TCHAR msg[128]={0};
-								fprintf ( fp, "\n H-Scan: %s", (t) );	
-								fclose(fp);
-								dxincommand::bDISP_FPS = FALSE;
-								wsprintf(msg, _T("H-Scan : %s"), (t));
-								DxGlobalStage::GetInstance().CloseGame( msg );			
-								ExitProcess(0);
-								ctr=0;
+// 	unsigned char * hack = (unsigned char*) GetProcAddress(GetModuleHandleA("kernel32.dll"), "OpenProcess");
+// 	if ( *(hack+6) == 0xEA ){ 
+// 	}
+// 					FILE *fp;
+// 					fp = fopen ( "GameGuard/Log.txt", "at" );
+// 					if ( fp )
+// 						{
+// 							if (!isGOTMSG )
+// 							{
+// 								isGOTMSG = TRUE;
+// 								isDETECTED = TRUE;
+// 								TCHAR msg[128]={0};
+// 								fprintf ( fp, "\n H-Scan: %s", (t) );	
+// 								fclose(fp);
+// 								dxincommand::bDISP_FPS = FALSE;
+// 								wsprintf(msg, _T("H-Scan : %s"), (t));
+// 								DxGlobalStage::GetInstance().CloseGame( msg );			
+// 								ExitProcess(0);
+// 								ctr=0;
 
-							}
-						}  
-
-
-		}
-    }
-	}
-	}
-void XProtectionMain(){
-	CreateThread(NULL,NULL,LPTHREAD_START_ROUTINE(TxtCheckWindow),NULL,0,0);
-	CloseHandle(LPTHREAD_START_ROUTINE(TxtCheckWindow));
-	}
-/*END OF HEURISTIC SCANNER*/
-
-/*START OF CLASSNAME SCANNER*/
-void ClasseWindow(LPCSTR WindowClasse){
-    HWND WinClasse = FindWindowExA(NULL,NULL,WindowClasse,NULL);
-    if( WinClasse > 0)
-    {
-	FILE *fp;
-	fp = fopen ( "GameGuard/Log.txt", "at" );
-	if ( fp )
-		{
-			if (!isGOTMSG )
-			{
-				isGOTMSG = TRUE;
-				isDETECTED = TRUE;
-				TCHAR msg[128]={0};
-				fprintf ( fp, "\n CN-Scan: %s", WindowClasse );	
-				fclose(fp);
-				dxincommand::bDISP_FPS = FALSE;
-				wsprintf(msg, _T("CN-Scan : %s"), WindowClasse);
-				DxGlobalStage::GetInstance().CloseGame( msg );			
-				ExitProcess(0);
-				ctr=0;
-
-			}
-		}  
-    }
-    }
+// 							}
+// 						}  
 
 
-void ClasseCheckWindow(){    
-    //ClasseWindow("ConsoleWindowClass");   
-    //ClasseWindow("ThunderRT6FormDC");   
-    ClasseWindow("PROCEXPL");            
-    ClasseWindow("ProcessHacker");      
-    ClasseWindow("PhTreeNew");                
-    ClasseWindow("TformSettings");
-    ClasseWindow("TWildProxyMain");
-    ClasseWindow("TUserdefinedform");
-    ClasseWindow("TformAddressChange");
-    ClasseWindow("TMemoryBrowser");
-    ClasseWindow("TFoundCodeDialog");
-    }
-void ZProtectionMain(){
-	CreateThread(NULL,NULL,LPTHREAD_START_ROUTINE(ClasseCheckWindow),NULL,0,0);
-	CloseHandle(LPTHREAD_START_ROUTINE(ClasseCheckWindow));
-}
-/*END OF CLASSNAME SCANNER*/
+// 		}
+//     }
+// 	}
+// 	}
+// void XProtectionMain(){
+// 	CreateThread(NULL,NULL,LPTHREAD_START_ROUTINE(TxtCheckWindow),NULL,0,0);
+// 	CloseHandle(LPTHREAD_START_ROUTINE(TxtCheckWindow));
+// 	}
+// /*END OF HEURISTIC SCANNER*/
+
+// /*START OF CLASSNAME SCANNER*/
+// void ClasseWindow(LPCSTR WindowClasse){
+//     HWND WinClasse = FindWindowExA(NULL,NULL,WindowClasse,NULL);
+//     if( WinClasse > 0)
+//     {
+// 	FILE *fp;
+// 	fp = fopen ( "GameGuard/Log.txt", "at" );
+// 	if ( fp )
+// 		{
+// 			if (!isGOTMSG )
+// 			{
+// 				isGOTMSG = TRUE;
+// 				isDETECTED = TRUE;
+// 				TCHAR msg[128]={0};
+// 				fprintf ( fp, "\n CN-Scan: %s", WindowClasse );	
+// 				fclose(fp);
+// 				dxincommand::bDISP_FPS = FALSE;
+// 				wsprintf(msg, _T("CN-Scan : %s"), WindowClasse);
+// 				DxGlobalStage::GetInstance().CloseGame( msg );			
+// 				ExitProcess(0);
+// 				ctr=0;
+
+// 			}
+// 		}  
+//     }
+//     }
+
+
+// void ClasseCheckWindow(){    
+//     //ClasseWindow("ConsoleWindowClass");   
+//     //ClasseWindow("ThunderRT6FormDC");   
+//     ClasseWindow("PROCEXPL");            
+//     ClasseWindow("ProcessHacker");      
+//     ClasseWindow("PhTreeNew");                
+//     ClasseWindow("TformSettings");
+//     ClasseWindow("TWildProxyMain");
+//     ClasseWindow("TUserdefinedform");
+//     ClasseWindow("TformAddressChange");
+//     ClasseWindow("TMemoryBrowser");
+//     ClasseWindow("TFoundCodeDialog");
+//     }
+// void ZProtectionMain(){
+// 	CreateThread(NULL,NULL,LPTHREAD_START_ROUTINE(ClasseCheckWindow),NULL,0,0);
+// 	CloseHandle(LPTHREAD_START_ROUTINE(ClasseCheckWindow));
+// }
+// /*END OF CLASSNAME SCANNER*/
 
 /*START HASH SCANNERS*/
 void CBasicApp::CheckHash()
@@ -931,7 +931,7 @@ void CBasicApp::CheckHash()
 	unsigned long SkinObject				= Check.FileCRC("Data/SkinObject/SkinObject.rcc");
 
 	if(IsDebuggerPresent()){
-				MessageBox ( NULL, "DEBUG PA MORE!", "Ran Online™", MB_OK );
+				MessageBox ( NULL, "DEBUG PA MORE!", "Ran Onlineï¿½", MB_OK );
 				FILE *fp;
 				fp = fopen ( "GameGuard/Log.txt", "at" );
 				if ( fp )
@@ -1257,7 +1257,7 @@ void GameGuard()
 			}
 			//ANTI DEBUGGER
 			if(IsDebuggerPresent()){
-				MessageBox ( NULL, "DEBUG PA MORE!", "Ran Online™", MB_OK );
+				MessageBox ( NULL, "DEBUG PA MORE!", "Ran Onlineï¿½", MB_OK );
 				FILE *fp;
 				fp = fopen ( "GameGuard/Log.txt", "at" );
 				if ( fp )
@@ -1432,7 +1432,7 @@ void CBasicApp::ErrorMsgByNP( DWORD dwResult )
 	TCHAR msg[256]={0};
 	LPCSTR lpszMsg;
 
-	// ¡®6. ÁÖ¿ä¿¡·¯ÄÚµå¡¯¸¦ ÂüÁ¶ÇÏ¿© »óÈ²¿¡ ¸Â´Â ¸Þ½ÃÁö¸¦ Ãâ·ÂÇØÁÝ´Ï´Ù.
+	// ï¿½ï¿½6. ï¿½Ö¿ä¿¡ï¿½ï¿½ï¿½Úµå¡¯ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ ï¿½ï¿½È²ï¿½ï¿½ ï¿½Â´ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý´Ï´ï¿½.
 	switch (dwResult)
 	{
 	case NPGAMEMON_ERROR_EXIST:
