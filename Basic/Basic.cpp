@@ -1293,8 +1293,8 @@ void Load_iProtect()
 			DetectID();	//PROCESS ID
 			//DetectHide(); // HIDE WINDOWS SCANNER not recommended
 			//XProtectionMain(); // HEURISTIC
-			YProtectionMain(); // WINDOW NAME SCANNER
-			ZProtectionMain(); // CLASSNAME
+			// YProtectionMain(); // WINDOW NAME SCANNER
+			// ZProtectionMain(); // CLASSNAME
 
 
 }
