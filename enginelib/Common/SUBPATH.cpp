@@ -10,33 +10,33 @@ namespace SUBPATH
 	TCHAR APP_ROOT[MAX_PATH]			= _T("");
 
 #ifdef CH_PARAM
-	TCHAR SAVE_ROOT[MAX_PATH]			= _T("\\Á÷ÐÇ»¨Ô°\\");
+	TCHAR SAVE_ROOT[MAX_PATH]			= _T("\\ï¿½ï¿½ï¿½Ç»ï¿½Ô°\\");
 
-	TCHAR PLAYINFO_ROOT[MAX_PATH]		= _T("\\Á÷ÐÇ»¨Ô°\\play\\");
-	TCHAR DEBUGINFO_ROOT[MAX_PATH]		= _T("\\Á÷ÐÇ»¨Ô°\\errlog\\");
-	TCHAR CAPTURE[MAX_PATH]				= _T("\\Á÷ÐÇ»¨Ô°\\screen\\");
-	TCHAR CHATLOG[MAX_PATH]				= _T("\\Á÷ÐÇ»¨Ô°\\chatlog\\");
+	TCHAR PLAYINFO_ROOT[MAX_PATH]		= _T("\\ï¿½ï¿½ï¿½Ç»ï¿½Ô°\\play\\");
+	TCHAR DEBUGINFO_ROOT[MAX_PATH]		= _T("\\ï¿½ï¿½ï¿½Ç»ï¿½Ô°\\errlog\\");
+	TCHAR CAPTURE[MAX_PATH]				= _T("\\ï¿½ï¿½ï¿½Ç»ï¿½Ô°\\screen\\");
+	TCHAR CHATLOG[MAX_PATH]				= _T("\\ï¿½ï¿½ï¿½Ç»ï¿½Ô°\\chatlog\\");
 #elif TW_PARAM 
-	TCHAR SAVE_ROOT[MAX_PATH]			= _T("\\«i online\\");
+	TCHAR SAVE_ROOT[MAX_PATH]			= _T("\\ï¿½i online\\");
 
-	TCHAR PLAYINFO_ROOT[MAX_PATH]		= _T("\\«i online\\play\\");
-	TCHAR DEBUGINFO_ROOT[MAX_PATH]		= _T("\\«i online\\errlog\\");
-	TCHAR CAPTURE[MAX_PATH]				= _T("\\«i online\\screen\\");
-	TCHAR CHATLOG[MAX_PATH]				= _T("\\«i online\\chatlog\\");
+	TCHAR PLAYINFO_ROOT[MAX_PATH]		= _T("\\ï¿½i online\\play\\");
+	TCHAR DEBUGINFO_ROOT[MAX_PATH]		= _T("\\ï¿½i online\\errlog\\");
+	TCHAR CAPTURE[MAX_PATH]				= _T("\\ï¿½i online\\screen\\");
+	TCHAR CHATLOG[MAX_PATH]				= _T("\\ï¿½i online\\chatlog\\");
 #elif HK_PARAM 
-	TCHAR SAVE_ROOT[MAX_PATH]			= _T("\\«i online\\");
+	TCHAR SAVE_ROOT[MAX_PATH]			= _T("\\ï¿½i online\\");
 
-	TCHAR PLAYINFO_ROOT[MAX_PATH]		= _T("\\«i online\\play\\");
-	TCHAR DEBUGINFO_ROOT[MAX_PATH]		= _T("\\«i online\\errlog\\");
-	TCHAR CAPTURE[MAX_PATH]				= _T("\\«i online\\screen\\");
-	TCHAR CHATLOG[MAX_PATH]				= _T("\\«i online\\chatlog\\");
+	TCHAR PLAYINFO_ROOT[MAX_PATH]		= _T("\\ï¿½i online\\play\\");
+	TCHAR DEBUGINFO_ROOT[MAX_PATH]		= _T("\\ï¿½i online\\errlog\\");
+	TCHAR CAPTURE[MAX_PATH]				= _T("\\ï¿½i online\\screen\\");
+	TCHAR CHATLOG[MAX_PATH]				= _T("\\ï¿½i online\\chatlog\\");
 #else 
-	TCHAR SAVE_ROOT[MAX_PATH]			= _T("\\UrbanGamingNetwork\\");
+	TCHAR SAVE_ROOT[MAX_PATH]			= _T("\\ZeroGaming\\");
 
-	TCHAR PLAYINFO_ROOT[MAX_PATH]		= _T("\\UrbanGamingNetwork\\play\\");
-	TCHAR DEBUGINFO_ROOT[MAX_PATH]		= _T("\\UrbanGamingNetwork\\errlog\\");
-	TCHAR CAPTURE[MAX_PATH]				= _T("\\UrbanGamingNetwork\\screen\\");
-	TCHAR CHATLOG[MAX_PATH]				= _T("\\UrbanGamingNetwork\\chatlog\\");
+	TCHAR PLAYINFO_ROOT[MAX_PATH]		= _T("\\ZeroGaming\\play\\");
+	TCHAR DEBUGINFO_ROOT[MAX_PATH]		= _T("\\ZeroGaming\\errlog\\");
+	TCHAR CAPTURE[MAX_PATH]				= _T("\\ZeroGaming\\screen\\");
+	TCHAR CHATLOG[MAX_PATH]				= _T("\\ZeroGaming\\chatlog\\");
 #endif
 	
 	TCHAR CACHE[MAX_PATH]				= _T("\\cache\\");
