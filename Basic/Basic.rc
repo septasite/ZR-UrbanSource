@@ -43,11 +43,11 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "CompanyName", "Ocram Networks"
-            VALUE "FileDescription", "UGN RAN Online"
+            VALUE "CompanyName", "ZeroGaming"
+            VALUE "FileDescription", "ZERO RAN Online"
             VALUE "FileVersion", "1, 0, 0, 1"
-            VALUE "InternalName", "Ocram RAN"
-            VALUE "LegalCopyright", "Copyright (C) Urban Gaming Networks - Min Com."
+            VALUE "InternalName", "ZERO RAN"
+            VALUE "LegalCopyright", "Copyright (C) Zero Gaming Networks - Min Com."
             VALUE "OriginalFilename", "Game.EXE"
             VALUE "ProductName", "ran-online"
             VALUE "ProductVersion", "1, 0, 0, 1"
