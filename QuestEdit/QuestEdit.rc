@@ -1,0 +1,882 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Korean resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_KOR)
+#ifdef _WIN32
+LANGUAGE LANG_KOREAN, SUBLANG_DEFAULT
+#pragma code_page(949)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MENU_MAINFRAME MENU 
+BEGIN
+    POPUP "File"
+    BEGIN
+        MENUITEM "New",                         ID_MENUITEM_NEW
+        MENUITEM SEPARATOR
+        MENUITEM "Load List",                   ID_MENUITEM_LOAD
+        MENUITEM "Save List",                   ID_MENUITEM_SAVE
+        MENUITEM SEPARATOR
+        MENUITEM "CSV_SAVE",                    ID_MENUITEM_CSV_SA
+        MENUITEM "CSV_LOAD",                    ID_MENUITEM_CSV_LO
+        MENUITEM "TEXT_EXPORT",                 ID_MENUITEM_TEXT_EXPORT
+        MENUITEM "TEXT_IMPORT",                 ID_MENUITEM_TEXT_IMPORT
+        MENUITEM SEPARATOR
+        MENUITEM "Exit",                        ID_MENUITEM_EXIT
+    END
+END
+
+IDR_MENU_QUEST_POPUP MENU 
+BEGIN
+    POPUP "ItemSuit"
+    BEGIN
+        MENUITEM "Add",                         ID_MENUITEM_ADD
+        MENUITEM "Del",                         ID_MENUITEM_DEL
+        MENUITEM SEPARATOR
+        MENUITEM "Copy",                        ID_MENUITEM_COPY
+        MENUITEM "Paste ( New )",               ID_MENUITEM_PASTE_NEW
+        MENUITEM "Paste ( Value )",             ID_MENUITEM_PASTE_VALUE
+        MENUITEM SEPARATOR
+        MENUITEM "Quest Edit",                  ID_MENUITEM_QUEST_MODIFY
+        MENUITEM "Quest Step Edit",             ID_MENUITEM_QUESTSTEP_MODIFY
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_DIALOG_MAP_SELELCT DIALOGEX 0, 0, 227, 301
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "MAP SELECT"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,107,275,48,14
+    PUSHBUTTON      "Cancel",IDCANCEL,165,275,48,14
+    LISTBOX         IDC_LIST_MAP_SELECT,6,6,215,263,LBS_SORT | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_DIALOG_MAP_SELELCT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 221
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 161
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_KOR)\r\n"
+    "LANGUAGE 18, 1\r\n"
+    "#pragma code_page(949)\r\n"
+    "#include ""res\\QuestEdit.rc2""  // Microsoft Visual C++에서 편집되지 않은 리소스\r\n"
+    "#include ""afxres.rc""         // 표준 구성 요소\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "../res/basic_tool.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041203b5"
+        BEGIN
+            VALUE "CompanyName", "TODO: <회사 이름>"
+            VALUE "FileDescription", "TODO: <파일 설명>"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "InternalName", "QuestEdit.exe"
+            VALUE "LegalCopyright", "TODO: (c) <회사 이름>.  All rights reserved."
+            VALUE "OriginalFilename", "QuestEdit.exe"
+            VALUE "ProductName", "TODO: <제품 이름>"
+            VALUE "ProductVersion", "1.0.0.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x412, 949
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Toolbar
+//
+
+IDR_TOOLBAR1 TOOLBAR  48, 15
+BEGIN
+    BUTTON      ID_MENUITEM_NEW
+    SEPARATOR
+    BUTTON      ID_MENUITEM_LOAD
+    BUTTON      ID_MENUITEM_SAVE
+    SEPARATOR
+    BUTTON      ID_MENUITEM_CSV_LO
+    SEPARATOR
+    BUTTON      ID_MENUITEM_CSV_SA
+    SEPARATOR
+    BUTTON      ID_MENUITEM_TEXT_IMPORT
+    SEPARATOR
+    BUTTON      ID_MENUITEM_TEXT_EXPORT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDR_TOOLBAR1            BITMAP                  "res\\toolbar1.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_ABOUTBOX            "QuestEdit Info(&A)..."
+    IDS_PROPSHT_CAPTION     "Sheet"
+END
+
+#endif    // Korean resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Chinese (Taiwan) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHT)
+#ifdef _WIN32
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL
+#pragma code_page(950)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_ABOUTBOX            "QuestEdit Info(&A)..."
+    IDS_PROPSHT_CAPTION     "Sheet"
+END
+
+#endif    // Chinese (Taiwan) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MENU_QUEST_POPUP MENU 
+BEGIN
+    POPUP "ItemSuit"
+    BEGIN
+        MENUITEM "Add",                         ID_MENUITEM_ADD
+        MENUITEM "Del",                         ID_MENUITEM_DEL
+        MENUITEM SEPARATOR
+        MENUITEM "Copy",                        ID_MENUITEM_COPY
+        MENUITEM "Paste ( New )",               ID_MENUITEM_PASTE_NEW
+        MENUITEM "Paste ( Value )",             ID_MENUITEM_PASTE_VALUE
+        MENUITEM SEPARATOR
+        MENUITEM "Quest Edit",                  ID_MENUITEM_QUEST_MODIFY
+        MENUITEM "Quest Step Edit",             ID_MENUITEM_QUESTSTEP_MODIFY
+        MENUITEM "Convert All Quest to ALL CLASS", ID_CNV_ALL
+    END
+END
+
+IDR_MENU_MAINFRAME MENU 
+BEGIN
+    MENUITEM "File",                        65535
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 235, 55
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "QuestEdit Info ( English )"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
+    LTEXT           "QuestEdit Version 1.0",IDC_STATIC,40,10,119,8,
+                    SS_NOPREFIX
+    LTEXT           "Copyright (C) 2012",IDC_STATIC,40,25,119,8
+    DEFPUSHBUTTON   "OK",IDOK,178,7,50,16,WS_GROUP
+END
+
+IDD_DIALOG_ITEM DIALOGEX 0, 0, 227, 301
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "ITEM ( English )"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,93,275,48,14
+    PUSHBUTTON      "Cancel",IDCANCEL,164,275,48,14
+    LISTBOX         IDC_LIST_ITEM,6,6,215,265,LBS_SORT | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+END
+
+IDD_DIALOG_MAP DIALOGEX 0, 0, 227, 301
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "MAP ( English )"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,107,275,48,14
+    PUSHBUTTON      "Cancel",IDCANCEL,163,275,48,14
+    LISTBOX         IDC_LIST_MAP,6,6,208,264,LBS_SORT | LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP
+END
+
+IDD_DIALOG_MOBGEN_ITEM DIALOGEX 0, 0, 189, 167
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "MOB Gen. QUEST ITEM ( English )"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,6,145,48,14
+    PUSHBUTTON      "Cancel",IDCANCEL,138,145,48,14
+    EDITTEXT        IDC_EDIT_GEN_NUM,53,36,40,14,ES_AUTOHSCROLL
+    LTEXT           "Gen. Number",IDC_STATIC,7,39,43,8
+    EDITTEXT        IDC_EDIT_GEN_RATE,138,36,40,14,ES_AUTOHSCROLL
+    LTEXT           "Percent(%)",IDC_STATIC,98,38,38,8
+    PUSHBUTTON      "Gen. MOB",IDC_BUTTON_GEN_MOB_ADD,6,60,42,14
+    PUSHBUTTON      "Remove",IDC_BUTTON_GEN_MOB_DEL,6,90,42,14
+    LISTBOX         IDC_LIST_GEN_MOB,54,60,126,80,LBS_SORT | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Gen. ITEM",IDC_BUTTON_GENITEM,6,6,42,14
+    EDITTEXT        IDC_EDIT_GENITEM,54,6,126,14,ES_AUTOHSCROLL | 
+                    ES_READONLY
+END
+
+IDD_DIALOG_NPC DIALOGEX 0, 0, 227, 301
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "NPC/MOB ( English )"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,109,275,48,14
+    PUSHBUTTON      "Cancel",IDCANCEL,165,275,48,14
+    LISTBOX         IDC_LIST_NPC,6,6,207,262,LBS_SORT | LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP
+END
+
+IDD_DIALOG_SKILL DIALOGEX 0, 0, 227, 301
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "SKILL ( English )"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,104,275,48,14
+    PUSHBUTTON      "Cancel",IDCANCEL,160,275,48,14
+    LISTBOX         IDC_LIST_SKILL,6,6,215,265,LBS_SORT | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+END
+
+IDD_DLG_INVEN_ELEMENT_EDIT DIALOGEX 0, 0, 169, 210
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "INVENTORY ITEM EDIT ( English )"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    EDITTEXT        IDC_EDIT_DAMAGE,67,42,21,14,ES_RIGHT | ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    EDITTEXT        IDC_EDIT_DEFENSE,67,61,21,14,ES_RIGHT | ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    EDITTEXT        IDC_EDIT_ELECTRIC,137,46,20,14,ES_RIGHT | ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    EDITTEXT        IDC_EDIT_FIRE,137,66,20,14,ES_RIGHT | ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    EDITTEXT        IDC_EDIT_ICE,137,86,20,14,ES_RIGHT | ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    EDITTEXT        IDC_EDIT_POISON,137,106,20,14,ES_RIGHT | ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    EDITTEXT        IDC_EDIT_TURNNUM,57,108,21,14,ES_RIGHT | ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    DEFPUSHBUTTON   "OK",IDOK,12,186,50,14
+    PUSHBUTTON      "CANCEL",IDCANCEL,112,186,50,14
+    LTEXT           "ID",-1,12,6,8,8
+    EDITTEXT        IDC_EDIT_MID,24,6,20,14,ES_RIGHT | ES_AUTOHSCROLL | 
+                    ES_READONLY | ES_NUMBER
+    EDITTEXT        IDC_EDIT_NAME,72,6,90,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Damage",-1,18,42,27,8
+    LTEXT           "Electric",-1,107,47,24,8
+    LTEXT           "Defense",-1,18,63,27,8
+    LTEXT           "Poison",-1,107,108,23,8
+    LTEXT           "Fire",-1,107,67,13,8
+    LTEXT           "Ice",-1,107,89,11,8
+    GROUPBOX        "Basic",-1,12,30,80,54
+    EDITTEXT        IDC_EDIT_SID,48,6,20,14,ES_RIGHT | ES_AUTOHSCROLL | 
+                    ES_READONLY | ES_NUMBER
+    GROUPBOX        "Resist",-1,102,30,60,114
+    GROUPBOX        "Model Used",-1,12,96,78,30
+    LTEXT           "Turn Num",-1,18,110,32,8
+    EDITTEXT        IDC_EDIT_SPIRIT,138,126,20,14,ES_RIGHT | ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    LTEXT           "Spirit",-1,108,129,17,8
+END
+
+IDD_FORMVIEW_QUESTSTEP DIALOGEX 0, 0, 640, 350
+STYLE DS_SETFONT | WS_CHILD
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    LTEXT           "Quest Progress Step",IDC_STATIC,18,3,68,12,WS_BORDER
+    EDITTEXT        IDC_EDIT_STEP_COMMENT,41,123,404,36,ES_MULTILINE | 
+                    ES_AUTOVSCROLL | WS_VSCROLL
+    LTEXT           "Progress\r\n\r\n\r\nDescription",IDC_STATIC_COMMENT,3,
+                    108,38,50
+    LISTBOX         IDC_LIST_STEP,18,16,366,85,LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "To Talk NPC",IDC_BUTTON_TALKNPC,217,166,45,14
+    EDITTEXT        IDC_EDIT_TALKNPC_NAME,267,167,103,14,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    PUSHBUTTON      "To Kill MOB",IDC_BUTTON_DIEMOB,167,185,48,14
+    EDITTEXT        IDC_EDIT_DIEMOB_NAME,219,186,109,14,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    EDITTEXT        IDC_EDIT_DIEMOB_NUM,405,186,40,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "To Safeguard NPC",IDC_BUTTON_GUARDNPC,189,204,64,14
+    EDITTEXT        IDC_EDIT_GUARDNPC_NAME,256,205,114,14,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    PUSHBUTTON      "Reach Map",IDC_BUTTON_REACH_MAP,3,242,48,14
+    EDITTEXT        IDC_EDIT_REACH_MAP_NAME,52,242,126,14,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    EDITTEXT        IDC_EDIT_REACH_PX,242,242,30,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_REACH_PY,277,242,30,14,ES_AUTOHSCROLL
+    LTEXT           "Position",IDC_STATIC_REACH,210,243,27,8
+    EDITTEXT        IDC_EDIT_REACH_RADIUS,357,242,30,14,ES_AUTOHSCROLL
+    LTEXT           "Radius",IDC_STATIC_REACH_R,329,243,23,8
+    PUSHBUTTON      "Defense MAP",IDC_BUTTON_GUARD_MAP,3,281,48,14,
+                    WS_DISABLED
+    EDITTEXT        IDC_EDIT_GUARD_MAP_NAME,52,281,126,14,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    EDITTEXT        IDC_EDIT_GUARD_PX,242,281,30,14,ES_AUTOHSCROLL | 
+                    WS_DISABLED
+    EDITTEXT        IDC_EDIT_GUARD_PY,277,281,30,14,ES_AUTOHSCROLL | 
+                    WS_DISABLED
+    LTEXT           "Position",IDC_STATIC_DEFENSE,210,282,26,8
+    EDITTEXT        IDC_EDIT_GUARD_RADIUS,357,281,30,14,ES_AUTOHSCROLL | 
+                    WS_DISABLED
+    LTEXT           "Radius",IDC_STATIC_DEFENSE_R,329,282,23,8
+    EDITTEXT        IDC_EDIT_GUARD_TIME,418,281,28,14,ES_AUTOHSCROLL | 
+                    WS_DISABLED
+    LTEXT           "Min.",IDC_STATIC_DEFENSE_T,399,282,15,8
+    PUSHBUTTON      "< Before",IDC_BUTTON_PREV,461,307,50,21
+    PUSHBUTTON      "Next >",IDC_BUTTON_NEXT,615,339,6,6,NOT WS_VISIBLE | 
+                    WS_DISABLED
+    PUSHBUTTON      "Add",IDC_BUTTON_STEP_NEW,417,15,30,25
+    PUSHBUTTON      "Del",IDC_BUTTON_REQ_STEP_DEL,417,43,30,25
+    PUSHBUTTON      "X",IDC_BUTTON_TALKNPC_DEL,429,166,15,14
+    PUSHBUTTON      "X",IDC_BUTTON_DIEMOB_DEL,384,185,15,14
+    PUSHBUTTON      "X",IDC_BUTTON_GUARDNPC_DEL,429,204,15,14
+    PUSHBUTTON      "X",IDC_BUTTON_REACH_MAP_DEL,182,241,15,14
+    PUSHBUTTON      "X",IDC_BUTTON_GUARD_MAP_DEL,182,281,15,14,WS_DISABLED
+    PUSHBUTTON      "OK",IDC_BUTTON_STEP_OK,572,307,50,21
+    EDITTEXT        IDC_EDIT_STEP_TITLE,41,106,404,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_TALKNPC_COMMENT,3,167,210,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_DIEMOB_COMMENT,3,186,161,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_GUARDNPC_COMMENT,3,205,183,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_REACH_MAP_COMMENT,4,224,441,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_GUARD_MAP_COMMENT,3,262,441,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "UP",IDC_BUTTON_UP,385,15,30,25
+    PUSHBUTTON      "DN",IDC_BUTTON_DOWN,385,43,30,25
+    EDITTEXT        IDC_EDIT_TALKNPC_NUM,374,167,52,14,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    EDITTEXT        IDC_EDIT_TALKNPC_NUM2,331,186,49,14,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    EDITTEXT        IDC_EDIT_TALKNPC_NUM3,373,205,52,14,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    PUSHBUTTON      "Cancel",IDC_BUTTON_EDITCANCEL,517,307,50,21
+    PUSHBUTTON      "Save",IDC_BUTTON_EDITCOMPLATE,572,307,50,21
+    LISTBOX         IDC_LIST_DEL_QITEM,454,109,139,48,LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Remove Item By Quest",IDC_STATIC_RESET_QITEM,455,96,75,
+                    11
+    PUSHBUTTON      "Add",IDC_BUTTON_DEL_QITEM_NEW,595,110,24,20
+    PUSHBUTTON      "Del",IDC_BUTTON_DEL_QITEM_DEL,595,132,24,20
+    LISTBOX         IDC_LIST_GIFT_QITEM,454,27,139,64,LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Gain Item By Quest",IDC_STATIC_GIFT_QITEM,455,15,64,10
+    PUSHBUTTON      "Add",IDC_BUTTON_GIFT_QITEM_NEW,595,26,24,20
+    PUSHBUTTON      "Del",IDC_BUTTON_GIFT_QITEM_DEL,595,68,24,20
+    PUSHBUTTON      "Edit",IDC_BUTTON_GIFT_QITEM_EDIT,595,47,24,20
+    PUSHBUTTON      "Edit",IDC_BUTTON_REQ_QITEM_EDIT,595,199,24,20
+    PUSHBUTTON      "Add",IDC_BUTTON_REQ_QITEM_NEW,595,177,24,20
+    LTEXT           "MOB Gen. Quest Item",IDC_STATIC_REQ_QITEM,455,165,72,9
+    LISTBOX         IDC_LIST_REQ_QITEM,454,178,139,65,LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Del",IDC_BUTTON_REQ_QITEM_DEL,595,220,24,20
+    EDITTEXT        IDC_EDIT_REQ_QITEM_COMMENT,3,301,299,12,ES_AUTOHSCROLL
+    LTEXT           "Reach Level",IDC_STATIC_LEVEL,309,302,41,10
+    EDITTEXT        IDC_EDIT_LEVEL,364,301,49,12,ES_AUTOHSCROLL
+    LTEXT           "Map ID",IDC_STEP_MAPID_STATIC,5,321,24,11
+    PUSHBUTTON      "Edit",IDC_STEP_MAP_EDIT_BUTTON,36,320,18,15
+    EDITTEXT        IDC_STEP_MAP_MID_EDIT,60,320,35,14,ES_AUTOHSCROLL | 
+                    ES_NUMBER | WS_DISABLED
+    EDITTEXT        IDC_STEP_MAP_SID_EDIT,105,320,35,14,ES_AUTOHSCROLL | 
+                    ES_NUMBER | WS_DISABLED
+    LTEXT           "X,Y",IDC_STEP_XY_STATIC,158,321,12,9
+    EDITTEXT        IDC_STEP_MAP_XPOS_EDIT,182,320,35,14,ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    EDITTEXT        IDC_STEP_MAP_YPOS_EDIT,222,320,35,14,ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    LTEXT           "GATE",IDC_STEP_GATE_STATIC,271,321,20,13
+    EDITTEXT        IDC_STEP_MAP_GATE_EDIT,296,320,23,14,ES_AUTOHSCROLL | 
+                    ES_NUMBER
+END
+
+IDD_QUESTEDIT_DIALOG DIALOGEX 0, 0, 654, 387
+STYLE DS_SETFONT | DS_MODALFRAME | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | 
+    WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "QuestEdit ( English )"
+MENU IDR_MENU_MAINFRAME
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    GROUPBOX        "",IDC_STATIC_CONTROL,7,22,640,360
+    PUSHBUTTON      "New",IDC_BUTTON_NEW,14,7,50,14
+    PUSHBUTTON      "Load",IDC_BUTTON_LOAD,83,7,50,14
+    PUSHBUTTON      "CSV Load",IDC_BUTTON_CSVLOAD,207,7,50,14
+    PUSHBUTTON      "Save",IDC_BUTTON_SAVE2,144,7,50,14
+    PUSHBUTTON      "CSV Save",IDC_BUTTON_CSVSAVE,268,7,50,14
+    PUSHBUTTON      "Text Import",IDC_BUTTON_TEXTIMPORT,336,7,50,14
+    PUSHBUTTON      "Text Export",IDC_BUTTON_TEXTEXPORT,395,7,50,14
+END
+
+IDD_INPUTIDDLG DIALOGEX 0, 0, 187, 30
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "INPUT ID BOX ( English )"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,130,7,50,16
+    LTEXT           "Input New ID",IDC_STATIC,9,10,50,11
+    EDITTEXT        IDC_EDIT_NEW_ID,61,7,60,16,ES_AUTOHSCROLL | ES_NUMBER
+END
+
+IDD_QUESTTREE_DIALOG DIALOGEX 0, 0, 640, 351
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Quest Tree View ( English )"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    CONTROL         "",IDC_TREE_ITEM,"SysTreeView32",TVS_HASBUTTONS | 
+                    TVS_HASLINES | TVS_LINESATROOT | TVS_NOTOOLTIPS | 
+                    WS_TABSTOP,7,7,626,336,WS_EX_STATICEDGE
+END
+
+IDD_FORMVIEW_QUEST DIALOGEX 0, 0, 640, 350
+STYLE DS_SETFONT | WS_CHILD
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    EDITTEXT        IDC_EDIT_QUEST_NID,30,4,64,14,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    LTEXT           "Subject",IDC_STATIC,19,24,25,8
+    EDITTEXT        IDC_EDIT_TITLE,62,22,503,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_COMMENT,18,49,278,84,ES_MULTILINE | 
+                    ES_AUTOVSCROLL | WS_VSCROLL
+    LTEXT           "Description",IDC_STATIC,19,39,43,8
+    GROUPBOX        "Precondition",IDC_STATIC,17,264,135,73
+    EDITTEXT        IDC_EDIT_BEGIN_MONEY,53,285,92,14,ES_AUTOHSCROLL
+    LTEXT           "Money",IDC_STATIC,24,287,23,8
+    GROUPBOX        "Practice Condition",IDC_STATIC,17,171,135,82
+    EDITTEXT        IDC_EDIT_LIMIT_TIME,102,184,36,14,ES_AUTOHSCROLL
+    LTEXT           "Limit Time(min.)",IDC_STATIC,23,187,55,8
+    CONTROL         "When Dying, Failure",IDC_CHECK_LIMIT_NONDIE,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,31,228,81,10,WS_EX_RIGHT
+    CONTROL         "Repeat",IDC_CHECK_REPEAT,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,18,137,38,10
+    CONTROL         "Retry(at failure)",IDC_CHECK_AGAIN,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,58,137,66,10
+    EDITTEXT        IDC_EDIT_BEGIN_PARTYNUM,95,307,50,14,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    LTEXT           "Num Of Party Mem.",IDC_STATIC,24,308,66,8
+    EDITTEXT        IDC_EDIT_LIMIT_PARTYNUM,102,206,36,14,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    LTEXT           "Num Of Party Mem.",IDC_STATIC,22,208,66,8
+    CONTROL         "Party",IDC_CHECK_PARTY,"Button",BS_AUTOCHECKBOX | 
+                    WS_DISABLED | WS_TABSTOP,18,150,33,10
+    CONTROL         "Not Progress With Other Quest",IDC_CHECK_ONLYONE_PROG,
+                    "Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,161,
+                    150,114,10
+    CONTROL         "Give Up",IDC_CHECK_GIVEUP,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,161,137,39,10
+    GROUPBOX        "Compensation For Success",IDC_STATIC,158,170,469,94
+    EDITTEXT        IDC_EDIT_GIFT_EXP,199,180,110,14,ES_AUTOHSCROLL
+    LTEXT           "EXP",IDC_STATIC,161,181,15,8
+    EDITTEXT        IDC_EDIT_GIFT_MONEY,199,196,110,14,ES_AUTOHSCROLL
+    LTEXT           "Money",IDC_STATIC,161,197,23,8
+    EDITTEXT        IDC_EDIT_GIFT_ELEMENT,199,228,36,14,ES_AUTOHSCROLL
+    LTEXT           "Attribute",IDC_STATIC,161,228,30,8
+    EDITTEXT        IDC_EDIT_GIFT_LIFEP,199,244,36,14,ES_AUTOHSCROLL
+    LTEXT           "Living",IDC_STATIC,161,243,20,8
+    EDITTEXT        IDC_EDIT_GIFT_DISPK,274,228,36,14,ES_AUTOHSCROLL
+    LTEXT           "PK",IDC_STATIC,242,228,10,8
+    EDITTEXT        IDC_EDIT_GIFT_SKILLP,199,212,36,14,ES_AUTOHSCROLL
+    LTEXT           "Skill P",IDC_STATIC,161,213,21,8
+    EDITTEXT        IDC_EDIT_GIFT_STATP,274,212,36,14,ES_AUTOHSCROLL
+    LTEXT           "Stats P",IDC_STATIC,242,213,24,8
+    LISTBOX         IDC_LIST_GIFT_ITEM,318,187,180,56,LBS_SORT | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Add",IDC_BUTTON_GIFT_ITEM_NEW,401,244,30,14
+    LTEXT           "Item",IDC_STATIC,352,177,15,8
+    PUSHBUTTON      "Del",IDC_BUTTON_GIFT_ITEM_DEL,470,244,30,14
+    LISTBOX         IDC_LIST_GIFT_SKILL,504,187,117,56,LBS_SORT | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Add",IDC_BUTTON_GIFT_SKILL_NEW,556,244,30,14
+    LTEXT           "Skill",IDC_STATIC,507,178,14,8
+    PUSHBUTTON      "Del",IDC_BUTTON_GIFT_SKILL_DEL,590,244,30,14
+    PUSHBUTTON      "< Before",IDC_BUTTON_PREV,461,307,50,21,NOT WS_VISIBLE | 
+                    WS_DISABLED
+    PUSHBUTTON      "Next >",IDC_BUTTON_NEXT,462,307,50,21
+    PUSHBUTTON      "Edit",IDC_BUTTON_GIFT_ITEM_EDIT,436,244,30,14
+    EDITTEXT        IDC_EDIT_EDITVERSION,461,5,42,14,ES_AUTOHSCROLL
+    LTEXT           "Edit Version",IDC_STATIC,413,7,40,8
+    CONTROL         "The Same Quest in Party",IDC_CHECK_PARTYQUEST,"Button",
+                    BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,58,150,97,10
+    EDITTEXT        IDC_EDIT_GIFT_QUEST,274,244,36,14,ES_AUTOHSCROLL
+    LTEXT           "Quest",IDC_STATIC,242,245,20,8
+    PUSHBUTTON      "Cancel",IDC_BUTTON_EDITCANCEL,517,307,50,21
+    PUSHBUTTON      "Save",IDC_BUTTON_EDITCOMPLATE,572,307,50,21
+    LTEXT           "ID",IDC_STATIC,20,7,8,8
+    LTEXT           "FILENAME",IDC_STATIC,147,7,36,8
+    EDITTEXT        IDC_EDIT_QUEST_FILENAME,189,4,158,14,ES_AUTOHSCROLL
+    GROUPBOX        "Auto Start Condition",IDC_STATIC,299,40,327,127
+    LTEXT           "Item",IDC_STATIC,523,57,15,9
+    EDITTEXT        IDC_EDIT_START_ITEM_MID,553,57,30,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_START_ITEM_SID,589,57,30,12,ES_AUTOHSCROLL
+    LTEXT           "Skill",IDC_STATIC,523,74,14,9
+    EDITTEXT        IDC_EDIT_START_SKILL_MID,553,73,30,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_START_SKILL_SID,589,73,30,12,ES_AUTOHSCROLL
+    LTEXT           "Map ID",IDC_STATIC,523,116,24,10
+    EDITTEXT        IDC_EDIT_START_QUEST_MAP_MID,553,115,30,12,
+                    ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_EDIT_START_QUEST_MAP_SID,589,115,30,12,
+                    ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_EDIT_START_QUEST_MAP_X,553,131,30,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    EDITTEXT        IDC_EDIT_START_QUEST_MAP_Y,589,131,30,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    LTEXT           "Position",IDC_STATIC,523,131,27,8
+    LTEXT           "Level",IDC_STATIC,523,90,18,8
+    EDITTEXT        IDC_EDIT_START_LEVEL,553,90,48,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_START_QUEST_MAP_RADIUS,553,146,48,12,
+                    ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Radius",IDC_STATIC,523,145,23,8
+    CONTROL         "Brawler [M]",IDC_CHECK_FIGHETER_M,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,311,65,60,8
+    CONTROL         "Shamman [M]",IDC_CHECK_SPIRIT_M,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,378,65,60,8
+    CONTROL         "Archer [M]",IDC_CHECK_ARCHER_M,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,311,109,60,8
+    CONTROL         "Swordsman [M]",IDC_CHECK_ARMS_M,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,311,87,60,8
+    GROUPBOX        "Class(Necessary)",IDC_STATIC,305,49,206,113
+    LTEXT           "School(Necessary) :",IDC_STATIC,309,146,69,11
+    COMBOBOX        IDC_COMBO_SCHOOL,385,145,85,162,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Extreme [M]",IDC_CHECK_EXTREME_M,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,378,87,60,8
+    CONTROL         "Extreme [W]",IDC_CHECK_EXTREME_W,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,378,98,60,8
+    CONTROL         "Brawler [W]",IDC_CHECK_FIGHETER_W,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,311,76,60,8
+    CONTROL         "Archer [W]",IDC_CHECK_ARCHER_W,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,311,120,60,8
+    CONTROL         "Shamman [W]",IDC_CHECK_SPIRIT_W,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,378,76,60,8
+    CONTROL         "Swordsman [W]",IDC_CHECK_ARMS_W,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,311,98,61,8
+    GROUPBOX        "Quest Progress Condition",IDC_STATIC,157,265,470,73
+    LTEXT           "START",IDC_STATIC,164,290,24,9
+    LTEXT           "COMPLETE",IDC_STATIC,164,306,40,10
+    LTEXT           "FAILURE",IDC_STATIC,164,321,29,10
+    COMBOBOX        IDC_STATE_COMBO1,206,289,73,63,CBS_DROPDOWNLIST | 
+                    WS_DISABLED | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_STATE_COMBO2,206,304,73,61,CBS_DROPDOWNLIST | 
+                    WS_DISABLED | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_STATE_COMBO3,206,319,73,62,CBS_DROPDOWNLIST | 
+                    WS_DISABLED | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Time Over",IDC_FAIL_CHECK1,"Button",BS_AUTOCHECKBOX | 
+                    WS_DISABLED | WS_TABSTOP,463,276,48,11
+    CONTROL         "Die",IDC_FAIL_CHECK2,"Button",BS_AUTOCHECKBOX | 
+                    WS_DISABLED | WS_TABSTOP,519,276,33,11
+    CONTROL         "Leave",IDC_FAIL_CHECK3,"Button",BS_AUTOCHECKBOX | 
+                    WS_DISABLED | WS_TABSTOP,567,276,44,11
+    LTEXT           "TYPE",IDC_STATIC,286,277,19,9
+    COMBOBOX        IDC_MAP_SELECT_COMBO,312,276,73,47,CBS_DROPDOWNLIST | 
+                    WS_DISABLED | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Map ID",IDC_STATIC,286,295,24,10
+    PUSHBUTTON      "Edit",IDC_MAP_EDIT_BUTTON,392,276,25,14,WS_DISABLED
+    EDITTEXT        IDC_MAP_MID_EDIT,312,294,30,14,ES_AUTOHSCROLL | 
+                    ES_NUMBER | WS_DISABLED
+    EDITTEXT        IDC_MAP_SID_EDIT,343,294,30,14,ES_AUTOHSCROLL | 
+                    ES_NUMBER | WS_DISABLED
+    LTEXT           "X,Y",IDC_STATIC,286,313,12,10
+    EDITTEXT        IDC_MAP_XPOS_EDIT,312,312,30,14,ES_AUTOHSCROLL | 
+                    ES_NUMBER | WS_DISABLED
+    EDITTEXT        IDC_MAP_YPOS_EDIT,343,312,30,14,ES_AUTOHSCROLL | 
+                    ES_NUMBER | WS_DISABLED
+    LTEXT           "GATE",IDC_STATIC,380,297,20,8
+    EDITTEXT        IDC_MAP_GATE_EDIT,402,295,25,14,ES_AUTOHSCROLL | 
+                    ES_NUMBER | WS_DISABLED
+    CONTROL         "Use Progress Condition",IDC_USE_PROGRESS_CHECK,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,166,276,102,11
+    PUSHBUTTON      "Apply",IDC_BUTTON_MOVEMAP,386,312,44,14
+    GROUPBOX        "",IDC_STATIC,281,270,156,64
+    CONTROL         "Science [M]",IDC_CHECK_SCIENCE_M2,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,378,109,60,8
+    CONTROL         "Science [W]",IDC_CHECK_SCIENCE_W2,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,378,120,60,8
+    CONTROL         "Assasin [M]",IDC_CHECK_ASSASIN_M3,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,445,65,60,8
+    CONTROL         "Assasin [W]",IDC_CHECK_ASSASIN_W3,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,445,76,60,8
+    CONTROL         "Testing [M]",IDC_CHECK_TESTING_M4,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,445,87,60,8
+    CONTROL         "Testing [W]",IDC_CHECK_TESTING_W4,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,445,98,60,8
+    CONTROL         "[M]",IDC_RADIO_M,"Button",BS_AUTORADIOBUTTON,442,110,27,
+                    10
+    CONTROL         "[W]",IDC_RADIO_W,"Button",BS_AUTORADIOBUTTON,476,110,28,
+                    10
+    CONTROL         "ALL",IDC_RADIO_ALL,"Button",BS_AUTORADIOBUTTON,442,123,
+                    27,10
+    EDITTEXT        IDC_EDIT_SCHOOL,474,144,31,14,ES_AUTOHSCROLL | 
+                    WS_DISABLED
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 228
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 48
+    END
+
+    IDD_DIALOG_ITEM, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 221
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 167
+    END
+
+    IDD_DIALOG_MAP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 221
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 167
+    END
+
+    IDD_DIALOG_MOBGEN_ITEM, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 183
+        TOPMARGIN, 7
+    END
+
+    IDD_DIALOG_NPC, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 221
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 162
+    END
+
+    IDD_DIALOG_SKILL, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 221
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 167
+    END
+
+    IDD_DLG_INVEN_ELEMENT_EDIT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 162
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 186
+    END
+
+    IDD_FORMVIEW_QUESTSTEP, DIALOG
+    BEGIN
+        RIGHTMARGIN, 632
+    END
+
+    IDD_QUESTEDIT_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 650
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 383
+    END
+
+    IDD_INPUTIDDLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 180
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 23
+    END
+
+    IDD_QUESTTREE_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 633
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 343
+    END
+
+    IDD_FORMVIEW_QUEST, DIALOG
+    BEGIN
+        RIGHTMARGIN, 627
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// RT_MANIFEST
+//
+
+1                       RT_MANIFEST             "res\\manifest.xml"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_ABOUTBOX            "QuestEdit Info(&A)..."
+    IDS_PROPSHT_CAPTION     "Sheet"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_KOR)
+LANGUAGE 18, 1
+#pragma code_page(949)
+#include "res\QuestEdit.rc2"  // Microsoft Visual C++에서 편집되지 않은 리소스
+#include "afxres.rc"         // 표준 구성 요소
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

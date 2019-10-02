@@ -1,0 +1,2401 @@
+#include "StdAfx.h"
+#include "UIInfoLoader.h"
+#include "GLGaeaClient.h"
+#include "GLItemMan.h"
+#include "GLItemDef.h"
+#include "GLItem.h"
+#include "GameTextControl.h"
+#include "UITextControl.h"
+#include "InnerInterface.h"
+#include "ItemImage.h"
+
+#include "../RanClientLib/G-Logic/CItemSetLists.h"
+#include "../RanClientLib/G-Logic/CItemSetListOption.h"
+
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
+namespace NS_ITEMINFO_BOXINFO
+{
+    SITEMCUSTOM	m_sItemCustomBACK;
+	BOOL		m_bShopOpenBACK;
+    BOOL		m_bInMarketBACK;
+	BOOL		m_bInPrivateMarketBACK;
+	BOOL		m_bIsWEAR_ITEMBACK;
+	WORD		m_wPosXBACK;
+	WORD		m_wPosYBACK;
+	
+	//Item Name Render by NjD
+	void SetNameItem ( CString strText, D3DCOLOR dwColor )
+	{
+		CInnerInterface::GetInstance().ADDNAME_RENDER_BOXINFO ( strText, dwColor );
+	}
+	//Item Render by NjD
+	void AddItemRender ( SNATIVEID sICONINDEX, const char* szTexture )
+	{
+		CInnerInterface::GetInstance().ADDITEM_RENDER_BOXINFO ( sICONINDEX, szTexture );
+	}
+
+	void ResetItemRender ()
+	{
+		CInnerInterface::GetInstance().RESETITEM_RENDER_BOXINFO ();	
+	}
+	//Item Images in Box by NjD
+	void AddItemBoxRender ( SNATIVEID sICONINDEX, const char* szTexture, int nIndex )
+	{
+		CInnerInterface::GetInstance().ADDITEMBOX_RENDER_BOXINFO ( sICONINDEX, szTexture, nIndex );
+	}
+
+	void ResetItemBoxRender ()
+	{
+		CInnerInterface::GetInstance().RESETITEMBOX_RENDER_BOXINFO ();	
+	}
+	//Item Images in Random Box by NjD
+	void AddItemBoxRandomRender ( SNATIVEID sICONINDEX, const char* szTexture, int nIndex )
+	{
+		CInnerInterface::GetInstance().ADDITEMBOXRANDOM_RENDER_BOXINFO ( sICONINDEX, szTexture, nIndex );
+	}
+
+	void ResetItemBoxRandomRender ()
+	{
+		CInnerInterface::GetInstance().RESETITEMBOXRANDOM_RENDER_BOXINFO ();	
+	}
+
+	//Resi Icons by NjD
+	void SetResiIcons ()
+	{
+		CInnerInterface::GetInstance().SETRESIICON_BOXINFO ();	
+	}
+	
+	void ResetResiIcons ()
+	{
+		CInnerInterface::GetInstance().RESETRESIICON_BOXINFO ();	
+	}
+
+	void	RESET ()
+	{
+		m_sItemCustomBACK.sNativeID = NATIVEID_NULL ();
+		m_bShopOpenBACK = FALSE;
+		m_bInMarketBACK = FALSE;
+		m_bInPrivateMarketBACK = FALSE;
+		m_bIsWEAR_ITEMBACK = FALSE;
+		ResetItemRender ();
+		ResetItemBoxRender();
+		ResetResiIcons ();
+		ResetItemBoxRandomRender();
+	}
+
+	void AddTextNoSplit ( CString strText, D3DCOLOR dwColor )
+	{
+		CInnerInterface::GetInstance().ADDTEXT_NOSPLIT_BOXINFO ( strText, dwColor );
+	}
+
+	void AddTextLongestLineSplit ( CString strText, D3DCOLOR dwColor )
+	{
+		CInnerInterface::GetInstance().ADDTEXT_LONGESTLINE_SPLIT_BOXINFO ( strText, dwColor );
+	}
+
+	void RemoveAllInfo ()
+	{
+		CInnerInterface::GetInstance().RESET_INFO_BOXINFO ();
+	}
+
+	char*	GetNumberWithSign ( int nValue )
+	{
+		static	char szNumber[128];
+
+		if ( 0 < nValue )
+		{
+			StringCchPrintf ( szNumber, 128, "+%d", nValue );
+		}
+		else if ( nValue < 0 )
+		{
+			StringCchPrintf ( szNumber, 128, "%d", nValue );
+		}
+
+		return szNumber;
+	}
+
+	void AddInfoItemAddon ( int nBasic, int nAddon, CString strFormat )
+	{
+		CString Text;
+		if ( nAddon )
+		{
+			Text.Format ( "%s:%d%s", strFormat, nBasic, GetNumberWithSign ( nAddon ) );
+			AddTextNoSplit ( Text, NS_UITEXTCOLOR::LIGHTYELLOW );
+		}
+		else if ( nBasic )
+		{
+			Text.Format ( "%s:%d", strFormat, nBasic );
+			AddTextNoSplit ( Text, NS_UITEXTCOLOR::WHITE );
+		}
+	}
+
+	void APPEND_ITEM_GRADE ( CString& strOrigin, BYTE uGRADE )
+	{
+		if ( !uGRADE ) return ;
+
+		CString strGRADE;
+		strGRADE.Format ( "[+%d]", uGRADE );
+		strOrigin += strGRADE;
+	}
+
+	void AddInfoItemAddon ( int nBasic, int nAddon, BYTE uGRADE, CString strFormat )
+	{
+		CString Text;
+		if ( nAddon )
+		{
+			Text.Format ( "%s:%d%s", strFormat, nBasic, GetNumberWithSign( nAddon ) );
+			APPEND_ITEM_GRADE ( Text, uGRADE );
+			AddTextNoSplit ( Text, NS_UITEXTCOLOR::LIGHTYELLOW );
+		}
+		else if ( nBasic )
+		{
+			Text.Format ( "%s:%d", strFormat, nBasic );
+			APPEND_ITEM_GRADE ( Text, uGRADE );
+			AddTextNoSplit ( Text, NS_UITEXTCOLOR::WHITE );
+		}
+	}
+
+	void AddInfoItemAddonRange ( int nBasicMin, int nBasicMax, int nAddon, BYTE uGRADE, CString strFormat )
+	{
+		CString Text;
+
+		if ( nAddon )
+		{
+			Text.Format ( "%s:%d%s~%d%s", strFormat, nBasicMin, GetNumberWithSign( nAddon ), nBasicMax, GetNumberWithSign( nAddon ) );
+            APPEND_ITEM_GRADE ( Text, uGRADE );
+			AddTextNoSplit ( Text, NS_UITEXTCOLOR::LIGHTYELLOW );
+		}
+		else if ( nBasicMin || nBasicMax )
+		{
+			Text.Format ( "%s:%d~%d", strFormat, nBasicMin, nBasicMax );
+			APPEND_ITEM_GRADE ( Text, uGRADE );
+			AddTextNoSplit ( Text, NS_UITEXTCOLOR::WHITE );
+		}
+	}
+
+	void AddItemTurnInfo ( const SITEMCUSTOM &sItemCustom, const BOOL bInMarket, const BOOL bInPrivateMarket )
+	{
+		SITEM* pItemData = GLItemMan::GetInstance().GetItem ( sItemCustom.sNativeID );
+
+		CString strText;
+
+		//switch ( pItemData->sBasicOp.emItemType )
+		//{
+		//case ITEM_CHARM:
+		//case ITEM_ARROW:
+		//case ITEM_CURE:
+		//case ITEM_GRINDING:
+			if ( pItemData->sDrugOp.wPileNum > 1 )
+			{
+				WORD wPileNum = pItemData->sDrugOp.wPileNum;
+				WORD wTurnNum = sItemCustom.wTurnNum;	
+			
+				if ( bInPrivateMarket )	//	°³ÀÎ »óÁ¡
+				{
+					strText.Format("%s:%d", ID2GAMEWORD("ITEM_TURN_INFO", 0 ), wTurnNum);
+					AddTextNoSplit(strText,NS_UITEXTCOLOR::WHITE);
+
+					return ;
+				}
+
+				if ( bInMarket )	wTurnNum = pItemData->GETAPPLYNUM();
+				strText.Format("%s:%d/%d", ID2GAMEWORD("ITEM_TURN_INFO", 0 ), wTurnNum, wPileNum);
+				AddTextNoSplit(strText,NS_UITEXTCOLOR::WHITE);
+			}
+			//break;
+		//}
+	}
+
+	void AddInfoPetSkillItem( const SITEMCUSTOM &sItemCustom )
+	{
+		CString strText;
+
+		SNATIVEID sNativeID = sItemCustom.sNativeID;
+		GLPetClient* pPetClient = GLGaeaClient::GetInstance().GetPetClient();
+		SITEM* pItemData = GLItemMan::GetInstance().GetItem ( sNativeID );
+		SNATIVEID sSkillID = pItemData->sSkillBookOp.sSkill_ID;
+
+		//	Note : §Þ¯à«H®§¾É¤J.
+		PGLSKILL pSkill = GLSkillMan::GetInstance().GetData ( sSkillID.wMainID, sSkillID.wSubID );
+		if ( pSkill )
+		{
+			if ( pPetClient->ISLEARNED_SKILL( sSkillID ) )
+			{
+				AddTextNoSplit ( ID2GAMEWORD ( "ITEM_SKILL_CONDITION", 0 ), NS_UITEXTCOLOR::RED );	
+				return ;
+			}
+		}
+	}
+
+	void AddInfoSkillItem ( const SITEMCUSTOM &sItemCustom )
+	{
+		CString strText;
+
+		SNATIVEID sNativeID = sItemCustom.sNativeID;
+		GLCharacter* pCharacter = GLGaeaClient::GetInstance().GetCharacter();	
+		SITEM* pItemData = GLItemMan::GetInstance().GetItem ( sNativeID );
+		SNATIVEID sSkillID = pItemData->sSkillBookOp.sSkill_ID;
+
+		//	Note : §Þ¯à«H®§¾É¤J.
+		PGLSKILL pSkill = GLSkillMan::GetInstance().GetData ( sSkillID.wMainID, sSkillID.wSubID );
+		if ( pSkill )
+		{
+			//	±âº» Á¤º¸
+			{
+				//	2. µî±Þ
+				strText.Format("%s:%d",ID2GAMEWORD("SKILL_BASIC_INFO", 1), pSkill->m_sBASIC.dwGRADE);
+				AddTextNoSplit(strText,NS_UITEXTCOLOR::WHITE);
+
+				//	3. ¼Ó¼º
+				strText.Format("%s:%s",ID2GAMEWORD("SKILL_BASIC_INFO", 2), COMMENT::BRIGHT[pSkill->m_sLEARN.emBRIGHT].c_str());
+				AddTextNoSplit(strText,NS_UITEXTCOLOR::WHITE);
+
+				//	4. Á÷¾÷
+				strText.Format ("%s:", ID2GAMEWORD("SKILL_BASIC_INFO", 3) );
+				if ( pSkill->m_sLEARN.dwCLASS & GLCC_FIGHTER_M )	strText.AppendFormat ( "%s", COMMENT::CHARCLASS[0].c_str() );
+				if ( pSkill->m_sLEARN.dwCLASS & GLCC_ARMS_M )		strText.AppendFormat ( "%s", COMMENT::CHARCLASS[1].c_str() );
+				if ( pSkill->m_sLEARN.dwCLASS & GLCC_ARCHER_W )		strText.AppendFormat ( "%s", COMMENT::CHARCLASS[2].c_str() );
+				if ( pSkill->m_sLEARN.dwCLASS & GLCC_SPIRIT_W )		strText.AppendFormat ( "%s", COMMENT::CHARCLASS[3].c_str() );
+				if ( pSkill->m_sLEARN.dwCLASS & GLCC_FIGHTER_W )	strText.AppendFormat ( "%s", COMMENT::CHARCLASS[4].c_str() );
+				if ( pSkill->m_sLEARN.dwCLASS & GLCC_EXTREME_M )	strText.AppendFormat ( "%s", COMMENT::CHARCLASS[5].c_str() );
+				if ( pSkill->m_sLEARN.dwCLASS & GLCC_EXTREME_W )	strText.AppendFormat ( "%s", COMMENT::CHARCLASS[6].c_str() );
+				if ( pSkill->m_sLEARN.dwCLASS & GLCC_ARMS_W )		strText.AppendFormat ( "%s", COMMENT::CHARCLASS[7].c_str() );
+				if ( pSkill->m_sLEARN.dwCLASS & GLCC_ARCHER_M )		strText.AppendFormat ( "%s", COMMENT::CHARCLASS[8].c_str() );				
+				if ( pSkill->m_sLEARN.dwCLASS & GLCC_SPIRIT_M )		strText.AppendFormat ( "%s", COMMENT::CHARCLASS[9].c_str() );				
+				//added by tobets | 14-7-2012 | add new class
+				if ( pSkill->m_sLEARN.dwCLASS & GLCC_SCIENCE_M )	strText.AppendFormat ( "%s", COMMENT::CHARCLASS[10].c_str() );
+				if ( pSkill->m_sLEARN.dwCLASS & GLCC_SCIENCE_W )	strText.AppendFormat ( "%s", COMMENT::CHARCLASS[11].c_str() );
+				if ( pSkill->m_sLEARN.dwCLASS & GLCC_ASSASSIN_M )	strText.AppendFormat ( "%s", COMMENT::CHARCLASS[12].c_str() );
+				if ( pSkill->m_sLEARN.dwCLASS & GLCC_ASSASSIN_W )	strText.AppendFormat ( "%s", COMMENT::CHARCLASS[13].c_str() );
+
+				//AddTextNoSplit(strText,NS_UITEXTCONTROL::GetEvaluateColor ( pItemData->sBasicOp.dwReqCharClass & pCharacter->m_emClass ) );
+			}
+
+			{
+				//	¥Ø¼Ð¶ZÂ÷¡A¥ª¤â¡A¥k¤â¤u¨ã
+				const SKILL::SBASIC& sBASIC = pSkill->m_sBASIC;		
+
+				if ( sBASIC.wTARRANGE )
+				{
+					strText.Format("%s:%d",ID2GAMEWORD( "SKILL_ADVANCED_TARGET_RANGE", 0), sBASIC.wTARRANGE);
+					AddTextNoSplit(strText, NS_UITEXTCOLOR::WHITE );
+				}
+
+				if ( (sBASIC.emUSE_LITEM && (sBASIC.emUSE_LITEM != ITEMATT_NOCARE)) || 
+					(sBASIC.emUSE_RITEM && (sBASIC.emUSE_RITEM != ITEMATT_NOCARE)) )
+				{
+					AddTextNoSplit(ID2GAMEWORD("SKILL_CATEGORY", 1),NS_UITEXTCOLOR::LIGHTSKYBLUE);
+				}
+
+				CString strUSEITEM;
+				if ( sBASIC.emUSE_LITEM )
+				{
+					if ( sBASIC.emUSE_LITEM != ITEMATT_NOCARE )
+					{
+						strText.Format( "%s:%s", 
+										ID2GAMEWORD( "SKILL_ADVANCED_USE_ITEM_LR_HAND", 0), 
+										ID2GAMEWORD( "SKILL_ADVANCED_USE_ITEM", sBASIC.emUSE_LITEM - 1 ) );
+						AddTextNoSplit(strText, NS_UITEXTCOLOR::WHITE );
+					}
+				}
+
+				if ( sBASIC.emUSE_RITEM )
+				{
+					if ( sBASIC.emUSE_RITEM != ITEMATT_NOCARE )
+					{
+						strText.Format ( "%s:%s", 
+										ID2GAMEWORD( "SKILL_ADVANCED_USE_ITEM_LR_HAND", 1), 
+										ID2GAMEWORD( "SKILL_ADVANCED_USE_ITEM", sBASIC.emUSE_RITEM - 1 ) );
+						AddTextNoSplit(strText, NS_UITEXTCOLOR::WHITE );
+					}
+				}
+			}
+
+			//	¤w¸g¾Ç²ßªº§Þ¯à
+			if ( pCharacter->GETLEARNED_SKILL ( sSkillID ) )
+			{
+				AddTextNoSplit ( ID2GAMEWORD ( "ITEM_SKILL_CONDITION", 0 ), NS_UITEXTCOLOR::RED );	
+				return ;
+			}
+
+			//	¥²¶·¶ñ¼gªº«H®§
+			{
+				//AddTextNoSplit( ID2GAMEWORD("SKILL_CATEGORY", 7), NS_UITEXTCOLOR::LIGHTSKYBLUE);
+				AddTextNoSplit ( "\n", NS_UITEXTCOLOR::BLACK);
+				const WORD wLevel = 0;
+				SKILL::SLEARN& sLEARN = pSkill->m_sLEARN;
+				SKILL::SLEARN_LVL& sLVL = sLEARN.sLVL_STEP[wLevel];
+			
+				//	1. »Ý­n«O¯dªº§Þ¥©
+				SNATIVEID NeedSkillID = pSkill->m_sLEARN.sSKILL;			
+				if ( NeedSkillID != NATIVEID_NULL() )
+				{
+					BOOL bVALID = FALSE;
+					BOOL bNeedSkillLevel = FALSE;
+
+					CString strNeedSkillName;
+					CString strNeedSkillLevel;
+
+					PGLSKILL pNeedSkill = GLSkillMan::GetInstance().GetData ( NeedSkillID.wMainID, NeedSkillID.wSubID );
+					strNeedSkillName.Format("%s:%s", ID2GAMEWORD( "SKILL_ADVANCED_INFO", 0), pNeedSkill->GetName() );
+					bVALID = pCharacter->ISLEARNED_SKILL ( NeedSkillID );			
+
+					//	2. »Ý­n«O¯dªº§Þ¯à¤ô¥­
+					if ( 0 < sLVL.dwSKILL_LVL )
+					{
+						strNeedSkillLevel.Format("%s:%d",ID2GAMEWORD( "SKILL_ADVANCED_INFO", 1), (sLVL.dwSKILL_LVL + 1) );
+						bNeedSkillLevel = TRUE;
+
+						SCHARDATA2::SKILL_MAP& map = pCharacter->m_ExpSkills;				
+						SCHARDATA2::SKILL_MAP_ITER iter = map.find ( NeedSkillID.dwID );
+						if ( iter != map.end() )
+						{
+							SCHARSKILL& rCharSkill = (*iter).second;
+
+							//	¦â±m±±¨î
+							bVALID = rCharSkill.wLevel >= sLVL.dwSKILL_LVL;						
+						}
+					}
+
+					AddTextNoSplit(strNeedSkillName,NS_UITEXTCONTROL::GetEvaluateColor ( bVALID ));
+
+					if ( bNeedSkillLevel )
+						AddTextNoSplit(strNeedSkillLevel, NS_UITEXTCONTROL::GetEvaluateColor ( bVALID ) );
+				}
+
+				//	3. ¿ä±¸°æÇèÄ¡
+				if ( 0 < sLVL.dwSKP )
+				{
+					strText.Format("%s:%d",ID2GAMEWORD( "SKILL_ADVANCED_INFO", 2), sLVL.dwSKP);				
+					AddTextNoSplit(strText, NS_UITEXTCONTROL::GetEvaluateColor ( pCharacter->m_dwSkillPoint >= sLVL.dwSKP ) );
+				}
+
+				//	4. ¿ä±¸·¹º§
+				if ( 0 < sLVL.dwLEVEL )
+				{
+					strText.Format("%s:%d",ID2GAMEWORD( "SKILL_ADVANCED_INFO", 3), sLVL.dwLEVEL);
+					AddTextNoSplit(strText, NS_UITEXTCONTROL::GetEvaluateColor ( pCharacter->GETLEVEL () >= int(sLVL.dwLEVEL) ) );
+				}
+
+				if ( 0 < sLVL.nREBORN )
+				{
+					strText.Format("%s:%d",ID2GAMEWORD( "SKILL_ADVANCED_INFO", 4), sLVL.nREBORN);
+					AddTextNoSplit(strText, NS_UITEXTCONTROL::GetEvaluateColor ( pCharacter->GETREBORN () >= int(sLVL.nREBORN) ) );
+				}
+
+				//	5. Á¶°Ç - ¾Ï±¤
+				BOOL bValue = TRUE;
+				strText.Format ( "%s", COMMENT::BRIGHT[pItemData->sBasicOp.emReqBright].c_str() );
+				if ( pItemData->sBasicOp.emReqBright != BRIGHT_BOTH )
+				{
+					if ( pCharacter->GETBRIGHT() != pItemData->sBasicOp.emReqBright )
+					{
+						bValue = FALSE;
+					}
+				}
+				AddTextNoSplit ( strText, NS_UITEXTCONTROL::GetEvaluateColor ( bValue ) );
+
+
+				//	Stats
+				//	1. ¿ä±¸Èû
+				if ( 0 < sLVL.sSTATS.dwPow )
+				{
+					strText.Format("%s :%d",ID2GAMEWORD( "SKILL_ADVANCED_INFO_STATS", 0), sLVL.sSTATS.dwPow);
+					AddTextNoSplit(strText, NS_UITEXTCONTROL::GetEvaluateColor ( pCharacter->m_sSUMSTATS.dwPow >= sLVL.sSTATS.dwPow ) );
+				}
+
+				//	2. ¿ä±¸Ã¼·Â
+				if ( 0 < sLVL.sSTATS.dwStr )
+				{
+					strText.Format("%s :%d",ID2GAMEWORD( "SKILL_ADVANCED_INFO_STATS", 1), sLVL.sSTATS.dwStr);
+					AddTextNoSplit(strText, NS_UITEXTCONTROL::GetEvaluateColor ( pCharacter->m_sSUMSTATS.dwStr >= sLVL.sSTATS.dwStr ) );
+				}
+
+				//	3. ¿ä±¸Á¤½Å
+				if ( 0 < sLVL.sSTATS.dwSpi )
+				{
+					strText.Format("%s :%d",ID2GAMEWORD( "SKILL_ADVANCED_INFO_STATS", 2), sLVL.sSTATS.dwSpi);
+					AddTextNoSplit(strText, NS_UITEXTCONTROL::GetEvaluateColor ( pCharacter->m_sSUMSTATS.dwSpi >= sLVL.sSTATS.dwSpi ));
+				}
+
+				//	4. ¿ä±¸¹ÎÃ¸
+				if ( 0 < sLVL.sSTATS.dwDex )
+				{
+					strText.Format("%s :%d",ID2GAMEWORD( "SKILL_ADVANCED_INFO_STATS", 3), sLVL.sSTATS.dwDex);
+					AddTextNoSplit(strText, NS_UITEXTCONTROL::GetEvaluateColor ( pCharacter->m_sSUMSTATS.dwDex >= sLVL.sSTATS.dwDex ) );
+				}
+
+				//	5. ¿ä±¸Áö·Â
+				if ( 0 < sLVL.sSTATS.dwInt )
+				{
+					strText.Format("%s :%d",ID2GAMEWORD( "SKILL_ADVANCED_INFO_STATS", 4), sLVL.sSTATS.dwInt);
+					AddTextNoSplit(strText, NS_UITEXTCONTROL::GetEvaluateColor ( pCharacter->m_sSUMSTATS.dwInt >= sLVL.sSTATS.dwInt ) );
+				}
+
+				//	6. ¿ä±¸±Ù·Â
+				if ( 0 < sLVL.sSTATS.dwSta )
+				{
+					strText.Format("%s :%d",ID2GAMEWORD( "SKILL_ADVANCED_INFO_STATS", 5), sLVL.sSTATS.dwSta);
+					AddTextNoSplit(strText, NS_UITEXTCONTROL::GetEvaluateColor ( pCharacter->m_sSUMSTATS.dwPow >= sLVL.sSTATS.dwSta ) );
+				}
+			}
+		}
+	}
+
+	void AddTextAddValue( const SITEMCUSTOM & sItemCustom, const ITEM::SSUIT & sSUIT )
+	{
+		CString strText;
+		BOOL bLEAST_HAVE_ONE(TRUE);
+		BOOL bADD_HP(FALSE), bADD_MP(FALSE), bADD_SP(FALSE), bADD_MA(FALSE);
+		INT arrVALUE[EMADD_SIZE];
+		SecureZeroMemory( arrVALUE, sizeof(arrVALUE) );
+
+		for ( int i = 0; i < ITEM::SSUIT::ADDON_SIZE; ++i )
+		{
+			EMITEM_ADDON emTYPE = sSUIT.sADDON[i].emTYPE;
+
+			if ( emTYPE != EMADD_NONE )
+			{
+				//	NOTE
+				//		°¡»êÈ¿°ú°¡ Á¸ÀçÇÒ°æ¿ì¿¡¸¸ Å¸ÀÌÆ²À»
+				//		Ãâ·ÂÇÏ±â À§ÇØ, Àû¾îµµ ÇÏ³ª°¡ Á¸ÀçÇÒ¶§
+				//		»Ñ¸°´Ù´Â °ÍÀ» Ã¼Å©ÇÑ´Ù.
+				if ( bLEAST_HAVE_ONE )
+				{
+					//AddTextNoSplit( ID2GAMEWORD ( "ITEM_CATEGORY", 10 ),NS_UITEXTCOLOR::LIGHTSKYBLUE);
+					AddTextNoSplit( " ",NS_UITEXTCOLOR::PRIVATE);
+					bLEAST_HAVE_ONE = FALSE;
+				}
+
+				int nVALUE = sSUIT.sADDON[i].nVALUE;
+
+				switch ( emTYPE )
+				{
+				case EMADD_HP:
+					if( !bADD_HP )
+					{
+						arrVALUE[EMADD_HP] = sItemCustom.GETADDHP();
+						bADD_HP = TRUE;
+					}
+					break;
+				case EMADD_MP:
+					if( !bADD_MP )
+					{
+						arrVALUE[EMADD_MP] = sItemCustom.GETADDMP();
+						bADD_MP = TRUE;
+					}
+					break;
+				case EMADD_SP:
+					if( !bADD_SP )
+					{
+						arrVALUE[EMADD_SP] = sItemCustom.GETADDSP();
+						bADD_SP = TRUE;
+					}
+					break;
+				case EMADD_MA:
+					if( !bADD_MA )
+					{
+						arrVALUE[EMADD_MA] = sItemCustom.GETADDMA();
+						bADD_MA = TRUE;
+					}
+					break;
+				case EMADD_HITRATE:		arrVALUE[EMADD_HITRATE] += nVALUE;		break;
+				case EMADD_AVOIDRATE:	arrVALUE[EMADD_AVOIDRATE] += nVALUE;	break;
+				case EMADD_DAMAGE:		arrVALUE[EMADD_DAMAGE] += nVALUE;		break;
+				case EMADD_DEFENSE:		arrVALUE[EMADD_DEFENSE] += nVALUE;		break;
+				case EMADD_STATS_POW:	arrVALUE[EMADD_STATS_POW] += nVALUE;	break;
+				case EMADD_STATS_STR:	arrVALUE[EMADD_STATS_STR] += nVALUE;	break;
+				case EMADD_STATS_SPI:	arrVALUE[EMADD_STATS_SPI] += nVALUE;	break;
+				case EMADD_STATS_DEX:	arrVALUE[EMADD_STATS_DEX] += nVALUE;	break;
+				case EMADD_STATS_INT:	arrVALUE[EMADD_STATS_INT] += nVALUE;	break;
+				case EMADD_STATS_STA:	arrVALUE[EMADD_STATS_STA] += nVALUE;	break;
+				case EMADD_PA:			arrVALUE[EMADD_PA] += nVALUE;			break;
+				case EMADD_SA:			arrVALUE[EMADD_SA] += nVALUE;			break;
+				case EMADD_CP:			arrVALUE[EMADD_CP] += nVALUE;			break; //add cp
+				};
+			}
+		}
+
+		for( int i=1; i<EMADD_SIZE; ++i)
+		{
+			if( arrVALUE[i] != 0 )
+			{
+				strText.Format( "%s :%s", ID2GAMEWORD( "ITEM_ADDON_INFO", i ), GetNumberWithSign( arrVALUE[i] ) );
+				AddTextNoSplit( strText, NS_UITEXTCOLOR::LIME );
+			}
+		}
+
+		if ( sItemCustom.nidDISGUISE!=SNATIVEID(false) )
+		{
+			SITEM* pJDisguiseData = GLItemMan::GetInstance().GetItem ( sItemCustom.nidDISGUISE );
+			if ( pJDisguiseData )
+			{
+				if ( pJDisguiseData->sBasicOp.IsCostumeCombine() )
+				{
+					//add jitem
+					BOOL bLEAST_HAVE_ONE(TRUE);
+					INT arrVALUECOS[EMADD_SIZE];
+					SecureZeroMemory( arrVALUECOS, sizeof(arrVALUECOS) );
+	
+					for ( int j = 0; j < ITEM::SSUIT::ADDON_SIZE; ++j )
+					{
+						EMITEM_ADDON emTYPEJ = pJDisguiseData->sSuitOp.sADDON[j].emTYPE;
+
+						if ( emTYPEJ != EMADD_NONE )
+						{
+							if ( bLEAST_HAVE_ONE )
+							{
+								AddTextNoSplit ( "Costume Value" , NS_UITEXTCOLOR::AQUAMARINE );
+								bLEAST_HAVE_ONE = FALSE;
+							}
+
+							int nVALUECOS = pJDisguiseData->sSuitOp.sADDON[j].nVALUE;
+							switch ( emTYPEJ )
+							{
+								case EMADD_HP:			arrVALUECOS[EMADD_HP] += nVALUECOS;			break;
+								case EMADD_MP:			arrVALUECOS[EMADD_MP] += nVALUECOS;			break;
+								case EMADD_SP:			arrVALUECOS[EMADD_SP] += nVALUECOS;			break;
+								case EMADD_MA:			arrVALUECOS[EMADD_MA] += nVALUECOS;			break;
+								case EMADD_HITRATE:		arrVALUECOS[EMADD_HITRATE] += nVALUECOS;		break;
+								case EMADD_AVOIDRATE:	arrVALUECOS[EMADD_AVOIDRATE] += nVALUECOS;		break;
+								case EMADD_DAMAGE:		arrVALUECOS[EMADD_DAMAGE] += nVALUECOS;		break;
+								case EMADD_DEFENSE:		arrVALUECOS[EMADD_DEFENSE] += nVALUECOS;		break;
+								case EMADD_STATS_POW:	arrVALUECOS[EMADD_STATS_POW] += nVALUECOS;		break;
+								case EMADD_STATS_STR:	arrVALUECOS[EMADD_STATS_STR] += nVALUECOS;		break;
+								case EMADD_STATS_SPI:	arrVALUECOS[EMADD_STATS_SPI] += nVALUECOS;		break;
+								case EMADD_STATS_DEX:	arrVALUECOS[EMADD_STATS_DEX] += nVALUECOS;		break;
+								case EMADD_STATS_INT:	arrVALUECOS[EMADD_STATS_INT] += nVALUECOS;		break;
+								case EMADD_STATS_STA:	arrVALUECOS[EMADD_STATS_STA] += nVALUECOS;		break;
+								case EMADD_PA:			arrVALUECOS[EMADD_PA] += nVALUECOS;			break;
+								case EMADD_SA:			arrVALUECOS[EMADD_SA] += nVALUECOS;			break;
+								case EMADD_CP:			arrVALUECOS[EMADD_CP] += nVALUECOS;			break; //add cp
+							};
+						}
+					}
+
+					CString strTextCos;
+					for( int i=1; i<EMADD_SIZE; ++i)
+					{
+						if( arrVALUECOS[i] != 0 )
+						{
+							strTextCos.Format( "%s :%s", ID2GAMEWORD( "ITEM_ADDON_INFO", i ), GetNumberWithSign( arrVALUECOS[i] ) );
+							//AddTextNoSplit( strTextCos, NS_UITEXTCOLOR::DARKTURQUOISE );
+							AddTextNoSplit( strTextCos, NS_UITEXTCOLOR::LIME );
+						}		
+					}
+				}
+			}	
+		}
+	}
+
+	void LOAD_SIMPLE ( const SITEMCUSTOM &sItemCustom )
+	{
+		if ( m_sItemCustomBACK == sItemCustom ) return ;
+
+		m_sItemCustomBACK = sItemCustom;
+
+		RemoveAllInfo();
+
+		SITEM* pItemData = GLItemMan::GetInstance().GetItem ( sItemCustom.sNativeID );
+		if ( !pItemData ) return ;
+		
+		DWORD dwLevel = pItemData->sBasicOp.emLevel;
+		//	ÀÌ¸§
+		AddTextNoSplit ( pItemData->GetName(), COMMENT::ITEMCOLOR[dwLevel] );
+	}
+
+	void LOAD ( const SITEMCUSTOM &sItemCustom, const BOOL bShopOpen, const BOOL bInMarket, const BOOL bInPrivateMarket, const BOOL bIsWEAR_ITEM, WORD wPosX, WORD wPosY, SNATIVEID sNpcNativeID )
+	{	
+		if ( m_sItemCustomBACK == sItemCustom && m_bShopOpenBACK == bShopOpen
+			&& m_bInMarketBACK == bInMarket && m_bInPrivateMarketBACK == bInPrivateMarket
+			&& m_bIsWEAR_ITEMBACK == bIsWEAR_ITEM && m_wPosXBACK == wPosX && m_wPosYBACK == wPosY)	return ;
+
+		m_sItemCustomBACK = sItemCustom;
+		m_bShopOpenBACK = bShopOpen;
+		m_bInMarketBACK = bInMarket;
+		m_bInPrivateMarketBACK = bInPrivateMarket;
+		m_bIsWEAR_ITEMBACK = bIsWEAR_ITEM;
+		m_wPosXBACK = wPosX;
+		m_wPosYBACK = wPosY;
+
+		RemoveAllInfo();
+
+		if ( bIsWEAR_ITEM )
+		{
+			AddTextNoSplit ( ID2GAMEWORD ("WEAR_ITEM" ), NS_UITEXTCOLOR::RED );
+		}
+
+		CString strText, strText2;
+		BOOL bValue = FALSE;
+		int nExtraValue = 0;
+
+		GLCharacter* pCharacter = GLGaeaClient::GetInstance().GetCharacter();
+		SITEM* pItemData = GLItemMan::GetInstance().GetItem ( sItemCustom.sNativeID );
+		SNATIVEID		m_sNativeID;
+
+		if ( !pItemData ) ResetResiIcons();
+
+		int nVALUEBOX;
+		{
+			BOOL bInsert = FALSE;
+			EMITEMLEVEL emLevel = pItemData->sBasicOp.emLevel;
+				strText.Format ( "%s",pItemData->GetName() );
+				BYTE uGRADE = sItemCustom.GETGRADE(EMGRINDING_NUNE);
+
+					{
+						CString strCombine;
+						if ( uGRADE == 0 )
+						{ strCombine.Format ( "        %s", strText ); }
+
+						else
+
+						{ strCombine.Format ( "        +%d %s", uGRADE, strText ); }
+
+						DWORD dwLevel = (DWORD)pItemData->sBasicOp.emLevel;
+
+						DWORD strColorName[20] = 
+						{			
+							NS_UITEXTCOLOR::PALEGREEN,//0
+							NS_UITEXTCOLOR::PALEGREEN,//1
+							NS_UITEXTCOLOR::PALEGREEN,//2
+							NS_UITEXTCOLOR::PALEGREEN,//3
+							NS_UITEXTCOLOR::PALEGREEN,//4
+							NS_UITEXTCOLOR::SILVER,//5
+							NS_UITEXTCOLOR::SILVER,//6
+							NS_UITEXTCOLOR::ORANGE,//7 
+							NS_UITEXTCOLOR::ORANGE,//8
+							NS_UITEXTCOLOR::GOLD,//9
+							NS_UITEXTCOLOR::AQUA,//10
+							NS_UITEXTCOLOR::VIOLET,//11
+							NS_UITEXTCOLOR::GREEN,//12
+							NS_UITEXTCOLOR::RED,//13
+							NS_UITEXTCOLOR::FUCHSIA,//14
+							NS_UITEXTCOLOR::YELLOW,//15
+							NS_UITEXTCOLOR::WHITE,//16
+							NS_UITEXTCOLOR::LIGHTORANGE,//17
+							NS_UITEXTCOLOR::VIOLET,//18
+							NS_UITEXTCOLOR::LIME,//19
+						};
+
+						int ColorGrade = uGRADE;
+						SetNameItem( strCombine, strColorName[ColorGrade] );
+						//Allow Spaces
+						AddTextNoSplit ( " ", NS_UITEXTCOLOR::BLACK );
+					}
+	
+				
+				
+
+		
+
+		/*BOOL bInsert = FALSE;
+
+		strText.Format ( "%s", ID2GAMEWORD ( "ITEM_BASIC_INFO", 0 ), pItemData->GetName() );
+		BYTE uGRADE = sItemCustom.GETGRADE(EMGRINDING_NUNE);
+		APPEND_ITEM_GRADE ( strText, uGRADE );
+
+		DWORD dwLevel = (DWORD)pItemData->sBasicOp.emLevel;
+
+
+		DWORD strColorName[GRADE_LIMIT_MAX+1] = 
+		{			
+			NS_UITEXTCOLOR::PALEGREEN,//0
+			NS_UITEXTCOLOR::PALEGREEN,//1
+			NS_UITEXTCOLOR::PALEGREEN,//2
+			NS_UITEXTCOLOR::PALEGREEN,//3
+			NS_UITEXTCOLOR::PALEGREEN,//4
+			NS_UITEXTCOLOR::SILVER,//5
+			NS_UITEXTCOLOR::SILVER,//6
+			NS_UITEXTCOLOR::ORANGE,//7 
+			NS_UITEXTCOLOR::ORANGE,//8
+			NS_UITEXTCOLOR::GOLD,//9
+			NS_UITEXTCOLOR::AQUA,//10
+			NS_UITEXTCOLOR::VIOLET,//11
+			NS_UITEXTCOLOR::GREEN,//12
+			NS_UITEXTCOLOR::RED,//13
+			NS_UITEXTCOLOR::FUCHSIA,//14
+			NS_UITEXTCOLOR::YELLOW,//15
+			NS_UITEXTCOLOR::WHITE,//16
+			NS_UITEXTCOLOR::LIGHTORANGE,//17
+			NS_UITEXTCOLOR::VIOLET,//17
+		};
+
+		int ColorGrade;
+
+		if( uGRADE > 18 ){ 
+		ColorGrade = 0;
+		}else{
+		ColorGrade = uGRADE;
+		}
+			AddTextNoSplit ( strText, strColorName[ColorGrade] );*/
+				
+			
+				DWORD dwReqSchool = pItemData->sBasicOp.dwReqSchool;
+				CString strSchool;
+				if ( pItemData->sBasicOp.dwReqSchool!=GLSCHOOL_ALL )
+					{
+						if ( pItemData->sBasicOp.dwReqSchool & GLSCHOOL_00)
+						{
+							strSchool += "Sacred Gate";
+						}
+						if ( pItemData->sBasicOp.dwReqSchool & GLSCHOOL_01)
+						{
+							strSchool += "Mystic Peak";
+						}
+						if ( pItemData->sBasicOp.dwReqSchool & GLSCHOOL_02)
+						{
+							strSchool += "Phoenix";
+						}						
+					}
+					else
+					{
+						strSchool = ID2GAMEWORD ( "ITEM_REQ_SCHOOL", 3 );
+					}
+
+			if( sItemCustom.nidDISGUISE != NATIVEID_NULL() )
+					{
+						SITEM* pItemDisguise = GLItemMan::GetInstance().GetItem ( sItemCustom.nidDISGUISE );
+						DWORD dwReqCharClass_Disguise = pItemDisguise->sBasicOp.dwReqCharClass;
+						DWORD dwReqCharClass = pItemData->sBasicOp.dwReqCharClass;
+						CString szClass;
+
+						if( dwReqCharClass )
+						{
+							//if ( (dwReqCharClass==GLCC_ALL_NEWSEX) && (dwReqCharClass_Disguise==GLCC_ALL_NEWSEX) )
+							//add class
+							if ( (dwReqCharClass==GLCC_ALL_NEWSEX) && (dwReqCharClass_Disguise==GLCC_ALL_NEWSEX) )
+							{
+								szClass = ("All Classes");
+							}
+							else if (((dwReqCharClass&GLCC_FIGHTER_M) && (dwReqCharClass_Disguise&GLCC_FIGHTER_M) &&
+										(dwReqCharClass&GLCC_ARMS_M)  && (dwReqCharClass_Disguise&GLCC_ARMS_M) 	  &&	
+									  (dwReqCharClass&GLCC_ARCHER_M)  && (dwReqCharClass_Disguise&GLCC_ARCHER_M)  &&	
+									  (dwReqCharClass&GLCC_SPIRIT_M)  && (dwReqCharClass_Disguise&GLCC_SPIRIT_M)  &&	
+									 (dwReqCharClass&GLCC_EXTREME_M)  && (dwReqCharClass_Disguise&GLCC_EXTREME_M) &&
+									 (dwReqCharClass&GLCC_SCIENCE_M)  && (dwReqCharClass_Disguise&GLCC_SCIENCE_M) &&	
+									 (dwReqCharClass&GLCC_ASSASSIN_M)  && (dwReqCharClass_Disguise&GLCC_ASSASSIN_M) ) 
+																	  ||
+									 ((dwReqCharClass&GLCC_FIGHTER_M) && (dwReqCharClass_Disguise&GLCC_FIGHTER_M) &&
+										(dwReqCharClass&GLCC_ARMS_M)  && (dwReqCharClass_Disguise&GLCC_ARMS_M) 	  &&	
+									  (dwReqCharClass&GLCC_ARCHER_M)  && (dwReqCharClass_Disguise&GLCC_ARCHER_M)  &&	
+									  (dwReqCharClass&GLCC_SPIRIT_M)  && (dwReqCharClass_Disguise&GLCC_SPIRIT_M)  &&	
+									 (dwReqCharClass&GLCC_EXTREME_M)  && (dwReqCharClass_Disguise&GLCC_EXTREME_M) &&
+									 (dwReqCharClass&GLCC_SCIENCE_M)  && (dwReqCharClass_Disguise&GLCC_SCIENCE_M) )	)
+							{
+								szClass = ("All Male Classes");
+							}
+							else if (((dwReqCharClass&GLCC_FIGHTER_W) && (dwReqCharClass_Disguise&GLCC_FIGHTER_W) &&
+										(dwReqCharClass&GLCC_ARMS_W)  && (dwReqCharClass_Disguise&GLCC_ARMS_W) 	  &&	
+									  (dwReqCharClass&GLCC_ARCHER_W)  && (dwReqCharClass_Disguise&GLCC_ARCHER_W)  &&	
+									  (dwReqCharClass&GLCC_SPIRIT_W)  && (dwReqCharClass_Disguise&GLCC_SPIRIT_W)  &&	
+									 (dwReqCharClass&GLCC_EXTREME_W)  && (dwReqCharClass_Disguise&GLCC_EXTREME_W) &&
+									 (dwReqCharClass&GLCC_SCIENCE_W)  && (dwReqCharClass_Disguise&GLCC_SCIENCE_W) &&	
+									 (dwReqCharClass&GLCC_ASSASSIN_W)  && (dwReqCharClass_Disguise&GLCC_ASSASSIN_W)) 
+																	  ||
+									 ((dwReqCharClass&GLCC_FIGHTER_W) && (dwReqCharClass_Disguise&GLCC_FIGHTER_W) &&
+										(dwReqCharClass&GLCC_ARMS_W)  && (dwReqCharClass_Disguise&GLCC_ARMS_W) 	  &&	
+									  (dwReqCharClass&GLCC_ARCHER_W)  && (dwReqCharClass_Disguise&GLCC_ARCHER_W)  &&	
+									  (dwReqCharClass&GLCC_SPIRIT_W)  && (dwReqCharClass_Disguise&GLCC_SPIRIT_W)  &&	
+									 (dwReqCharClass&GLCC_EXTREME_W)  && (dwReqCharClass_Disguise&GLCC_EXTREME_W) &&
+									 (dwReqCharClass&GLCC_SCIENCE_W)  && (dwReqCharClass_Disguise&GLCC_SCIENCE_W) )	)
+							{
+								szClass = ("All Female Classes");
+							}
+							else
+							{
+								if ( (dwReqCharClass&GLCC_FIGHTER_M) && (dwReqCharClass_Disguise&GLCC_FIGHTER_M) &&
+									(dwReqCharClass&GLCC_FIGHTER_W) && (dwReqCharClass_Disguise&GLCC_FIGHTER_W))
+								{
+									szClass+="/Brawler";
+								}
+								if ( (dwReqCharClass&GLCC_ARMS_M)  && (dwReqCharClass_Disguise&GLCC_ARMS_M) &&
+									(dwReqCharClass&GLCC_ARMS_W)  && (dwReqCharClass_Disguise&GLCC_ARMS_W))
+								{
+									szClass+="/Swordie";
+								}
+								if ( (dwReqCharClass&GLCC_ARCHER_M)  && (dwReqCharClass_Disguise&GLCC_ARCHER_M) &&
+									(dwReqCharClass&GLCC_ARCHER_W)  && (dwReqCharClass_Disguise&GLCC_ARCHER_W))
+								{
+									szClass+="/Archer";
+								}
+								if ( (dwReqCharClass&GLCC_SPIRIT_M)  && (dwReqCharClass_Disguise&GLCC_SPIRIT_M) &&
+									(dwReqCharClass&GLCC_SPIRIT_W)  && (dwReqCharClass_Disguise&GLCC_SPIRIT_W))
+								{
+									szClass+="/Shaman";
+								}
+								if ( (dwReqCharClass&GLCC_EXTREME_M)  && (dwReqCharClass_Disguise&GLCC_EXTREME_M) &&
+									(dwReqCharClass&GLCC_EXTREME_W)  && (dwReqCharClass_Disguise&GLCC_EXTREME_W))
+								{
+									szClass+="/Extreme";
+								}
+								//add class
+								if ( (dwReqCharClass&GLCC_SCIENCE_M)  && (dwReqCharClass_Disguise&GLCC_SCIENCE_M) &&
+									(dwReqCharClass&GLCC_SCIENCE_W)  && (dwReqCharClass_Disguise&GLCC_SCIENCE_W))
+								{
+									szClass+="/Gunner";
+								}
+								if ( (dwReqCharClass&GLCC_ASSASSIN_M)  && (dwReqCharClass_Disguise&GLCC_ASSASSIN_M) &&
+									(dwReqCharClass&GLCC_ASSASSIN_W)  && (dwReqCharClass_Disguise&GLCC_ASSASSIN_W))
+								{
+									szClass+="/Assassin";
+								}
+							}
+
+						strText.Format( "%s", szClass.GetString() );
+						//AddTextNoSplit ( strText, NS_UITEXTCONTROL::GetEvaluateColor( 
+						//(dwReqCharClass&pCharacter->m_emClass) && (dwReqCharClass_Disguise&pCharacter->m_emClass) ) );
+				}
+			}
+			else
+			{
+				DWORD dwReqCharClass = pItemData->sBasicOp.dwReqCharClass;
+						CString szClass;
+						
+						if( dwReqCharClass )
+						{
+							//if ( dwReqCharClass==GLCC_ALL_NEWSEX)
+							//add class
+							if ( dwReqCharClass==GLCC_ALL_NEWSEX)
+							{
+								szClass = ("/All Classes");
+							}
+							else if ((( dwReqCharClass & GLCC_FIGHTER_M) && ( dwReqCharClass & GLCC_ARMS_M) 	&&
+									   ( dwReqCharClass & GLCC_ARCHER_M) && ( dwReqCharClass & GLCC_SPIRIT_M) 	&&
+									  ( dwReqCharClass & GLCC_EXTREME_M) &&	( dwReqCharClass & GLCC_SCIENCE_M) 	&&
+									  ( dwReqCharClass & GLCC_ASSASSIN_M) )	
+																		 ||										
+									 (( dwReqCharClass & GLCC_FIGHTER_M) && ( dwReqCharClass & GLCC_ARMS_M) 	&&
+									   ( dwReqCharClass & GLCC_ARCHER_M) && ( dwReqCharClass & GLCC_SPIRIT_M) 	&&
+									  ( dwReqCharClass & GLCC_EXTREME_M) &&	( dwReqCharClass & GLCC_SCIENCE_M) 	&&
+									  ( dwReqCharClass & GLCC_ASSASSIN_M))		)
+							{
+								szClass = ("/All Male Classes");
+							}
+							else if ((( dwReqCharClass & GLCC_FIGHTER_W) && ( dwReqCharClass & GLCC_ARMS_W) 	&&
+									   ( dwReqCharClass & GLCC_ARCHER_W) && ( dwReqCharClass & GLCC_SPIRIT_W) 	&&
+									  ( dwReqCharClass & GLCC_EXTREME_W) &&	( dwReqCharClass & GLCC_SCIENCE_W) 	&&
+									  ( dwReqCharClass & GLCC_ASSASSIN_W))	
+																		 ||										
+									 (( dwReqCharClass & GLCC_FIGHTER_W) && ( dwReqCharClass & GLCC_ARMS_W) 	&&
+									   ( dwReqCharClass & GLCC_ARCHER_W) && ( dwReqCharClass & GLCC_SPIRIT_W) 	&&
+									  ( dwReqCharClass & GLCC_EXTREME_W) &&	( dwReqCharClass & GLCC_SCIENCE_W) 	&&
+									  ( dwReqCharClass & GLCC_ASSASSIN_W))	)
+							{
+								szClass = ("/All Female Classes");
+							}
+							else
+							{
+								if (( dwReqCharClass & GLCC_FIGHTER_M)&&( dwReqCharClass & GLCC_FIGHTER_W))
+								{
+									szClass+="/Brawler";
+								}
+								if (( dwReqCharClass & GLCC_ARMS_M)&&( dwReqCharClass & GLCC_ARMS_W))
+								{
+									szClass+="/Swordie";
+								}
+								if (( dwReqCharClass & GLCC_ARCHER_M)&&( dwReqCharClass & GLCC_ARCHER_W))
+								{
+									szClass+="/Archer";
+								}
+								if (( dwReqCharClass & GLCC_SPIRIT_M)&&( dwReqCharClass & GLCC_SPIRIT_W))
+								{
+									szClass+="/Shaman";
+								}
+								if (( dwReqCharClass & GLCC_EXTREME_M)&&( dwReqCharClass & GLCC_EXTREME_W))
+								{
+									szClass+="/Extreme";
+								}
+								//add class
+								if (( dwReqCharClass & GLCC_SCIENCE_M)&&( dwReqCharClass & GLCC_SCIENCE_W))
+								{
+									szClass+="/Scientist";
+								}
+								if (( dwReqCharClass & GLCC_ASSASSIN_M)&&( dwReqCharClass & GLCC_ASSASSIN_W))
+								{
+									szClass+="/Assassin";
+								}
+							}
+
+					strText.Format( "%s", szClass.GetString() );
+					//AddTextNoSplit ( strText, NS_UITEXTCONTROL::GetEvaluateColor ( dwReqCharClass & pCharacter->m_emClass ) );
+				}
+			}
+
+			//CString strItemReq = " " + strSchool + strText;
+			CString strItemReq; 
+			strItemReq.Format ( "          %s", strSchool + strText);
+			AddTextNoSplit ( strItemReq, NS_UITEXTCOLOR::WHITE );
+			
+			if ( pItemData->sBasicOp.wReqLevelDW || pItemData->sBasicOp.wReqLevelUP )
+			{
+				bool bReqLevel = true;
+				strText.Format( "          %s %d", ID2GAMEWORD("ITEM_ADVANCED_INFO_CONDITION", 0), pItemData->sBasicOp.wReqLevelDW );
+									
+				if ( pItemData->sBasicOp.wReqLevelUP )
+				{
+					strText2.Format ( " ~ %d",pItemData->sBasicOp.wReqLevelUP );
+					strText += strText2; 
+					bReqLevel = (pItemData->sBasicOp.wReqLevelUP >= pCharacter->m_wLevel);
+				}
+
+				AddTextNoSplit(strText, NS_UITEXTCONTROL::GetEvaluateColor ( pItemData->sBasicOp.wReqLevelDW <= pCharacter->m_wLevel && bReqLevel ) );
+			}
+			else
+			{
+				AddTextNoSplit( " ", NS_UITEXTCOLOR::BLACK );
+			}
+
+			if ( pItemData->sBasicOp.emItemType == ITEM_BOX )
+			{
+				AddTextNoSplit ( " ", NS_UITEXTCOLOR::BLACK );
+				AddTextNoSplit ( " ", NS_UITEXTCOLOR::BLACK );
+				AddTextNoSplit ( " ", NS_UITEXTCOLOR::BLACK );
+			}
+
+			const int nELEC   = sItemCustom.GETRESIST_ELEC();
+			const int nFIRE   = sItemCustom.GETRESIST_FIRE();
+			const int nICE    = sItemCustom.GETRESIST_ICE();
+			const int nPOISON = sItemCustom.GETRESIST_POISON();
+			const int nSPIRIT = sItemCustom.GETRESIST_SPIRIT();
+					
+			if ( (nELEC) && (nFIRE) && (nICE) && (nPOISON) && (nSPIRIT) )
+			{
+				//strText.Format ( "Resistance:      %d      %d      %d      %d      %d      ", nELEC, nFIRE, nICE, nPOISON, nSPIRIT );
+				//strText.Format ( "Resistance: \t%d \t%d \t%d \t%d \t%d", nELEC, nFIRE, nICE, nPOISON, nSPIRIT );
+				if ( (nELEC) && (nFIRE) && (nICE) && (nPOISON) && (nSPIRIT) <=9 )
+				{
+				strText.Format ( "     %d        %d        %d         %d        %d", nELEC, nFIRE, nICE, nPOISON, nSPIRIT );
+				BYTE uGRADE = ( (sItemCustom.GETGRADE(EMGRINDING_RESIST_ELEC)) 	 || 
+								(sItemCustom.GETGRADE(EMGRINDING_RESIST_FIRE)) 	 || 
+								(sItemCustom.GETGRADE(EMGRINDING_RESIST_ICE)) 	 || 
+								(sItemCustom.GETGRADE(EMGRINDING_RESIST_POISON)) || 
+								(sItemCustom.GETGRADE(EMGRINDING_RESIST_SPIRIT)));
+				APPEND_ITEM_GRADE ( strText, uGRADE );
+				AddTextNoSplit(strText,NS_UITEXTCOLOR::LIME);
+				}
+				else if ( (nELEC) && (nFIRE) && (nICE) && (nPOISON) && (nSPIRIT) <= 99 )
+				{
+				strText.Format ( "    %d       %d      %d       %d      %d", nELEC, nFIRE, nICE, nPOISON, nSPIRIT );
+				BYTE uGRADE = ( (sItemCustom.GETGRADE(EMGRINDING_RESIST_ELEC)) 	 || 
+								(sItemCustom.GETGRADE(EMGRINDING_RESIST_FIRE)) 	 || 
+								(sItemCustom.GETGRADE(EMGRINDING_RESIST_ICE)) 	 || 
+								(sItemCustom.GETGRADE(EMGRINDING_RESIST_POISON)) || 
+								(sItemCustom.GETGRADE(EMGRINDING_RESIST_SPIRIT)));
+				APPEND_ITEM_GRADE ( strText, uGRADE );
+				AddTextNoSplit(strText,NS_UITEXTCOLOR::LIME);
+				}
+
+				else if ( (nELEC) || (nFIRE) || (nICE) || (nPOISON) || (nSPIRIT) <= 999 )
+				{
+				strText.Format ( "     %d    %d     %d     %d     %d", nELEC, nFIRE, nICE, nPOISON, nSPIRIT );
+				BYTE uGRADE = ( (sItemCustom.GETGRADE(EMGRINDING_RESIST_ELEC)) 	 && 
+								(sItemCustom.GETGRADE(EMGRINDING_RESIST_FIRE)) 	 && 
+								(sItemCustom.GETGRADE(EMGRINDING_RESIST_ICE)) 	 && 
+								(sItemCustom.GETGRADE(EMGRINDING_RESIST_POISON)) && 
+								(sItemCustom.GETGRADE(EMGRINDING_RESIST_SPIRIT)));
+				APPEND_ITEM_GRADE ( strText, uGRADE );
+				AddTextNoSplit(strText,NS_UITEXTCOLOR::LIME);
+				}
+
+			}
+
+			else if ( pItemData->sBasicOp.emItemType == ITEM_RANDOMITEM )
+			{
+				nVALUEBOX = int(pItemData->sRandomBox.vecBOX.size());
+				if ( nVALUEBOX <= 10 )
+				{
+					AddTextNoSplit ( " ",NS_UITEXTCOLOR::BLACK );
+					AddTextNoSplit ( " ",NS_UITEXTCOLOR::BLACK );
+					AddTextNoSplit ( " ",NS_UITEXTCOLOR::BLACK );
+				}
+				else if ( nVALUEBOX <= 20 )
+				{
+					AddTextNoSplit ( " ",NS_UITEXTCOLOR::BLACK );
+					AddTextNoSplit ( " ",NS_UITEXTCOLOR::BLACK );
+					AddTextNoSplit ( " ",NS_UITEXTCOLOR::BLACK );
+					AddTextNoSplit ( " ",NS_UITEXTCOLOR::BLACK );
+					AddTextNoSplit ( " ",NS_UITEXTCOLOR::BLACK );
+					AddTextNoSplit ( " ",NS_UITEXTCOLOR::BLACK );
+				}
+				else if ( nVALUEBOX <= 30 )
+				{
+					AddTextNoSplit ( " ",NS_UITEXTCOLOR::BLACK );
+					AddTextNoSplit ( " ",NS_UITEXTCOLOR::BLACK );
+					AddTextNoSplit ( " ",NS_UITEXTCOLOR::BLACK );
+					AddTextNoSplit ( " ",NS_UITEXTCOLOR::BLACK );
+					AddTextNoSplit ( " ",NS_UITEXTCOLOR::BLACK );
+					AddTextNoSplit ( " ",NS_UITEXTCOLOR::BLACK );
+					AddTextNoSplit ( " ",NS_UITEXTCOLOR::BLACK );
+					AddTextNoSplit ( " ",NS_UITEXTCOLOR::BLACK );
+					AddTextNoSplit ( " ",NS_UITEXTCOLOR::BLACK );
+				}
+			}	
+			
+			//	???
+			if ( sItemCustom.nidDISGUISE!=SNATIVEID(false) )
+			{
+				SITEM* pDisguiseData = GLItemMan::GetInstance().GetItem ( sItemCustom.nidDISGUISE );
+
+				strText.Format ( "%s:%s", ID2GAMEWORD ( "ITEM_BASIC_INFO", 3 ), pDisguiseData->GetName() );			
+				AddTextNoSplit ( strText, NS_UITEXTCOLOR::GREENYELLOW );
+			}
+
+			//	??? ?? ??
+			if ( sItemCustom.tDISGUISE!=0 )
+			{				
+				CTime cTime(sItemCustom.tDISGUISE);
+				if ( cTime.GetYear()!=1970 )
+				{
+					CString strExpireDate;
+					strExpireDate = CInnerInterface::GetInstance().MakeString( ID2GAMEWORD("ITEM_EXPIRE_DATE"),
+																				(cTime.GetYear ()%2000), 
+																				cTime.GetMonth (), 
+																				cTime.GetDay (), 
+																				cTime.GetHour (), 
+																				cTime.GetMinute () );
+
+					strText.Format ( "%s:%s", ID2GAMEWORD ( "ITEM_BASIC_INFO", 7 ), strExpireDate );			
+					AddTextNoSplit ( strText, NS_UITEXTCOLOR::DARKORANGE );
+				}
+			}
+
+			LONGLONG dwCOMMISSION_MONEY = 0;
+
+			//	2.??
+			if ( pItemData->sBasicOp.dwBuyPrice || bInPrivateMarket )
+			{
+				if ( bInPrivateMarket )
+				{
+					bool bOPENER;
+					DWORD dwPrivateMarketID;
+					CInnerInterface::GetInstance().GetPrivateMarketInfo ( bOPENER, dwPrivateMarketID );
+					if ( bOPENER )	//	?? ??
+					{
+						GLPrivateMarket &sPMarket = GLGaeaClient::GetInstance().GetCharacter()->m_sPMarket;
+
+						const SSALEITEM *pSALE = sPMarket.GetItem ( SNATIVEID(wPosX,wPosY) ); 
+						if ( pSALE )
+						{
+							CString strMoney = NS_UITEXTCONTROL::MAKE_MONEY_FORMAT ( pSALE->llPRICE, 3, "," );
+							CString GetMoneyCon = NS_UITEXTCONTROL::MAKE_MONEY_FORMAT ( pSALE->llPRICE, 3, "" );
+							strText.Format ( "%s:%s", ID2GAMEWORD ( "ITEM_BASIC_INFO", 5 ), strMoney );		
+
+							LONGLONG GetMoneyColor = _ttoi64(GetMoneyCon);
+							if ( GetMoneyColor >= 0 && GetMoneyColor <= 99999 ){ AddTextNoSplit ( strText, GLCONST_CHAR::dwITEM_MONEY_COLOR0 );}
+							if ( GetMoneyColor >= 100000 && GetMoneyColor <= 999999 ){ AddTextNoSplit ( strText, GLCONST_CHAR::dwITEM_MONEY_COLOR1 );}
+							if ( GetMoneyColor >= 1000000 && GetMoneyColor <= 9999999 ){ AddTextNoSplit ( strText, GLCONST_CHAR::dwITEM_MONEY_COLOR2 );}
+							if ( GetMoneyColor >= 10000000 && GetMoneyColor <= 99999999 ){ AddTextNoSplit ( strText, GLCONST_CHAR::dwITEM_MONEY_COLOR3 );}
+							if ( GetMoneyColor >= 100000000 && GetMoneyColor <= 999999999 ){ AddTextNoSplit ( strText, GLCONST_CHAR::dwITEM_MONEY_COLOR4 );}
+							if ( GetMoneyColor >= 1000000000 && GetMoneyColor <= 9999999999 ){ AddTextNoSplit ( strText, GLCONST_CHAR::dwITEM_MONEY_COLOR5 );}
+							if ( GetMoneyColor >= 10000000000 && GetMoneyColor <= 99999999999 ){ AddTextNoSplit ( strText, GLCONST_CHAR::dwITEM_MONEY_COLOR6 );}
+							if ( GetMoneyColor >= 100000000000 && GetMoneyColor <= 999999999999 ){ AddTextNoSplit ( strText, GLCONST_CHAR::dwITEM_MONEY_COLOR7 );}
+							if ( GetMoneyColor >= 1000000000000  ){ AddTextNoSplit ( strText, NS_UITEXTCOLOR::WHITE );}
+						}						
+					}
+					else		//	?? ??
+					{
+						PGLCHARCLIENT pCLIENT = GLGaeaClient::GetInstance().GetChar ( dwPrivateMarketID );
+						if ( !pCLIENT ) return ;
+
+						GLPrivateMarket &sPMarket = pCLIENT->m_sPMarket;
+
+						const SSALEITEM *pSALE = sPMarket.GetItem ( SNATIVEID(wPosX,wPosY) ); 
+						if ( pSALE )
+						{
+							CString strMoney = NS_UITEXTCONTROL::MAKE_MONEY_FORMAT ( pSALE->llPRICE, 3, "," );
+							CString GetMoneyCon = NS_UITEXTCONTROL::MAKE_MONEY_FORMAT ( pSALE->llPRICE, 3, "" );
+							strText.Format ( "%s:%s", ID2GAMEWORD ( "ITEM_BASIC_INFO", 5 ), strMoney );		
+
+							LONGLONG GetMoneyColor = _ttoi64(GetMoneyCon);
+							if ( GetMoneyColor >= 0 && GetMoneyColor <= 99999 ){ AddTextNoSplit ( strText, GLCONST_CHAR::dwITEM_MONEY_COLOR0 );}
+							if ( GetMoneyColor >= 100000 && GetMoneyColor <= 999999 ){ AddTextNoSplit ( strText, GLCONST_CHAR::dwITEM_MONEY_COLOR1 );}
+							if ( GetMoneyColor >= 1000000 && GetMoneyColor <= 9999999 ){ AddTextNoSplit ( strText, GLCONST_CHAR::dwITEM_MONEY_COLOR2 );}
+							if ( GetMoneyColor >= 10000000 && GetMoneyColor <= 99999999 ){ AddTextNoSplit ( strText, GLCONST_CHAR::dwITEM_MONEY_COLOR3 );}
+							if ( GetMoneyColor >= 100000000 && GetMoneyColor <= 999999999 ){ AddTextNoSplit ( strText, GLCONST_CHAR::dwITEM_MONEY_COLOR4 );}
+							if ( GetMoneyColor >= 1000000000 && GetMoneyColor <= 9999999999 ){ AddTextNoSplit ( strText, GLCONST_CHAR::dwITEM_MONEY_COLOR5 );}
+							if ( GetMoneyColor >= 10000000000 && GetMoneyColor <= 99999999999 ){ AddTextNoSplit ( strText, GLCONST_CHAR::dwITEM_MONEY_COLOR6 );}
+							if ( GetMoneyColor >= 100000000000 && GetMoneyColor <= 999999999999 ){ AddTextNoSplit ( strText, GLCONST_CHAR::dwITEM_MONEY_COLOR7 );}
+							if ( GetMoneyColor >= 1000000000000  ){ AddTextNoSplit ( strText, NS_UITEXTCOLOR::WHITE );}
+						}
+					}
+				}				
+				else if ( bShopOpen && bInMarket )	// ?? ??
+				{
+					LONGLONG dwNpcSellPrice = 0;
+
+					volatile LONGLONG dwPrice = 0;
+					volatile float fSHOP_RATE = GLGaeaClient::GetInstance().GetCharacter()->GetBuyRate();
+					volatile float fSHOP_RATE_C = fSHOP_RATE * 0.01f;
+
+					if( sNpcNativeID.wMainID != 0 && sNpcNativeID.wSubID != 0 )
+					{
+						PCROWDATA pCrowData = GLCrowDataMan::GetInstance().GetCrowData ( sNpcNativeID );
+						if( pCrowData != NULL )
+						{
+							LONGLONG dwNpcPrice = pCrowData->GetNpcSellPrice( pItemData->sBasicOp.sNativeID.dwID );
+							if( dwNpcPrice == 0 )
+							{								
+								dwNpcSellPrice = pItemData->sBasicOp.dwBuyPrice;
+								dwPrice = DWORD ( (float)dwNpcSellPrice * fSHOP_RATE_C );
+							}else{
+								dwNpcSellPrice = dwNpcPrice;
+								dwPrice = dwNpcSellPrice;								
+							}
+						}
+
+					}				
+
+					
+					CString strMoney = NS_UITEXTCONTROL::MAKE_MONEY_FORMAT ( dwPrice, 3, "," );
+
+					strText.Format( "%s:%s", ID2GAMEWORD("ITEM_BASIC_INFO", 1), strMoney );
+
+					//	??? ??
+					dwCOMMISSION_MONEY = dwPrice - dwNpcSellPrice;
+					
+					D3DCOLOR dwColor = NS_UITEXTCOLOR::RED;
+					if( dwPrice <= GLGaeaClient::GetInstance().GetCharacterLogic().m_lnMoney )
+					{
+						dwColor = NS_UITEXTCOLOR::PALEGREEN;
+					}
+					AddTextNoSplit ( strText, dwColor );
+				}
+				else if ( bShopOpen ) // ?? ??
+				{
+					volatile float fSHOP_RATE = GLGaeaClient::GetInstance().GetCharacter()->GetSaleRate();
+					volatile float fSALE_DISCOUNT = fSHOP_RATE * 0.01f;
+
+					volatile DWORD dwPrice = pItemData->GETSELLPRICE ( sItemCustom.wTurnNum );
+					volatile DWORD dwSALE_PRICE = DWORD ( dwPrice * fSALE_DISCOUNT );					
+
+					//	??? ??
+					volatile DWORD dwDISPRICE = pItemData->GETSELLPRICE ( sItemCustom.wTurnNum );
+					dwCOMMISSION_MONEY = dwDISPRICE - dwSALE_PRICE;
+
+					CString strMoney = NS_UITEXTCONTROL::MAKE_MONEY_FORMAT ( dwSALE_PRICE, 3, "," );
+					strText.Format( "%s:%s", ID2GAMEWORD("ITEM_BASIC_INFO", 1), strMoney );
+
+					AddTextNoSplit ( strText, NS_UITEXTCOLOR::PALEGREEN );
+				}
+			}
+
+			//	??? ??
+			if ( dwCOMMISSION_MONEY )
+			{
+				CString strMoney = NS_UITEXTCONTROL::MAKE_MONEY_FORMAT ( dwCOMMISSION_MONEY, 3, "," );
+				strText.Format( "%s:%s", ID2GAMEWORD("ITEM_BASIC_INFO", 6), strMoney );
+
+				AddTextNoSplit ( strText, NS_UITEXTCOLOR::PALEGREEN );
+			}
+
+			//	????
+			AddItemTurnInfo ( sItemCustom, bInMarket, bInPrivateMarket );
+
+			//	????
+			if ( pItemData->IsTIMELMT () )
+			{
+				CTime cTime(sItemCustom.tBORNTIME);
+				if ( cTime.GetYear()!=1970 )
+				{
+					CTimeSpan sLMT(pItemData->sDrugOp.tTIME_LMT);
+					cTime += sLMT;
+
+					CString strExpireDate;
+					strExpireDate = CInnerInterface::GetInstance().MakeString ( ID2GAMEWORD("ITEM_EXPIRE_DATE"),
+						(cTime.GetYear ()%2000), cTime.GetMonth (), cTime.GetDay (), cTime.GetHour (), cTime.GetMinute () );
+
+					strText.Format ( "%s:%s", ID2GAMEWORD ( "ITEM_BASIC_INFO", 4 ), strExpireDate );			
+					AddTextNoSplit ( strText, NS_UITEXTCOLOR::DARKORANGE );
+				}
+			}
+
+
+			//	??? ????
+			if ( pItemData->sBasicOp.IsCoolTime() )
+			{
+				CString strTime = "";
+				CTimeSpan cCoolTime( pItemData->sBasicOp.dwCoolTime );
+				
+				if ( cCoolTime.GetHours() > 0 )	
+					strTime += CInnerInterface::GetInstance().MakeString( "%d%s ", cCoolTime.GetHours(), ID2GAMEWORD ( "ITEM_BASIC_TIME", 0 ) );
+				if ( cCoolTime.GetMinutes() > 0 )	
+					strTime += CInnerInterface::GetInstance().MakeString( "%d%s ", cCoolTime.GetMinutes(), ID2GAMEWORD ( "ITEM_BASIC_TIME", 1 ) );
+				if ( cCoolTime.GetSeconds() > 0 )	
+					strTime += CInnerInterface::GetInstance().MakeString( "%d%s ", cCoolTime.GetSeconds(), ID2GAMEWORD ( "ITEM_BASIC_TIME", 2 ) );
+
+				strText.Format ( "%s : %s", ID2GAMEWORD ( "ITEM_BASIC_INFO", 8 ), strTime );			
+				AddTextNoSplit ( strText, NS_UITEXTCOLOR::DARKORANGE );	
+			}
+
+			//	????
+
+
+			GLCharacter* pCharacter = GLGaeaClient::GetInstance().GetCharacter();
+			if ( pCharacter && pCharacter->IsCoolTime( pItemData->sBasicOp.sNativeID ) )
+			{
+				CString strTime = "";
+				__time64_t tCurTime =  GLGaeaClient::GetInstance().GetCurrentTime().GetTime();
+				__time64_t tCoolTime = pCharacter->GetMaxCoolTime( pItemData->sBasicOp.sNativeID );				
+
+				CTimeSpan cReTime( tCoolTime - tCurTime );
+
+                if ( cReTime.GetHours() > 0 )	
+					strTime += CInnerInterface::GetInstance().MakeString( "%d%s ", cReTime.GetHours(), ID2GAMEWORD ( "ITEM_BASIC_TIME", 0 ) );
+				if ( cReTime.GetMinutes() > 0 )	
+					strTime += CInnerInterface::GetInstance().MakeString( "%d%s ", cReTime.GetMinutes(), ID2GAMEWORD ( "ITEM_BASIC_TIME", 1 ) );
+				if ( cReTime.GetSeconds() > 0 )	
+					strTime += CInnerInterface::GetInstance().MakeString( "%d%s ", cReTime.GetSeconds(), ID2GAMEWORD ( "ITEM_BASIC_TIME", 2 ) );
+
+				strText.Format ( "%s : %s", ID2GAMEWORD ( "ITEM_BASIC_INFO", 9 ), strTime );			
+				AddTextNoSplit ( strText, NS_UITEXTCOLOR::DARKORANGE );
+			}
+
+			//////////////////////////////////////////////////////////////////////////////////////////////////////
+			//	AdvInfo
+			SCHARSTATS& rItemStats = pItemData->sBasicOp.sReqStats;
+			SCHARSTATS& rCharStats = pCharacter->m_sSUMSTATS;
+			EMITEM_TYPE emItemType = pItemData->sBasicOp.emItemType;
+
+			switch ( emItemType )
+			{
+			case ITEM_SUIT:
+			case ITEM_REVIVE:
+			case ITEM_ANTI_DISAPPEAR:
+				{
+					BYTE uGRADE = 0;
+
+					//	°ø°Ý ¼Ó¼º
+					if ( pItemData->sSuitOp.emAttack != ITEMATT_NOTHING )
+					{
+						strText.Format("%s (%s)", ID2GAMEWORD("ITEM_ADVANCED_INFO", 6), COMMENT::ITEMATTACK[pItemData->sSuitOp.emAttack].c_str() );
+						AddTextNoSplit ( strText, NS_UITEXTCOLOR::WHITE );
+					}
+
+					//	Âø¿ëÀ§Ä¡
+					if(pItemData->sSuitOp.emSuit!=SUIT_HANDHELD)
+					{
+						strText.Format("%s ", COMMENT::ITEMSUIT[pItemData->sSuitOp.emSuit].c_str() );
+						AddTextNoSplit (strText, NS_UITEXTCOLOR::WHITE );
+					}
+
+					//	°ø°Ý °Å¸®
+					/*if ( sItemCustom.GETATTRANGE() )
+					{
+						strText.Format("%s: %dm",ID2GAMEWORD("ITEM_ADVANCED_INFO", 2), sItemCustom.GETATTRANGE() );
+						AddTextNoSplit ( strText, NS_UITEXTCOLOR::WHITE );
+					}*/
+
+					//	°ø°Ý·Â
+					GLPADATA &sDamage = sItemCustom.getdamage();
+					nExtraValue = sItemCustom.GETGRADE_DAMAGE();
+					uGRADE = sItemCustom.GETGRADE(EMGRINDING_DAMAGE);
+					AddInfoItemAddonRange ( sDamage.dwLow, sDamage.dwHigh, nExtraValue, uGRADE, ID2GAMEWORD("ITEM_ADVANCED_INFO", 0) );
+
+					//	±â·ÂÄ¡
+					nExtraValue = sItemCustom.GETGRADE_DAMAGE();
+					if ( nExtraValue )
+					{
+						uGRADE = sItemCustom.GETGRADE(EMGRINDING_DAMAGE);
+						strText.Format ( "%s :+%d", ID2GAMEWORD("ITEM_ADVANCED_INFO", 8), nExtraValue );
+						APPEND_ITEM_GRADE ( strText, uGRADE );
+						AddTextNoSplit ( strText, NS_UITEXTCOLOR::WHITE );
+					}
+
+					//	¹æ¾î·Â
+					short nDefense = sItemCustom.getdefense();
+					nExtraValue = sItemCustom.GETGRADE_DEFENSE();
+					uGRADE = sItemCustom.GETGRADE(EMGRINDING_DEFENSE);
+					AddInfoItemAddon ( nDefense, nExtraValue, uGRADE, ID2GAMEWORD("ITEM_ADVANCED_INFO", 1) );
+
+					//	¸íÁß·ü
+					if ( sItemCustom.GETHITRATE() )
+					{
+						nExtraValue = 0;
+						AddInfoItemAddon ( sItemCustom.GETHITRATE(), nExtraValue, ID2GAMEWORD("ITEM_ADVANCED_INFO", 3) );		
+					}
+
+					//	È¸ÇÇÀ²
+					if ( sItemCustom.GETAVOIDRATE() )
+					{
+						nExtraValue = 0;
+						AddInfoItemAddon ( sItemCustom.GETAVOIDRATE(), nExtraValue, ID2GAMEWORD("ITEM_ADVANCED_INFO", 4) );
+					}
+
+					//	SP ??
+					const WORD wReqSP = sItemCustom.GETREQ_SP();
+					if ( 0 < wReqSP )
+					{
+						strText.Format("%s :%d", ID2GAMEWORD("ITEM_ADVANCED_INFO", 7), wReqSP );
+						AddTextNoSplit ( strText, NS_UITEXTCOLOR::WHITE );
+					}
+
+					//	Á¶°Ç - ¾Ï±¤
+					/*
+					bValue = TRUE;
+					strText.Format ( "%s", COMMENT::BRIGHT[pItemData->sBasicOp.emReqBright].c_str() );
+					if ( pItemData->sBasicOp.emReqBright != BRIGHT_BOTH )
+					{
+						if ( pCharacter->GETBRIGHT() != pItemData->sBasicOp.emReqBright )
+						{
+							bValue = FALSE;
+						}
+					}
+					AddTextNoSplit ( strText, NS_UITEXTCONTROL::GetEvaluateColor ( bValue ) );					
+					*/
+
+					//	Âø¿ëÁ¶°Ç->°ÝÅõÄ¡
+					if ( pItemData->sBasicOp.wReqPA )
+					{
+						strText.Format("%s :%d", ID2GAMEWORD("ITEM_ADVANCED_INFO_CONDITION", 1), pItemData->sBasicOp.wReqPA );
+						AddTextNoSplit ( strText, NS_UITEXTCONTROL::GetEvaluateColor ( pItemData->sBasicOp.wReqPA <= pCharacter->m_wSUM_PA ) );
+					}
+					//	Âø¿ëÁ¶°Ç->»ç°ÝÄ¡
+					if ( pItemData->sBasicOp.wReqSA )
+					{
+						strText.Format("%s :%d", ID2GAMEWORD("ITEM_ADVANCED_INFO_CONDITION", 2 ), pItemData->sBasicOp.wReqSA );
+						AddTextNoSplit(strText,NS_UITEXTCONTROL::GetEvaluateColor ( pItemData->sBasicOp.wReqSA <= pCharacter->m_wSUM_SA ));
+					}
+
+					//	Stats
+					//	????->?
+					if ( rItemStats.dwPow )
+					{
+						strText.Format( "%s :%d", ID2GAMEWORD("ITEM_ADVANCED_INFO_CONDITION_STATS", 0 ), rItemStats.dwPow );
+						AddTextNoSplit ( strText, NS_UITEXTCONTROL::GetEvaluateColor ( rItemStats.dwPow <= rCharStats.dwPow ) );
+					}
+					//	????->??
+					if ( rItemStats.dwStr )
+					{
+						strText.Format("%s :%d", ID2GAMEWORD("ITEM_ADVANCED_INFO_CONDITION_STATS", 1 ), rItemStats.dwStr );
+						AddTextNoSplit(strText, NS_UITEXTCONTROL::GetEvaluateColor ( rItemStats.dwStr <= rCharStats.dwStr ) );
+					}
+					//	????->???
+					if ( rItemStats.dwSpi)
+					{
+						strText.Format("%s :%d", ID2GAMEWORD("ITEM_ADVANCED_INFO_CONDITION_STATS", 2 ), rItemStats.dwSpi );
+						AddTextNoSplit(strText, NS_UITEXTCONTROL::GetEvaluateColor ( rItemStats.dwSpi <= rCharStats.dwSpi ) );
+					}
+					//	????->???
+					if ( rItemStats.dwDex )
+					{
+						strText.Format("%s :%d", ID2GAMEWORD("ITEM_ADVANCED_INFO_CONDITION_STATS", 3 ), rItemStats.dwDex );
+						AddTextNoSplit(strText, NS_UITEXTCONTROL::GetEvaluateColor ( rItemStats.dwDex <= rCharStats.dwDex ) );
+					}
+					//	????->??
+					if ( rItemStats.dwInt  )
+					{
+						strText.Format("%s :%d", ID2GAMEWORD("ITEM_ADVANCED_INFO_CONDITION_STATS", 4 ), rItemStats.dwInt );
+						AddTextNoSplit(strText, NS_UITEXTCONTROL::GetEvaluateColor ( rItemStats.dwInt <= rCharStats.dwInt ) );
+					}
+					//	????->??
+					if ( rItemStats.dwSta )
+					{
+						strText.Format("%s :%d", ID2GAMEWORD("ITEM_ADVANCED_INFO_CONDITION_STATS", 5 ), rItemStats.dwSta );
+						AddTextNoSplit ( strText, NS_UITEXTCONTROL::GetEvaluateColor ( rItemStats.dwSta <= rCharStats.dwSta ) );
+					}
+
+					float fExpMultiple = pItemData->GetExpMultiple();
+					if( fExpMultiple != 1.0f )
+					{
+						strText.Format("%s %2.2f", ID2GAMEWORD( "ITEM_ADVANCED_INFO_SPECIAL_EX", 0 ), fExpMultiple);
+						AddTextNoSplit(strText,NS_UITEXTCOLOR::DODGERBLUE);
+					}
+
+					
+
+					//-----------------------------------------------------------------------------------------------
+					//	ÀúÇ×°ª
+					/*const int nELEC   = sItemCustom.GETRESIST_ELEC();
+					const int nFIRE   = sItemCustom.GETRESIST_FIRE();
+					const int nICE    = sItemCustom.GETRESIST_ICE();
+					const int nPOISON = sItemCustom.GETRESIST_POISON();
+					const int nSPIRIT = sItemCustom.GETRESIST_SPIRIT();
+
+					if ( nELEC || nFIRE || nICE || nPOISON || nSPIRIT )
+					{
+						AddTextNoSplit ( ID2GAMEWORD ( "ITEM_CATEGORY", 3 ), NS_UITEXTCOLOR::LIME );
+
+						if ( nELEC )
+						{
+							strText.Format("%s:%d", ID2GAMEWORD("ITEM_ADVANCED_INFO_RESIST", 0 ), nELEC );	
+							BYTE uGRADE = sItemCustom.GETGRADE(EMGRINDING_RESIST_ELEC);
+							APPEND_ITEM_GRADE ( strText, uGRADE );
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::PRIVATE);
+						}
+						if ( nFIRE )
+						{
+							strText.Format("%s:%d", ID2GAMEWORD("ITEM_ADVANCED_INFO_RESIST", 1 ), nFIRE );
+							BYTE uGRADE = sItemCustom.GETGRADE(EMGRINDING_RESIST_FIRE);
+							APPEND_ITEM_GRADE ( strText, uGRADE );
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::PRIVATE);
+						}
+						if ( nICE )
+						{
+							strText.Format("%s:%d", ID2GAMEWORD("ITEM_ADVANCED_INFO_RESIST", 2 ), nICE );
+							BYTE uGRADE = sItemCustom.GETGRADE(EMGRINDING_RESIST_ICE);
+							APPEND_ITEM_GRADE ( strText, uGRADE );
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::PRIVATE);
+						}
+						if ( nPOISON )
+						{
+							strText.Format("%s:%d", ID2GAMEWORD("ITEM_ADVANCED_INFO_RESIST", 3 ), nPOISON );
+							BYTE uGRADE = sItemCustom.GETGRADE(EMGRINDING_RESIST_POISON);
+							APPEND_ITEM_GRADE ( strText, uGRADE );
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::PRIVATE);
+						}
+						if ( nSPIRIT )
+						{
+							strText.Format("%s:%d", ID2GAMEWORD("ITEM_ADVANCED_INFO_RESIST", 4 ), nSPIRIT );
+							BYTE uGRADE = sItemCustom.GETGRADE(EMGRINDING_RESIST_SPIRIT);
+							APPEND_ITEM_GRADE ( strText, uGRADE );
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::PRIVATE);
+						}
+					}*/
+		
+					//	»óÅÂÀÌ»ó
+					EMSTATE_BLOW emBLOW = pItemData->sSuitOp.sBLOW.emTYPE;
+					float fVAR1 = pItemData->sSuitOp.sBLOW.fVAR1 * COMMENT::BLOW_VAR1_SCALE[emBLOW];
+					float fVAR2 = pItemData->sSuitOp.sBLOW.fVAR2 * COMMENT::BLOW_VAR2_SCALE[emBLOW];
+
+					if ( emBLOW !=EMBLOW_NONE )
+					{
+						AddTextNoSplit ( " ", NS_UITEXTCOLOR::LIGHTSKYBLUE );
+
+						if ( emBLOW == EMBLOW_NUMB )
+						{
+							strText.Format("%.0f", pItemData->sSuitOp.sBLOW.fRATE );
+							strText += ("% chance of Paralysis effect, decreased" );
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::LIGHTYELLOW);
+							strText.Format("movement and attack speed by %.0f", fVAR1 );
+							strText += "%, skill";
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::LIGHTYELLOW);
+							strText.Format("cool down time is increased by %.0f for %.0f", fVAR2, pItemData->sSuitOp.sBLOW.fLIFE );
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::LIGHTYELLOW);
+							AddTextNoSplit("seconds",NS_UITEXTCOLOR::LIGHTYELLOW);
+						}
+						else if ( emBLOW == EMBLOW_FROZEN )
+						{
+							strText.Format("%.0f", pItemData->sSuitOp.sBLOW.fRATE );
+							strText += ("% chance of Frost effect, decreased" );
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::LIGHTYELLOW);
+							strText.Format("movement and attack speed by %.0f", fVAR1 );
+							strText += "% ";
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::LIGHTYELLOW);
+							strText.Format("for %.0f seconds, +%.0f", pItemData->sSuitOp.sBLOW.fLIFE, fVAR2 );
+							strText += "% damage";
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::LIGHTYELLOW);
+						}
+						else if ( emBLOW == EMBLOW_STUN )
+						{
+							strText.Format("%.0f", pItemData->sSuitOp.sBLOW.fRATE );
+							strText += ( "% chance of Stun effect, unable to act");
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::LIGHTYELLOW);
+							strText.Format("for %.0f second with 0 additional damage", pItemData->sSuitOp.sBLOW.fLIFE );
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::LIGHTYELLOW);
+						}
+						else if ( emBLOW == EMBLOW_BURN )
+						{
+							strText.Format("%.0f", pItemData->sSuitOp.sBLOW.fRATE );
+							strText += ( "% chance of Flame effect and");
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::LIGHTYELLOW);
+							strText.Format("%.0f seconds to give %.0f damage per", pItemData->sSuitOp.sBLOW.fLIFE, fVAR2 );
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::LIGHTYELLOW);
+							strText.Format("seconds" );
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::LIGHTYELLOW);
+						}
+						else if ( emBLOW == EMBLOW_POISON )
+						{
+							strText.Format("%.0f", pItemData->sSuitOp.sBLOW.fRATE );
+							strText += ( "% chance of Intoxication effect, and");
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::LIGHTYELLOW);
+							strText.Format("for %.0f seconds %.0f damage per seconds", pItemData->sSuitOp.sBLOW.fLIFE, fVAR2 );
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::LIGHTYELLOW);
+							//strText.Format("" );
+							//AddTextNoSplit(strText,NS_UITEXTCOLOR::LIGHTYELLOW);
+						}
+						else if ( emBLOW == EMBLOW_STONE )
+						{
+
+							strText.Format("%.0f", pItemData->sSuitOp.sBLOW.fRATE );
+							strText += "% chance of Fossil effect, decreased";
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::LIGHTYELLOW);
+							strText.Format("movement and attack speed by %.0f", fVAR1 );
+							strText += "%";
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::LIGHTYELLOW);
+							strText.Format("and %.0f damage for %.0f seconds", fVAR2, pItemData->sSuitOp.sBLOW.fLIFE );
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::LIGHTYELLOW);
+						}
+						else if ( emBLOW == EMBLOW_MAD )
+						{
+
+							strText.Format("With the probability of %.0f", pItemData->sSuitOp.sBLOW.fRATE );
+							strText += "% to give Fossil";
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::LIGHTYELLOW);
+							strText.Format(" effect to the opponent and attack with the " );
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::LIGHTYELLOW);
+							strText.Format(" effect of attack speed and moving speed" );
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::LIGHTYELLOW);
+							strText.Format(" continuous %.1f seconds to decreased %.0f", pItemData->sSuitOp.sBLOW.fLIFE, fVAR2  );
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::LIGHTYELLOW);
+						}
+						else {
+							strText.Format("%s:%s", ID2GAMEWORD("ITEM_ADVANCED_INFO_ABNORMAL", 0 ), COMMENT::BLOW[emBLOW].c_str() );
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::LIGHTYELLOW);
+
+							strText.Format("%s:%.2f", ID2GAMEWORD("ITEM_ADVANCED_INFO_ABNORMAL", 1 ),pItemData->sSuitOp.sBLOW.fLIFE );
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::LIGHTYELLOW);
+
+							strText.Format("%s:%.2f%%", ID2GAMEWORD("ITEM_ADVANCED_INFO_ABNORMAL", 2 ),pItemData->sSuitOp.sBLOW.fRATE );
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::LIGHTYELLOW);
+
+							{
+								float fVAR1 = pItemData->sSuitOp.sBLOW.fVAR1 * COMMENT::BLOW_VAR1_SCALE[emBLOW];
+
+								if( fVAR1 != 0.0f )
+								{
+									if ( COMMENT::IsBLOW1_PER(emBLOW) )
+										strText.Format("%s:%.2f%%", COMMENT::BLOW_VAR1[emBLOW].c_str(), fVAR1 );
+									else
+										strText.Format("%s:%.2f", COMMENT::BLOW_VAR1[emBLOW].c_str(), fVAR1 );
+
+									AddTextNoSplit(strText,NS_UITEXTCOLOR::LIGHTYELLOW);
+								}
+							}
+
+							{
+								float fVAR2 = pItemData->sSuitOp.sBLOW.fVAR2 * COMMENT::BLOW_VAR2_SCALE[emBLOW];
+
+								if( fVAR2 != 0.0f )
+								{
+									if ( COMMENT::IsBLOW2_PER(emBLOW) )
+										strText.Format("%s:%.2f%%", COMMENT::BLOW_VAR2[emBLOW].c_str(), fVAR2 );
+									else
+										strText.Format("%s:%.2f", COMMENT::BLOW_VAR2[emBLOW].c_str(), fVAR2 );
+
+									AddTextNoSplit(strText,NS_UITEXTCOLOR::LIGHTYELLOW);
+								}
+							}
+						}
+					}
+
+
+					//	NOTE
+					//		?? ??
+					AddTextAddValue( sItemCustom, pItemData->sSuitOp );
+
+					//	????
+					//
+					{
+						BOOL bSPAC = sItemCustom.GETINCHP() || sItemCustom.GETINCMP() || sItemCustom.GETINCSP() || sItemCustom.GETINCAP();
+						BOOL bVAR_HP(FALSE), bVAR_MP(FALSE), bVAR_SP(FALSE), bVAR_AP(FALSE);
+
+						EMITEM_VAR emITEM_VAR = pItemData->sSuitOp.sVARIATE.emTYPE;
+						EMITEM_VAR emITEM_VOL = pItemData->sSuitOp.sVOLUME.emTYPE;
+						/*
+						if ( (emITEM_VAR!=EMVAR_NONE) || (emITEM_VOL!=EMVAR_NONE) || bSPAC )
+						{
+							AddTextNoSplit ( ID2GAMEWORD ( "ITEM_CATEGORY", 5 ), NS_UITEXTCOLOR::LIGHTSKYBLUE );
+						}
+						*/
+						
+						if ( sItemCustom.nidDISGUISE!=SNATIVEID(false) )
+						{
+							SITEM* pJDisguiseData = GLItemMan::GetInstance().GetItem ( sItemCustom.nidDISGUISE );
+							if ( pJDisguiseData )
+							{
+								if ( pJDisguiseData->sBasicOp.IsCostumeCombine() )
+								{
+									EMITEM_VAR emITEMCOS_VAR = pJDisguiseData->sSuitOp.sVARIATE.emTYPE;
+									EMITEM_VAR emITEMCOS_VOL = pJDisguiseData->sSuitOp.sVOLUME.emTYPE;
+								//add jitem
+
+									float fVAR_SCALE(0);
+									if ( emITEMCOS_VAR != EMVAR_NONE )
+									{			
+										
+										fVAR_SCALE = pJDisguiseData->sSuitOp.sVARIATE.fVariate;
+										CString strText2;
+										fVAR_SCALE *= COMMENT::ITEMVAR_SCALE[emITEMCOS_VAR];
+										strText2.Format("%s %2.2f", ID2GAMEWORD("ITEM_ADVANCED_INFO_SPECIAL_ADD", emITEMCOS_VAR ), fVAR_SCALE );
+										if ( COMMENT::IsITEMVAR_SCALE(emITEMCOS_VAR) )		strText2 += "%";
+										AddTextNoSplit(strText2,NS_UITEXTCOLOR::LIME);
+									}
+
+									if ( emITEMCOS_VOL != EMVAR_NONE)
+									{
+										CString strText3;
+										float fVOLUME = pJDisguiseData->sSuitOp.sVOLUME.fVolume;
+										strText3.Format("%s %.2f", ID2GAMEWORD("ITEM_ADVANCED_INFO_SPECIAL_ADD_VOL", emITEMCOS_VOL ), fVOLUME );
+										AddTextNoSplit(strText3,NS_UITEXTCOLOR::LIME);
+									}
+								}
+							}
+						}
+
+
+
+						//	???? ( ??? )
+						//
+						float fVAR_SCALE(0);
+						if ( emITEM_VAR != EMVAR_NONE )
+						{
+							switch ( emITEM_VAR )
+							{
+							case EMVAR_HP:
+								bVAR_HP = TRUE;
+								fVAR_SCALE = sItemCustom.GETINCHP();
+								break;
+							case EMVAR_MP:
+								bVAR_MP = TRUE;
+								fVAR_SCALE = sItemCustom.GETINCMP();
+								break;
+							case EMVAR_SP:
+								bVAR_SP = TRUE;
+								fVAR_SCALE = sItemCustom.GETINCSP();
+								break;
+							case EMVAR_AP:
+								bVAR_AP = TRUE;
+								fVAR_SCALE = sItemCustom.GETINCAP();
+								break;
+							default:
+								fVAR_SCALE = pItemData->sSuitOp.sVARIATE.fVariate;
+								break;
+							};
+
+							fVAR_SCALE *= COMMENT::ITEMVAR_SCALE[emITEM_VAR];
+							strText.Format("%s %2.2f", ID2GAMEWORD("ITEM_ADVANCED_INFO_SPECIAL_ADD", emITEM_VAR ), fVAR_SCALE );
+							if ( COMMENT::IsITEMVAR_SCALE(emITEM_VAR) )		strText += "%";
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::LIME);
+						}
+
+						if ( !bVAR_HP && sItemCustom.GETINCHP() )
+						{
+							fVAR_SCALE = sItemCustom.GETINCHP();
+							emITEM_VAR = EMVAR_HP;
+							fVAR_SCALE *= COMMENT::ITEMVAR_SCALE[emITEM_VAR];
+							strText.Format("%s %2.2f", ID2GAMEWORD("ITEM_ADVANCED_INFO_SPECIAL_ADD", emITEM_VAR ), fVAR_SCALE );
+							if ( COMMENT::IsITEMVAR_SCALE(emITEM_VAR) )		strText += "%";
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::LIME);
+						}
+
+						if ( !bVAR_MP && sItemCustom.GETINCMP() )
+						{
+							fVAR_SCALE = sItemCustom.GETINCMP();
+							emITEM_VAR = EMVAR_MP;
+							fVAR_SCALE *= COMMENT::ITEMVAR_SCALE[emITEM_VAR];
+							strText.Format("%s %2.2f", ID2GAMEWORD("ITEM_ADVANCED_INFO_SPECIAL_ADD", emITEM_VAR ), fVAR_SCALE );
+							if ( COMMENT::IsITEMVAR_SCALE(emITEM_VAR) )		strText += "%";
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::LIME);
+						}
+
+						if ( !bVAR_SP && sItemCustom.GETINCSP() )
+						{
+							fVAR_SCALE = sItemCustom.GETINCSP();
+							emITEM_VAR = EMVAR_SP;
+							fVAR_SCALE *= COMMENT::ITEMVAR_SCALE[emITEM_VAR];
+							strText.Format("%s %2.2f", ID2GAMEWORD("ITEM_ADVANCED_INFO_SPECIAL_ADD", emITEM_VAR ), fVAR_SCALE );
+							if ( COMMENT::IsITEMVAR_SCALE(emITEM_VAR) )		strText += "%";
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::LIME);
+						}
+
+						if ( !bVAR_AP && sItemCustom.GETINCAP() )
+						{
+							fVAR_SCALE = sItemCustom.GETINCAP();
+							emITEM_VAR = EMVAR_AP;
+							fVAR_SCALE *= COMMENT::ITEMVAR_SCALE[emITEM_VAR];
+							strText.Format("%s %2.2f", ID2GAMEWORD("ITEM_ADVANCED_INFO_SPECIAL_ADD", emITEM_VAR ), fVAR_SCALE );
+							if ( COMMENT::IsITEMVAR_SCALE(emITEM_VAR) )		strText += "%";
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::LIME);
+						}
+
+						// °æÇèÄ¡ ¹èÀ²						
+
+						//	Æ¯¼ö±â´É ( º¯È­·® )
+						//
+						if ( emITEM_VOL != EMVAR_NONE)
+						{
+							if ( emITEM_VOL == EMVAR_MOVE_SPEED )
+							{
+								float fVOLUME = sItemCustom.GETMOVESPEED();
+								strText.Format("%s %.2f", ID2GAMEWORD("ITEM_ADVANCED_INFO_SPECIAL_ADD_VOL", emITEM_VOL ), fVOLUME );
+								AddTextNoSplit(strText,NS_UITEXTCOLOR::LIME);
+							}
+							else
+							{
+								float fVOLUME = pItemData->sSuitOp.sVOLUME.fVolume;
+								strText.Format("%s %.2f", ID2GAMEWORD("ITEM_ADVANCED_INFO_SPECIAL_ADD_VOL", emITEM_VOL ), fVOLUME );
+								AddTextNoSplit(strText,NS_UITEXTCOLOR::LIME);
+							}
+							
+						}
+					}
+
+					// Note : ?? ??
+					if( sItemCustom.IsSetRandOpt() )
+					{
+						CString strDescText;
+
+						//AddTextNoSplit( ID2GAMEWORD ( "ITEM_CATEGORY", 11 ), NS_UITEXTCOLOR::LIGHTSKYBLUE );
+						AddTextNoSplit( " ", NS_UITEXTCOLOR::LIGHTSKYBLUE );
+						INT nRandOptType = sItemCustom.GETOptTYPE1();
+						if( (EMR_OPT_NULL < nRandOptType) && (nRandOptType < EMR_OPT_SIZE) )
+						{
+							strDescText.Format( "%s:", ID2GAMEWORD("ITEM_RANDOM_OPTION", nRandOptType ) );
+
+							float fVal = sItemCustom.GETOptVALUE1();
+							if( fVal != 0.0f )
+							{
+								if( fVal > 0.0f) strDescText += _T('+');
+
+								strDescText.AppendFormat( "%.2f", fVal );
+								if( sItemCustom.IsPerRandOpt( nRandOptType ) ) strDescText += _T('%');
+
+								AddTextNoSplit( strDescText, NS_UITEXTCOLOR::PRIVATE );
+							}
+						}
+
+						nRandOptType = sItemCustom.GETOptTYPE2();
+						if( (EMR_OPT_NULL < nRandOptType) && (nRandOptType < EMR_OPT_SIZE) )
+						{
+							strDescText.Format( "%s:", ID2GAMEWORD("ITEM_RANDOM_OPTION", nRandOptType ) );
+
+							float fVal = sItemCustom.GETOptVALUE2();
+							if( fVal != 0.0f )
+							{
+								if( fVal > 0.0f) strDescText += _T('+');
+
+								strDescText.AppendFormat( "%.2f", fVal );
+								if( sItemCustom.IsPerRandOpt( nRandOptType ) ) strDescText += _T('%');
+
+								AddTextNoSplit( strDescText, NS_UITEXTCOLOR::PRIVATE );
+							}
+						}
+
+						nRandOptType = sItemCustom.GETOptTYPE3();
+						if( (EMR_OPT_NULL < nRandOptType) && (nRandOptType < EMR_OPT_SIZE) )
+						{
+							strDescText.Format( "%s:", ID2GAMEWORD("ITEM_RANDOM_OPTION", nRandOptType ) );
+
+							float fVal = sItemCustom.GETOptVALUE3();
+							if( fVal != 0.0f )
+							{
+								if( fVal > 0.0f) strDescText += _T('+');
+
+								strDescText.AppendFormat( "%.2f", fVal );
+								if( sItemCustom.IsPerRandOpt( nRandOptType ) ) strDescText += _T('%');
+
+								AddTextNoSplit( strDescText, NS_UITEXTCOLOR::PRIVATE );
+							}
+						}
+
+						nRandOptType = sItemCustom.GETOptTYPE4();
+						if( (EMR_OPT_NULL < nRandOptType) && (nRandOptType < EMR_OPT_SIZE) )
+						{
+							strDescText.Format( "%s:", ID2GAMEWORD("ITEM_RANDOM_OPTION", nRandOptType ) );
+
+							float fVal = sItemCustom.GETOptVALUE4();
+							if( fVal != 0.0f )
+							{
+								if( fVal > 0.0f) strDescText += _T('+');
+
+								strDescText.AppendFormat( "%.2f", fVal );
+								if( sItemCustom.IsPerRandOpt( nRandOptType ) ) strDescText += _T('%');
+
+								AddTextNoSplit( strDescText, NS_UITEXTCOLOR::PRIVATE );
+							}
+						}
+					}
+				}
+				break;
+
+			case ITEM_CHARM:
+				{
+					/*AddTextNoSplit ( ID2GAMEWORD ( "ITEM_CATEGORY", 1 ), NS_UITEXTCOLOR::LIGHTSKYBLUE );
+
+					//	???
+					GLPADATA &sDAMAGE = sItemCustom.GETDAMAGE();
+					if ( sDAMAGE.dwLow || sDAMAGE.dwHigh  )
+					{
+						strText.Format("Talisman %s:%s~%s ", ID2GAMEWORD("ITEM_ARROW_INFO", 0 ), 
+													GetNumberWithSign ( sDAMAGE.dwLow ), 
+													GetNumberWithSign ( sDAMAGE.dwHigh ) );
+
+						AddTextNoSplit(strText,NS_UITEXTCOLOR::DEFAULT);
+					}
+ 
+
+					//	NOTE
+					//		°¡»ê È¿°ú
+					AddTextAddValue( sItemCustom, pItemData->sSuitOp );	*/
+
+					AddTextNoSplit ( ID2GAMEWORD ( "ITEM_CATEGORY", 1 ), NS_UITEXTCOLOR::LIGHTSKYBLUE );
+
+					BYTE uGRADE = 0;
+
+					//	°ø°Ý·Â
+					GLPADATA &sDamage = sItemCustom.getdamage();
+					nExtraValue = sItemCustom.GETGRADE_DAMAGE();
+					uGRADE = sItemCustom.GETGRADE(EMGRINDING_DAMAGE);
+					AddInfoItemAddonRange ( sDamage.dwLow, sDamage.dwHigh, nExtraValue, uGRADE, ID2GAMEWORD("ITEM_ADVANCED_INFO", 0) );
+
+					//	±â·ÂÄ¡
+					
+				}
+				break;
+
+			case ITEM_ARROW:
+				{
+					/*AddTextNoSplit ( ID2GAMEWORD ( "ITEM_CATEGORY", 1 ), NS_UITEXTCOLOR::LIGHTSKYBLUE );
+
+					//	???
+					GLPADATA &sDAMAGE = sItemCustom.GETDAMAGE();
+					if ( sDAMAGE.dwLow || sDAMAGE.dwHigh  )
+					{
+						strText.Format("Arrow %s:%s~%s ", ID2GAMEWORD("ITEM_ARROW_INFO", 0 ), 
+													GetNumberWithSign ( sDAMAGE.dwLow ), 
+													GetNumberWithSign ( sDAMAGE.dwHigh ) );
+
+						AddTextNoSplit(strText,NS_UITEXTCOLOR::DEFAULT);
+					}
+ 
+
+					//	NOTE
+					//		°¡»ê È¿°ú
+					AddTextAddValue( sItemCustom, pItemData->sSuitOp );	*/
+
+					AddTextNoSplit ( ID2GAMEWORD ( "ITEM_CATEGORY", 1 ), NS_UITEXTCOLOR::LIGHTSKYBLUE );
+
+					BYTE uGRADE = 0;
+
+					//	°ø°Ý·Â
+					GLPADATA &sDamage = sItemCustom.getdamage();
+					nExtraValue = sItemCustom.GETGRADE_DAMAGE();
+					uGRADE = sItemCustom.GETGRADE(EMGRINDING_DAMAGE);
+					AddInfoItemAddonRange ( sDamage.dwLow, sDamage.dwHigh, nExtraValue, uGRADE, ID2GAMEWORD("ITEM_ADVANCED_INFO", 0) );
+
+					//	±â·ÂÄ¡
+				}
+				break;
+
+			case ITEM_DRUG_CP:
+				{
+					//AddTextNoSplit ( ID2GAMEWORD ( "ITEM_CATEGORY", 7 ), NS_UITEXTCOLOR::LIGHTSKYBLUE );
+
+					if( pItemData->sDrugOp.wCureVolume == 0 )
+					{
+						strText.Format("%s",COMMENT::ITEMDRUG[pItemData->sDrugOp.emDrug].c_str());
+					}
+					else
+					{
+						strText.Format("%s:%d",COMMENT::ITEMDRUG[pItemData->sDrugOp.emDrug].c_str(), pItemData->sDrugOp.wCureVolume);
+					}
+
+					AddTextNoSplit(strText, NS_UITEXTCOLOR::WHITE);
+				}
+				break;
+
+			case ITEM_CURE:
+				{
+					//AddTextNoSplit ( ID2GAMEWORD ( "ITEM_CATEGORY", 7 ), NS_UITEXTCOLOR::YELLOW );
+
+					if( pItemData->sDrugOp.wCureVolume == 0 )
+					{
+						strText.Format("%s",COMMENT::ITEMDRUG[pItemData->sDrugOp.emDrug].c_str());
+					}
+					else
+					{
+						strText.Format("%s:%d",COMMENT::ITEMDRUG[pItemData->sDrugOp.emDrug].c_str(), pItemData->sDrugOp.wCureVolume);
+					}
+
+					AddTextNoSplit(strText, NS_UITEXTCOLOR::WHITE);
+				}
+				break;
+
+			case ITEM_SKILL:
+				{
+					AddInfoSkillItem ( sItemCustom );
+				}
+				break;
+
+			case ITEM_PET_SKILL:
+				{
+					AddInfoPetSkillItem( sItemCustom );
+				}
+				break;
+
+			case ITEM_GRINDING:
+				{
+					AddTextNoSplit ( ID2GAMEWORD ( "ITEM_CATEGORY_EX", 0 ), NS_UITEXTCOLOR::LIGHTSKYBLUE );
+				}
+				break;
+
+				// ??? ?? ?? ??
+			case ITEM_VIETNAM_EXPGET:
+				{
+					if ( pItemData->sDrugOp.bRatio )
+					{
+						strText.Format(ID2GAMEWORD ("ITEM_CATEGORY_VIETNAM_EXP", 1) , pItemData->sDrugOp.wCureVolume );						
+					}
+					else
+					{
+						strText.Format(ID2GAMEWORD ("ITEM_CATEGORY_VIETNAM_EXP", 0), pItemData->sDrugOp.wCureVolume );
+					}
+
+					AddTextNoSplit(strText,NS_UITEXTCOLOR::WHITE);
+				}
+				break;
+				// ??? ?? ?? ??
+			case ITEM_VIETNAM_ITEMGET:
+				{
+					strText.Format(ID2GAMEWORD ("ITEM_CATEGORY_VIETNAM_ITEM", 0) , pItemData->sDrugOp.wCureVolume );
+					AddTextNoSplit(strText,NS_UITEXTCOLOR::LIGHTSKYBLUE);
+				}
+				break;
+
+			case ITEM_VEHICLE:
+				{
+					strText.Format(ID2GAMEWORD ("ITEM_VEHICLE_TYPE_INFO", 0) , COMMENT::VEHICLE_TYPE[pItemData->sVehicle.emVehicleType].c_str() );
+					AddTextNoSplit(strText,NS_UITEXTCOLOR::WHITE);
+
+					strText.Format( "%s %s", ID2GAMEWORD ("ITEM_VEHICLE_NAME",0), COMMENT::VEHICLE_TYPE[pItemData->sVehicle.emVehicleType].c_str() );
+					AddTextNoSplit(strText,NS_UITEXTCOLOR::WHITE);
+
+					
+					EMITEM_VAR emITEM_VOL = pItemData->sSuitOp.sVOLUME.emTYPE;
+					//	???? ???
+					//
+					if ( emITEM_VOL != EMVAR_NONE)
+					{
+						if ( emITEM_VOL == EMVAR_MOVE_SPEED )
+						{
+							float fVOLUME = sItemCustom.GETMOVESPEED();
+							strText.Format("%s %.2f", ID2GAMEWORD("ITEM_ADVANCED_INFO_SPECIAL_ADD_VOL", emITEM_VOL ), fVOLUME );
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::PRIVATE);
+						}
+						else
+						{
+							float fVOLUME = pItemData->sSuitOp.sVOLUME.fVolume;
+							strText.Format("%s %.2f", ID2GAMEWORD("ITEM_ADVANCED_INFO_SPECIAL_ADD_VOL", emITEM_VOL ), fVOLUME );
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::PRIVATE);
+						}
+					}
+
+
+					bool bInfo(true);
+
+					
+					VEHICLEITEMINFO_MAP_ITER iter = GLGaeaClient::GetInstance().GetCharacter()->m_mapVEHICLEItemInfo.find ( sItemCustom.dwVehicleID );
+					if ( iter == GLGaeaClient::GetInstance().GetCharacter()->m_mapVEHICLEItemInfo.end() )
+					{
+						iter = GLGaeaClient::GetInstance().GetCharacter()->m_mapVEHICLEItemInfoTemp.find ( sItemCustom.dwVehicleID );
+						if ( iter == GLGaeaClient::GetInstance().GetCharacter()->m_mapVEHICLEItemInfoTemp.end() )	bInfo = false;
+					}
+
+
+					if ( bInfo ) 
+					{
+						SVEHICLEITEMINFO sVehicleItemInfo = (*iter).second;
+						for ( int i = 0; i < ACCE_TYPE_SIZE; ++i ) 
+						{
+							SITEM* pItem = GLItemMan::GetInstance().GetItem ( sVehicleItemInfo.m_PutOnItems[i].sNativeID );
+							if ( pItem )
+							{
+								strText.Format("%s %s", ID2GAMEWORD ("ITEM_VEHICLE_SLOT",i), pItem->GetName () );
+								AddTextNoSplit(strText,NS_UITEXTCOLOR::WHITE);
+							}
+						}
+
+						strText.Format( "%s %.2f%%", ID2GAMEWORD ("ITEM_VEHICLE_BATTERY",0), sVehicleItemInfo.m_nFull/10.0f );
+						AddTextNoSplit(strText,NS_UITEXTCOLOR::WHITE);
+					}
+				}
+				break;
+
+			case ITEM_PET_CARD:
+				{
+					if ( sItemCustom.dwPetID == 0 ) break;
+					PETCARDINFO_MAP_ITER iter = GLGaeaClient::GetInstance().GetCharacter()->m_mapPETCardInfo.find ( sItemCustom.dwPetID );
+					if ( iter == GLGaeaClient::GetInstance().GetCharacter()->m_mapPETCardInfo.end() )
+					{
+						iter = GLGaeaClient::GetInstance().GetCharacter()->m_mapPETCardInfoTemp.find ( sItemCustom.dwPetID );
+						if ( iter == GLGaeaClient::GetInstance().GetCharacter()->m_mapPETCardInfoTemp.end() ) break;
+					}
+
+					SPETCARDINFO sPetCardInfo = (*iter).second;
+
+					strText.Format(ID2GAMEWORD ("ITEM_PET_INFO", 0 ));
+					AddTextNoSplit(strText,NS_UITEXTCOLOR::LIGHTSKYBLUE);
+
+					strText.Format( "%s %s", ID2GAMEWORD ("ITEM_PET_NAME",0), sPetCardInfo.m_szName );
+					AddTextNoSplit(strText,NS_UITEXTCOLOR::WHITE);
+
+					strText.Format( "%s %s", ID2GAMEWORD ("ITEM_PET_TYPE",0), COMMENT::PET_TYPE[sPetCardInfo.m_emTYPE].c_str() );
+					AddTextNoSplit(strText,NS_UITEXTCOLOR::WHITE);
+
+					strText.Format( "%s %.2f%%", ID2GAMEWORD ("ITEM_PET_FULL",0), sPetCardInfo.m_nFull/10.0f );
+					AddTextNoSplit(strText,NS_UITEXTCOLOR::WHITE);
+					
+					SITEM* pItem = GLItemMan::GetInstance().GetItem ( sPetCardInfo.m_PutOnItems[ACCETYPEA].sNativeID );
+					if ( pItem )
+					{
+						strText.Format("%s %s", ID2GAMEWORD ("ITEM_PET_SLOTA",0), pItem->GetName () );
+						AddTextNoSplit(strText,NS_UITEXTCOLOR::WHITE);
+					}
+
+					pItem = GLItemMan::GetInstance().GetItem ( sPetCardInfo.m_PutOnItems[ACCETYPEB].sNativeID );
+					if ( pItem )
+					{
+						strText.Format("%s %s", ID2GAMEWORD ("ITEM_PET_SLOTB",0), pItem->GetName () );
+						AddTextNoSplit(strText,NS_UITEXTCOLOR::WHITE);
+					}
+
+					if ( sItemCustom.tDISGUISE != 0 )
+					{
+						CTime currentTime = GLGaeaClient::GetInstance().GetCurrentTime();
+						CTime startTime   = sItemCustom.tBORNTIME;
+						CTimeSpan timeSpan = currentTime - startTime;
+						if( timeSpan.GetTotalSeconds() < sItemCustom.tDISGUISE )
+						{
+							strText.Format("[%s]", ID2GAMEWORD ("ITEM_PET_USE_SKINPACK",0) );
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::GOLD);
+							strText.Format("%s : %dsec", ID2GAMEWORD ("CLUB_BATTLE_TIME",0), sItemCustom.tDISGUISE - timeSpan.GetTotalSeconds() );
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::GOLD);
+						}
+					}
+
+					AddTextNoSplit( ID2GAMEWORD ("ITEM_PET_SKILLS", 0 ), NS_UITEXTCOLOR::WHITE );
+
+					PETSKILL_MAP_CITER pos = sPetCardInfo.m_ExpSkills.begin();
+					PETSKILL_MAP_CITER pos_end = sPetCardInfo.m_ExpSkills.end();
+					for ( ;pos != pos_end; ++pos )
+					{
+						const PETSKILL& sPetSkill = (*pos).second;
+						PGLSKILL pSKILL = GLSkillMan::GetInstance().GetData( sPetSkill.sNativeID );
+						if ( pSKILL )
+						{
+							strText.Format("%s", pSKILL->GetName() );
+							AddTextNoSplit(strText,NS_UITEXTCOLOR::WHITE);
+						}
+					}
+				}
+				break;
+			}
+			
+			if( emItemType != ITEM_PET_SKILL )
+			{
+				//AddTextNoSplit( ID2GAMEWORD( "ITEM_CATEGORY", 8 ), NS_UITEXTCOLOR::YELLOW );
+
+				// Note : ½Ã±Í/Á÷±Í Ä«µå¿¡ ¸ÊÀÌ¸§ ÁÂÇ¥ Ãâ·Â
+				if( pItemData->sDrugOp.emDrug == ITEM_DRUG_CALL_REGEN )
+				{
+					GLCharacter* pCharacter = GLGaeaClient::GetInstance().GetCharacter();	
+
+					CString strName( GLGaeaClient::GetInstance().GetMapName( pCharacter->m_sStartMapID ) );
+					if( strName == _T("(null)") ) strName.Empty();
+
+					strText.Format( "%s:%s", ID2GAMEWORD("ITEM_CALL_MAP", 0 ), strName );
+					AddTextNoSplit( strText, NS_UITEXTCOLOR::WHITE);
+
+					SMAPNODE *pMapNode = GLGaeaClient::GetInstance().FindMapNode ( pCharacter->m_sStartMapID );
+					if( pMapNode )
+					{
+						GLLevelFile cLevelFile;
+						BOOL bOk = cLevelFile.LoadFile( pMapNode->strFile.c_str(), TRUE, NULL );
+						if( bOk )
+						{	
+							D3DXVECTOR3 vStartPos;
+							PDXLANDGATE pGate = cLevelFile.GetLandGateMan().FindLandGate( pCharacter->m_dwStartGate );
+							if( pGate )
+							{
+								vStartPos = pGate->GetGenPos ( DxLandGate::GEN_RENDUM );
+							}
+							else
+							{
+								pGate = cLevelFile.GetLandGateMan().FindLandGate( DWORD(0) );
+								if( pGate ) vStartPos = pGate->GetGenPos ( DxLandGate::GEN_RENDUM );
+							}
+
+							int nPosX(0), nPosY(0);
+							cLevelFile.GetMapAxisInfo().Convert2MapPos( vStartPos.x, vStartPos.z, nPosX, nPosY );
+
+							strText.Format( "%s:%d,%d", ID2GAMEWORD("ITEM_CALL_MAP", 1 ), nPosX, nPosY );
+							AddTextNoSplit( strText, NS_UITEXTCOLOR::WHITE);
+						}
+					}
+				}
+				else if( pItemData->sDrugOp.emDrug == ITEM_DRUG_CALL_LASTCALL )
+				{
+					GLCharacter* pCharacter = GLGaeaClient::GetInstance().GetCharacter();
+
+					if( pCharacter->m_sLastCallMapID.IsValidNativeID() )
+					{
+						CString strName( GLGaeaClient::GetInstance().GetMapName( pCharacter->m_sLastCallMapID ) );
+						if( strName == _T("(null)") ) strName.Empty();
+
+						strText.Format( "%s:%s", ID2GAMEWORD("ITEM_CALL_MAP", 0 ), strName );
+						AddTextNoSplit( strText, NS_UITEXTCOLOR::WHITE);
+
+						SMAPNODE *pMapNode = GLGaeaClient::GetInstance().FindMapNode ( pCharacter->m_sLastCallMapID );
+						if( pMapNode )
+						{
+							GLLevelFile cLevelFile;
+							BOOL bOk = cLevelFile.LoadFile( pMapNode->strFile.c_str(), TRUE, NULL );
+							if( bOk )
+							{	
+								int nPosX(0), nPosY(0);
+								cLevelFile.GetMapAxisInfo().Convert2MapPos( pCharacter->m_vLastCallPos.x, pCharacter->m_vLastCallPos.z, nPosX, nPosY );
+
+								strText.Format( "%s:%d,%d", ID2GAMEWORD("ITEM_CALL_MAP", 1 ), nPosX, nPosY );
+								AddTextNoSplit( strText, NS_UITEXTCOLOR::WHITE);
+							}
+						}
+					}
+					else
+					{
+						AddTextNoSplit( ID2GAMEWORD("ITEM_CALL_MAP", 2 ), NS_UITEXTCOLOR::RED);
+					}
+				}
+				else if ( pItemData->sDrugOp.emDrug == ITEM_DRUG_CALL_TELEPORT )
+				{
+					CString strName( GLGaeaClient::GetInstance().GetMapName( pItemData->sBasicOp.sSubID ) );
+					if( strName == _T("(null)") ) strName.Empty();
+
+					strText.Format( "%s:%s", ID2GAMEWORD("ITEM_TELEPORT_MAP", 0 ), strName );
+					AddTextNoSplit( strText, NS_UITEXTCOLOR::WHITE);
+
+					strText.Format( "%s:%d,%d", ID2GAMEWORD("ITEM_TELEPORT_MAP", 1 ), pItemData->sBasicOp.wPosX, pItemData->sBasicOp.wPosY );
+					AddTextNoSplit( strText, NS_UITEXTCOLOR::WHITE);
+				}
+
+			}
+
+			{ // ¼³¸í
+				const TCHAR * pszComment(NULL);
+
+				if ( (emItemType != ITEM_SKILL) || (emItemType != ITEM_PET_SKILL) )
+				{
+					pszComment = pItemData->GetComment();
+				}
+				else
+				{
+					SNATIVEID sNativeID = sItemCustom.sNativeID;
+					SITEM* pItemData = GLItemMan::GetInstance().GetItem ( sNativeID );
+					SITEM* pItemDataDisguise = GLItemMan::GetInstance().GetItem ( sItemCustom.nidDISGUISE );
+					SNATIVEID sSkillID = pItemData->sSkillBookOp.sSkill_ID;
+
+					//	Note : ?? ?? ???.
+					PGLSKILL pSkill = GLSkillMan::GetInstance().GetData ( sSkillID.wMainID, sSkillID.wSubID );
+					if ( pSkill )
+					{
+						pszComment = pSkill->GetDesc();
+					}
+				}
+
+				AddTextNoSplit( " ", NS_UITEXTCOLOR::WHITE);
+
+				{
+				BOOL bAccept(FALSE);
+				//BOOL bArmor = ( pItemData->sSuitOp.emSuit==SUIT_HANDHELD || pItemData->sBasicOp.emItemType==ITEM_SUIT);
+				if( sItemCustom.nidDISGUISE != NATIVEID_NULL() )
+				{
+					bAccept = pCharacter->ACCEPT_ITEM( sItemCustom.sNativeID, sItemCustom.nidDISGUISE );
+				}
+				else
+				{
+					bAccept = pCharacter->ACCEPT_ITEM( sItemCustom.sNativeID );
+				}
+
+
+				if ( bAccept )
+				{
+					strText.Format ( "(%s)", ID2GAMEWORD("ITEM_USABLE", 0 ) );
+					AddTextNoSplit(strText, NS_UITEXTCOLOR::WHITE );
+
+					DWORD dwNeedSP = pCharacter->CALC_ACCEPTP ( sItemCustom.sNativeID );
+					if ( 0 < dwNeedSP )
+					{
+						strText.Format ( "%s:%d", ID2GAMEWORD("ITEM_NEEDSP" ), dwNeedSP );
+						AddTextNoSplit(strText, NS_UITEXTCOLOR::PALEGREEN );
+					}
+				}
+				else
+				{
+					strText.Format ( "(%s)", ID2GAMEWORD("ITEM_USABLE", 1 ) );
+					AddTextNoSplit(strText, NS_UITEXTCOLOR::RED );
+				}
+
+			
+				bool bCanPreview = CInnerInterface::GetInstance().PreviewCheckSimple( pItemData->sBasicOp.sNativeID );
+				if ( bCanPreview )
+				{
+					AddTextNoSplit( " ", NS_UITEXTCOLOR::BLACK);
+					//AddTextLongestLineSplit ( "Pressing Alt key + left click the mouse button to preview the item", NS_UITEXTCOLOR::WHITE );
+				}
+
+				}
+
+				if( pszComment )
+				{
+					int StrLength = static_cast<int>( strlen( pszComment ) );
+					if( StrLength )
+					{
+						//AddTextNoSplit ( ID2GAMEWORD( "ITEM_CATEGORY", 9 ), NS_UITEXTCOLOR::LIGHTSKYBLUE );
+						AddTextLongestLineSplit( pszComment, NS_UITEXTCOLOR::LIGHTYELLOW );
+					}
+				}
+			}
+
+			{
+
+				DWORD dwFlags = pItemData->sBasicOp.dwFlags;
+				CString szFlag;
+					
+				if( dwFlags )
+				{			
+					AddTextNoSplit( " ", NS_UITEXTCOLOR::WHITE);
+					
+					if ( dwFlags & TRADE_SALE )
+					{
+						AddTextNoSplit ( "Shop Trade Possible", NS_UITEXTCOLOR::WHITE);
+					}
+					else
+					{
+						AddTextNoSplit ( "Shop Trade Impossible", NS_UITEXTCOLOR::DARKGRAY);
+					}
+					if ( dwFlags & TRADE_EXCHANGE)
+					{
+						AddTextNoSplit ( "User Trade Possible", NS_UITEXTCOLOR::WHITE);
+					}
+					else
+					{
+						AddTextNoSplit ( "User Trade Impossible", NS_UITEXTCOLOR::DARKGRAY);
+					}
+					if ( dwFlags & TRADE_THROW)
+					{
+						AddTextNoSplit ( "Ground Discard Possible", NS_UITEXTCOLOR::WHITE);
+					}
+					else
+					{
+						AddTextNoSplit ( "Ground Discard Impossible", NS_UITEXTCOLOR::DARKGRAY);
+					}
+					if ( dwFlags & TRADE_EVENT_SGL)
+					{
+						AddTextNoSplit ( "Event Item", NS_UITEXTCOLOR::WHITE);
+					}
+					//if ( dwFlags & TRADE_GARBAGE)
+					//{
+					//	AddTextNoSplit ( "Garbage Item", NS_UITEXTCOLOR::WHITE);
+					//}
+					if ( dwFlags & ITEM_DISGUISE)
+					{
+						AddTextNoSplit ( "Costume Combine", NS_UITEXTCOLOR::WHITE);
+					}
+					//if ( dwFlags & ITEM_OWNERSHIP)
+					//{
+					//	AddTextNoSplit ( "Item Owned", NS_UITEXTCOLOR::WHITE);
+					//}
+					strText.Format( "%s", szFlag.GetString() );
+					//AddTextNoSplit ( strText, NS_UITEXTCOLOR::DEFAULT );
+					}
+			
+			}
+			
+		{
+			const int nELEC   = sItemCustom.GETRESIST_ELEC();
+			const int nFIRE   = sItemCustom.GETRESIST_FIRE();
+			const int nICE    = sItemCustom.GETRESIST_ICE();
+			const int nPOISON = sItemCustom.GETRESIST_POISON();
+			const int nSPIRIT = sItemCustom.GETRESIST_SPIRIT();
+					
+			if ( (nELEC) && (nFIRE) && (nICE) && (nPOISON) && (nSPIRIT) )
+			{
+				SetResiIcons();
+			}
+			else
+			{
+				ResetResiIcons();
+			}
+		}
+
+		if ( sNpcNativeID != sItemCustom.sNativeID ) 
+			{
+				sNpcNativeID = sItemCustom.sNativeID;
+		
+				if ( sNpcNativeID.IsValidNativeID() )
+				{
+					SITEM* pItem = GLItemMan::GetInstance().GetItem ( sNpcNativeID );
+					if ( !pItem )
+					{
+						GASSERT ( 0 && " " );
+						return ;
+						ResetItemRender ();
+						ResetItemBoxRender ();
+						ResetItemBoxRandomRender();
+					}	
+
+					if ( pItem->sBasicOp.emItemType == ITEM_BOX  )
+					{
+						ResetItemRender ();	
+						ResetItemBoxRender ();
+						ResetItemBoxRandomRender();
+
+						for ( int i=0; i<ITEM::SBOX::ITEM_SIZE; ++i )
+						{
+							SITEMCUSTOM sCUSTOM;
+							sCUSTOM.sNativeID = pItem->sBox.sITEMS[i].nidITEM;
+
+							if ( sCUSTOM.sNativeID==SNATIVEID(false) )				continue;
+
+							CInnerInterface::GetInstance().sBOXINFOCUSTOM[i] = sCUSTOM;
+							SITEM* pItemData = GLItemMan::GetInstance().GetItem ( sCUSTOM.sNativeID );
+							if ( pItemData ) 
+							{
+								AddItemBoxRender ( pItemData->sBasicOp.sICONID, pItemData->GetInventoryFile(), i );
+							}
+						}
+					
+						AddItemRender ( pItem->sBasicOp.sICONID, pItem->GetInventoryFile() );
+						//AddTextNoSplit ( "Shift + Right-Click to Show Item's information inside.", NS_UITEXTCOLOR::WHITE );
+						//AddTextNoSplit ( "Alt + Right-Click to Show Item Preview in your character. Items aren't Random.", NS_UITEXTCOLOR::WHITE );
+					}
+					else if ( pItem->sBasicOp.emItemType == ITEM_RANDOMITEM )
+					{
+						ResetItemRender ();	
+						ResetItemBoxRender ();
+						ResetItemBoxRandomRender();
+
+						for ( DWORD i=0; i<pItem->sRandomBox.vecBOX.size(); ++i )
+						{
+							SITEMCUSTOM sCUSTOM;
+							ITEM::SRANDOMITEM sITEMBOX = pItem->sRandomBox.vecBOX[i];
+							sCUSTOM.sNativeID = sITEMBOX.nidITEM;
+
+							if ( sCUSTOM.sNativeID==SNATIVEID(false) )				continue;
+
+							CInnerInterface::GetInstance().sRANDOMBOXINFOCUSTOM[i] = sCUSTOM;
+							SITEM* pItemData = GLItemMan::GetInstance().GetItem ( sCUSTOM.sNativeID );
+							if ( pItemData ) 
+							{
+								AddItemBoxRandomRender ( pItemData->sBasicOp.sICONID, pItemData->GetInventoryFile(), i );
+							}
+						}
+						
+						AddItemRender ( pItem->sBasicOp.sICONID, pItem->GetInventoryFile() );
+						//AddTextNoSplit ( "Shift + Right-Click to Show Item's information inside.", NS_UITEXTCOLOR::WHITE );
+						//AddTextNoSplit ( "Alt + Right-Click to Show Item Preview in your character. Items here are Randomized.", NS_UITEXTCOLOR::WHITE );
+					}
+					else
+					{
+						ResetItemRender ();	
+						ResetItemBoxRender ();
+						ResetItemBoxRandomRender();
+						AddItemRender ( pItem->sBasicOp.sICONID, pItem->GetInventoryFile() );
+					}
+				}
+			}
+		}
+	}
+};

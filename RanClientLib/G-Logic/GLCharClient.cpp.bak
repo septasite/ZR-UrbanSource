@@ -1,0 +1,4190 @@
+#include "stdafx.h"
+#include "./GLCharClient.h"
+#include "./GLFactEffect.h"
+#include "./GLGaeaClient.h"
+#include "./GLItemMan.h"
+#include "./GLStrikeM.h"
+#include "./GLCharDefine.h"
+#include "RANPARAM.h"
+#include "../RanClientUILib/Interface/InnerInterface.h"
+#include "../RanClientUILib/Interface/DamageDisplay.h"
+#include "GLPartyClient.h"
+
+#include "../../EngineLib/DxCommon/DxShadowMap.h"
+#include "../../EngineLib/DxEffect/Char/DxEffCharData.h"
+#include "../../EngineLib/DxEffect/Single/DxEffGroupPlayer.h"
+#include "../RanClientUILib/Interface/ItemShopIconMan.h"
+
+//added by   | 18-7-2012 | Add ABL and ABF code
+#include "../EngineLib/Meshs/DxSkinPieceData.h"
+#include "../EngineLib/Meshs/DxSkinCharPiece.h"
+#include "../EngineLib/Meshs/DxSkinPieceRootData.h"
+
+//Added by   | 11-8-2012 | add VPS and VCF code
+#include "../EngineLib/Meshs/DxSkinVehicle.h"
+#include "../EngineLib/Meshs/DxSkinVehicleData.h"
+
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
+BOOL Boost = FALSE;
+
+GLCharClient::GLCharClient(void) 
+	: m_pd3dDevice(NULL)
+	, m_pSkinChar(NULL)
+
+	, m_vDir(0,0,-1)
+	, m_vDirOrig(0,0,-1)
+	, m_vPos(0,0,0)
+	, m_vServerPos(0,0,0)
+	, m_fAge(0.0f)
+	, m_Action(GLAT_IDLE)
+	, m_dwActState(NULL)
+	, m_vTarPos(0,0,0)
+	, m_fIdleTime(0.0f)
+	, m_fMoveDelay(0.0f)
+	
+	, m_dwANISUBSELECT(0)
+	, m_dwANISUBGESTURE(0)
+
+	, m_vMaxOrg(6,20,6)
+	, m_vMinOrg(-6,0,-6)
+	
+	, m_vMax(6,20,6)
+	, m_vMin(-6,0,-6)
+	, m_fHeight(20.f)
+	
+	, m_CHARINDEX(GLCI_FIGHTER_M)
+	, m_dwGaeaID(0)
+	, m_dwCeID(0)
+	
+	, m_pLandManClient(NULL)
+	, m_pGlobNode(NULL)
+	, m_pQuadNode(NULL)
+	, m_pCellNode(NULL)
+	
+	, m_emANIMAINSKILL(AN_SKILL)
+	, m_emANISUBSKILL(AN_SUB_NONE)
+	
+	, m_emANISUBTYPE(AN_SUB_NONE)
+	, m_dwRevData(NULL)
+	
+	, m_fSTATE_MOVE(0.0f)
+	, m_fSTATE_DELAY(0.0f)
+	
+	, m_bSTATE_PANT(false)
+	, m_bSTATE_STUN(false)
+	, m_bTRANSFORM_EFF(false) //Transform Function 
+
+//	, m_fDamageElapsed(0.0f)
+//	, m_fDamage(0.0f)
+	
+    , m_bFist(FALSE) // Fix Extreme Reboot - Eduj
+	, m_fSKILL_MOVE(0.0f)
+	, m_fITEM_MOVE_R(0.0f)
+	, m_fITEM_MOVE (0.0f)
+	, m_fATTVELO( 0.0f )
+	, m_fITEMATTVELO_R ( 0.0f ) 
+	, m_fITEMATTVELO ( 0.0f ) 
+	, m_dwSummonGUID ( GAEAID_NULL )
+	
+	, m_wTARNUM(0)
+	, m_vTARPOS(0,0,0)
+	, m_wACTIVESKILL_LEVEL(0)
+	
+	, m_fattTIMER(0.0f)
+	, m_nattSTEP(0)
+	, m_bVehicle ( FALSE )
+	, m_bItemShopOpen ( false )
+	, m_dwTransfromSkill(SNATIVEID::ID_NULL)
+	, m_bSafeZone(false)
+	, m_bSkinUpdate(false)
+{
+	D3DXMatrixIdentity( &m_matTrans );
+	DISABLEALLLANDEFF();
+}
+
+GLCharClient::~GLCharClient(void)
+{
+	FACTEFF::DeleteAllEffect( STARGETID(CROW_PC,m_dwGaeaID,m_vPos), m_pSkinChar, m_sSKILLFACT, m_sSTATEBLOWS );
+	SAFE_DELETE(m_pSkinChar);
+
+	if ( m_bItemShopOpen )
+	{
+		CInnerInterface::GetInstance().GetItemShopIconMan()->DEL_SHOP_ICON( m_dwGaeaID );
+	}
+
+}
+
+BOOL GLCharClient::IsValidBody ()
+{
+	return ( m_Action < GLAT_FALLING );
+}
+
+BOOL GLCharClient::IsDie ()
+{
+	if ( IsACTION(GLAT_DIE) )		return TRUE;
+
+	return FALSE;
+}
+
+BOOL GLCharClient::IsVisibleDetect ()
+{
+	if ( IsSTATE(EM_REQ_VISIBLENONE) || IsSTATE(EM_REQ_VISIBLEOFF) )	return FALSE;
+
+	DWORD dwUSERLVL = GLGaeaClient::GetInstance().GetCharacter()->m_dwUserLvl;
+	BOOL bRECVISIBLE = GLGaeaClient::GetInstance().GetCharacter()->m_bRECVISIBLE;
+
+	//Detect Invi if party member FINAL Code by AnFire16
+	GLPARTY_CLIENT* pPMember = GLPartyClient::GetInstance().FindMember ( m_dwGaeaID );
+	if ( pPMember )
+	{
+		if ( m_bINVISIBLE && !bRECVISIBLE && pPMember && !dwUSERLVL < USER_GM3)			return TRUE;
+	}
+	else
+	{
+		if ( m_bINVISIBLE && !bRECVISIBLE && !pPMember && dwUSERLVL < USER_GM3 )			return FALSE;
+		if ( m_bINVISIBLE && !bRECVISIBLE && !pPMember && !dwUSERLVL < USER_GM3)			return TRUE;
+	}
+
+	return TRUE;
+}
+
+BOOL GLCharClient::IsVisibleDetectParty ()
+{
+	DWORD dwUSERLVL = GLGaeaClient::GetInstance().GetCharacter()->m_dwUserLvl;
+	BOOL bRECVISIBLE = GLGaeaClient::GetInstance().GetCharacter()->m_bRECVISIBLE;
+	if ( m_bINVISIBLE && !bRECVISIBLE && dwUSERLVL < USER_GM3 )		return TRUE;
+
+	return TRUE;
+}
+
+HRESULT GLCharClient::Create ( GLLandManClient* pLandManClient, SDROP_CHAR* pCharData, LPDIRECT3DDEVICEQ pd3dDevice )
+{
+	m_pd3dDevice = pd3dDevice;
+	m_pLandManClient = pLandManClient;
+	if ( pCharData )	m_CharData = *pCharData;
+
+	m_bVehicle = pCharData->m_bVehicle;
+	m_sVehicle.m_dwGUID = pCharData->m_sVehicle.m_dwGUID;
+	m_sVehicle.m_emTYPE = pCharData->m_sVehicle.m_emTYPE;
+	m_sVehicle.m_sVehicleID = pCharData->m_sVehicle.m_sVehicleID;
+	m_sVehicle.m_wColor = pCharData->m_sVehicle.m_wColor; //add bike color
+
+	m_bItemShopOpen = pCharData->m_bItemShopOpen;
+
+	for ( int i = 0; i < ACCE_TYPE_SIZE; ++i )
+	{
+		m_sVehicle.m_PutOnItems[i].Assign( pCharData->m_sVehicle.m_PutOnItems[i] );
+	}
+
+	m_sVehicle.ITEM_UPDATE();
+
+	//	Note : ÇöÁ¦ ½ºÅ³ FACT ¾÷µ¥ÀÌÆ®.
+	//
+	for ( int i=0; i<SKILLFACT_SIZE; ++i )
+	{
+		SDROP_SKILLFACT &sDropFact = pCharData->sSKILLFACT[i];
+		if ( sDropFact.sNATIVEID==NATIVEID_NULL() )			continue;
+
+		RECEIVE_SKILLFACT ( sDropFact.sNATIVEID, sDropFact.wLEVEL, sDropFact.wSLOT, sDropFact.fAGE );
+	}
+	
+	//	Note : ÇöÁ¦ »óÅÂÀÌ?E¾÷µ¥ÀÌÆ®.
+	//
+	for ( i=0; i<EMBLOW_MULTI; ++i )
+	{
+		SDROP_STATEBLOW &sDropBlow = pCharData->sSTATEBLOWS[i];
+		if ( sDropBlow.emBLOW==EMBLOW_NONE )				continue;
+
+		SSTATEBLOW *pSTATEBLOW = NULL;
+		if ( sDropBlow.emBLOW <= EMBLOW_SINGLE )		pSTATEBLOW = &m_sSTATEBLOWS[0];
+		else											pSTATEBLOW = &m_sSTATEBLOWS[sDropBlow.emBLOW-EMBLOW_SINGLE];
+
+		sDropBlow.emBLOW = sDropBlow.emBLOW;
+		sDropBlow.fAGE = sDropBlow.fAGE;
+		sDropBlow.fSTATE_VAR1 = sDropBlow.fSTATE_VAR1;
+		sDropBlow.fSTATE_VAR2 = sDropBlow.fSTATE_VAR2;
+	}
+
+	DISABLEALLLANDEFF();
+	SLEVEL_ETC_FUNC *pEtcFunc = m_pLandManClient->GetLevelEtcFunc();
+	if( pEtcFunc && pEtcFunc->m_bUseFunction[EMETCFUNC_LANDEFFECT] )
+	{
+		int iNum = 0;
+		for( i=0; i<EMLANDEFFECT_MULTI; i++ )
+		{
+			if( pCharData->nLandEffect[i] == -1 ) continue;
+
+			SLANDEFFECT landEffect = pEtcFunc->FindLandEffect(pCharData->nLandEffect[i]);
+			ADDLANDEFF( landEffect, iNum );
+			iNum++;
+		}
+	}
+
+	//	Note : ÄÉ¸¯ÅÍÀÇ ¿Ü?E?¼³Á¤.
+	EMCHARINDEX emIndex = CharClassToIndex(m_CharData.emClass);
+	DxSkinCharData* pSkinChar = DxSkinCharDataContainer::GetInstance().LoadData( GLCONST_CHAR::szCharSkin[emIndex], pd3dDevice, TRUE );
+	if ( !pSkinChar )	return E_FAIL;
+
+	SAFE_DELETE(m_pSkinChar);
+	m_pSkinChar = new DxSkinChar;
+	m_pSkinChar->SetCharData ( pSkinChar, pd3dDevice, TRUE );
+	UpdateSuit ();
+	UPDATE_ITEM();
+
+	// Note : 1.AABB Box¸¦ °¡Á®¿Â´Ù. 2.³ôÀÌ¸¦ °è?E?³õ´Â´Ù.
+	m_pSkinChar->GetAABBBox( m_vMaxOrg, m_vMinOrg );
+	m_fHeight = m_vMaxOrg.y - m_vMinOrg.y;
+
+	//	Note : ¿¡´Ï¸ÞÀÌ¼Ç ÃÊ±âÈ­.
+	//
+	ReSelectAnimation ();
+
+	//	Note : ÀÌµ¿ Á¦¾î ÃÊ±âÈ­.
+	m_strName = m_CharData.szName;
+	m_dwGaeaID = m_CharData.dwGaeaID;
+	m_dwCeID = m_CharData.dwCeID;
+	m_vPos = m_CharData.vPos;
+	m_vDir = m_CharData.vDir;
+	m_dwSummonGUID = m_CharData.dwSummonGUID;
+
+	m_CHARINDEX = CharClassToIndex(m_CharData.emClass);
+
+	m_actorMove.SetMaxSpeed ( GLCONST_CHAR::cCONSTCLASS[m_CHARINDEX].fWALKVELO );
+	if ( pLandManClient )
+	{
+		m_actorMove.Create ( pLandManClient->GetNaviMesh(), m_vPos, -1 );
+	}
+
+	if ( pCharData->dwActState & EM_ACT_RUN )			SetSTATE ( EM_ACT_RUN );
+	if ( pCharData->dwActState & EM_REQ_VISIBLENONE )	SetSTATE ( EM_REQ_VISIBLENONE );
+	if ( pCharData->dwActState & EM_REQ_VISIBLEOFF )	SetSTATE ( EM_REQ_VISIBLEOFF );
+	if ( pCharData->dwActState & EM_ACT_PEACEMODE )		SetSTATE ( EM_ACT_PEACEMODE );
+
+	if ( pCharData->dwActState & EM_ACT_BOOSTER )		SetSTATE ( EM_ACT_BOOSTER ); //add bike booster
+
+	switch ( pCharData->Action )
+	{
+	case GLAT_MOVE:
+		{
+			//	Note : ÀÌµ¿ ½ÃÅ°?EÀ§ÇØ ³»ºÎ ?E?¸Þ½Ã?E¹ß»ý.
+			//
+			GLMSG::SNETPC_GOTO_BRD NetMsgGoto;
+			NetMsgGoto.dwActState = pCharData->dwActState;
+			NetMsgGoto.fDelay = 0.0f;
+			NetMsgGoto.vCurPos = pCharData->vPos;
+			NetMsgGoto.vTarPos = pCharData->vTarPos;
+			MsgGoto ( (NET_MSG_GENERIC*) &NetMsgGoto );
+		}
+		break;
+
+	case GLAT_FALLING:
+		TurnAction ( GLAT_FALLING );
+		break;
+
+	case GLAT_DIE:
+		TurnAction ( GLAT_DIE );
+		break;
+	case GLAT_GATHERING:
+		m_dwANISUBGESTURE = m_CharData.m_dwANISUBTYPE;
+		TurnAction( GLAT_GATHERING );
+		break;
+	case GLAT_TALK:
+		m_dwANISUBGESTURE = m_CharData.m_dwANISUBTYPE;
+		TurnAction ( GLAT_TALK );
+		break;
+	};
+
+	if ( pCharData->dwFLAGS & SDROP_CHAR::CHAR_GEN )
+	{
+		if ( !IsSTATE(EM_REQ_VISIBLENONE) && !IsSTATE(EM_REQ_VISIBLEOFF) )
+		{
+			D3DXMATRIX matEffect;
+			D3DXMatrixTranslation ( &matEffect, m_vPos.x, m_vPos.y, m_vPos.z );
+
+			STARGETID sTargetID(CROW_PC,pCharData->dwGaeaID,m_vPos);
+			DxEffGroupPlayer::GetInstance().NewEffGroup
+			(
+			GLCONST_CHAR::strREBIRTH_EFFECT.c_str(),
+				matEffect,
+				&sTargetID
+			);
+		}
+	}
+
+	if ( !m_pSkinChar->GETCURANIMNODE() )
+	{
+		CDebugSet::ToLogFile ( "ERORR : current animation node null point error [ %s ] [ M %d S %d ]", m_pSkinChar->GetFileName(), m_pSkinChar->GETCURMTYPE(), m_pSkinChar->GETCURSTYPE() );
+		m_pSkinChar->DEFAULTANI ();
+	}
+
+	//	Note : Å¬·´¸¶Å© ¹ö?EÈ®ÀÎ.
+	//
+	GLGaeaClient::GetInstance().GetCharacter()->ReqClubMarkInfo ( m_CharData.dwGuild, m_CharData.dwGuildMarkVer );
+
+	if ( m_bItemShopOpen )
+	{
+		CInnerInterface::GetInstance().GetItemShopIconMan()->ADD_SHOP_ICON( m_dwGaeaID );
+	}
+
+	return S_OK;
+}
+
+DWORD GLCharClient::GET_PK_COLOR ()
+{
+	if ( m_CharData.nBright >= 0 )	return GLCONST_CHAR::dwPK_NORMAL_NAME_COLOR;
+
+	int nLEVEL = 0;
+	for ( nLEVEL=0; nLEVEL<GLCONST_CHAR::EMPK_STATE_LEVEL; ++nLEVEL )
+	{
+		if ( GLCONST_CHAR::sPK_STATE[nLEVEL].nPKPOINT <= m_CharData.nBright )	break;
+	}
+
+	if ( nLEVEL>=GLCONST_CHAR::EMPK_STATE_LEVEL )	nLEVEL = GLCONST_CHAR::EMPK_STATE_LEVEL-1;
+
+	return GLCONST_CHAR::sPK_STATE[nLEVEL].dwNAME_COLOR;
+}
+
+SITEM* GLCharClient::GET_SLOT_ITEMDATA ( EMSLOT _slot )
+{
+	if ( VALID_SLOT_ITEM(_slot) )
+	{
+		const SITEMCLIENT &sITEMCLIENT = GET_SLOT_ITEM ( _slot );
+
+		SITEM* pITEM = GLItemMan::GetInstance().GetItem ( sITEMCLIENT.sNativeID );
+		return pITEM;
+	}
+
+	return NULL;
+}
+
+HRESULT GLCharClient::UpdateSuit ()
+{
+	GASSERT(m_pd3dDevice);
+
+	if ( m_bTRANSFORM_EFF ) return S_OK; //Transform Function 
+	EMCHARINDEX emIndex = CharClassToIndex(m_CharData.emClass);
+	DxSkinCharData* pSkinChar = DxSkinCharDataContainer::GetInstance().FindData ( GLCONST_CHAR::szCharSkin[emIndex] );
+	if ( !pSkinChar )	return E_FAIL;
+
+	
+	const GLCONST_CHARCLASS &sCONST = GLCONST_CHAR::cCONSTCLASS[emIndex];
+
+	if ( sCONST.dwHEADNUM > m_CharData.wFace )
+	{
+		std::string strHEAD_CPS = sCONST.strHEAD_CPS[m_CharData.wFace];
+	
+		PDXCHARPART pCharPart = NULL;
+		pCharPart = m_pSkinChar->GetPiece(PIECE_HEAD);		//	ÇöÁ¦ ÀåÂø ½ºÅ².
+
+		if ( pCharPart && strcmp(strHEAD_CPS.c_str(),pCharPart->m_szFileName) )
+		{
+			DxSkinPieceRootData* pPieceDataRoot;
+			pPieceDataRoot = DxSkinPieceRootDataContainer::GetInstance().LoadData( strHEAD_CPS.c_str() , m_pd3dDevice , TRUE );
+			if ( pPieceDataRoot )
+			{
+				if ( pPieceDataRoot->GetUseCPS() ) m_pSkinChar->SetPiece( pPieceDataRoot->GetCpsName().c_str(), m_pd3dDevice, 0x0, 0, TRUE );
+				m_pSkinChar->SetCharPieceData( pPieceDataRoot->GetData(), m_pd3dDevice, pPieceDataRoot->GetBoneLink(), pPieceDataRoot->GetWeaponSlot(), pPieceDataRoot->GetType(), 0x0, 0, TRUE );
+			}
+			else m_pSkinChar->SetPiece ( strHEAD_CPS.c_str(), m_pd3dDevice, 0x0, 0, TRUE );
+		}
+	}
+
+	if ( sCONST.dwHAIRNUM > m_CharData.wHair )
+	{
+		std::string strHAIR_CPS = sCONST.strHAIR_CPS[m_CharData.wHair];
+	
+		PDXCHARPART pCharPart = NULL;
+		pCharPart = m_pSkinChar->GetPiece(PIECE_HAIR);		//	ÇöÁ¦ ÀåÂø ½ºÅ².
+
+		if ( pCharPart && strcmp(strHAIR_CPS.c_str(),pCharPart->m_szFileName) )
+		{
+			DxSkinPieceRootData* pPieceDataRoot;
+			pPieceDataRoot = DxSkinPieceRootDataContainer::GetInstance().LoadData( strHAIR_CPS.c_str() , m_pd3dDevice , TRUE );
+			if ( pPieceDataRoot )
+			{
+				if ( pPieceDataRoot->GetUseCPS() ) m_pSkinChar->SetPiece( pPieceDataRoot->GetCpsName().c_str(), m_pd3dDevice, 0x0, 0, TRUE );
+				m_pSkinChar->SetCharPieceData( pPieceDataRoot->GetData(), m_pd3dDevice, pPieceDataRoot->GetBoneLink(), pPieceDataRoot->GetWeaponSlot(), pPieceDataRoot->GetType(), 0x0, 0, TRUE );
+			}
+			else m_pSkinChar->SetPiece ( strHAIR_CPS.c_str(), m_pd3dDevice, 0x0, 0, TRUE );
+		}
+	}
+
+	m_pSkinChar->SetHairColor( m_CharData.wHairColor );
+
+	//fix reboot dual cps
+	m_pSkinChar->ResetPiece(PIECE_RFINGER);
+	m_pSkinChar->ResetPiece(PIECE_LFINGER);
+
+	for ( int i=0; i<SLOT_NSIZE_S_2; i++ )
+	{
+		// ÇöÀç ÀåÂøÁßÀÎ ¹«±â°¡ ¾Æ´Ï¸é ³Ñ¾î°£´Ù.
+		if( !IsCurUseArm( EMSLOT(i) ) ) continue;
+
+		SITEMCLIENT &ItemClient = m_CharData.m_PutOnItems[i];
+
+		SNATIVEID nidITEM = ItemClient.nidDISGUISE;
+		if ( nidITEM==SNATIVEID(false) )	nidITEM = ItemClient.sNativeID;
+
+		if ( !m_bVehicle && i == SLOT_VEHICLE  ) nidITEM = SNATIVEID(false);
+		else if ( i == SLOT_VEHICLE )
+		{
+			//add vcf 
+			if ( m_sVehicle.m_emTYPE == VEHICLE_TYPE_BOARD )
+			{
+				nidITEM = m_sVehicle.GetSkinID();
+				if ( nidITEM == SNATIVEID(false) )
+				{
+					m_sVehicle.m_sVehicleID = ItemClient.sNativeID;
+					nidITEM = ItemClient.sNativeID;
+				}
+			}
+		}
+		if ( m_pSkinChar->m_pSkinVehicle  )//add vcf
+		{
+			if ( !m_bVehicle ) m_pSkinChar->ResetVCF();
+		}
+
+		if (nidITEM == SNATIVEID(false))
+		{
+			PDXSKINPIECE pSkinPiece = NULL;	
+			PDXCHARPART pCharPart = NULL;	
+
+			EMPIECECHAR emPiece = SLOT_2_PIECE(EMSLOT(i));
+
+			if ( emPiece!=PIECE_SIZE )
+			{
+				pSkinPiece = pSkinChar->GetPiece(emPiece);	
+				pCharPart = m_pSkinChar->GetPiece(emPiece);	
+			}
+
+			if ( pSkinPiece )
+			{
+				if ( pCharPart && strcmp(pSkinPiece->m_szFileName,pCharPart->m_szFileName) )
+					{
+						DxSkinPieceRootData* pPieceDataRoot;
+						pPieceDataRoot = DxSkinPieceRootDataContainer::GetInstance().LoadData( pSkinPiece->m_szFileName , m_pd3dDevice , TRUE );
+						if ( pPieceDataRoot )
+						{
+							if (pPieceDataRoot->GetUseCPS()) m_pSkinChar->SetPiece( pPieceDataRoot->GetCpsName().c_str(), m_pd3dDevice, 0X0, 0, TRUE );
+							else
+							{
+								EMPIECECHAR emPiece_a = SLOT_2_PIECE(EMSLOT(i));
+								PDXSKINPIECE pSkinPiece_a  = NULL;	
+								if ( emPiece_a!=PIECE_SIZE ) pSkinPiece_a  = pSkinChar->GetPiece(emPiece_a );
+								m_pSkinChar->SetPiece ( pSkinPiece_a->m_szFileName, m_pd3dDevice, 0X0, 0, TRUE );
+							}
+							m_pSkinChar->SetCharPieceData( pPieceDataRoot->GetData(), m_pd3dDevice, pPieceDataRoot->GetBoneLink(), pPieceDataRoot->GetWeaponSlot(), pPieceDataRoot->GetType(), 0x0, 0, TRUE );
+						}
+						else
+						{
+							m_pSkinChar->SetPiece ( pSkinPiece->m_szFileName, m_pd3dDevice, 0X0, 0, TRUE );
+							m_pSkinChar->ResetABL ( emPiece ); //clear abl when you remove an item
+						}
+					}
+					else m_pSkinChar->ResetABL ( emPiece );//clear abl when you remove an item
+					
+					//add upgradeeffect 
+					if (  emPiece == PIECE_UPBODY ) m_pSkinChar->ResetPiece(PIECE_EFF_UPBODY);
+					else if (  emPiece == PIECE_LOBODY ) m_pSkinChar->ResetPiece(PIECE_EFF_LOBODY);
+					else if (  emPiece == PIECE_GLOVE ) m_pSkinChar->ResetPiece(PIECE_EFF_GLOVE);
+					else if (  emPiece == PIECE_FOOT ) m_pSkinChar->ResetPiece(PIECE_EFF_FOOT);
+			}
+			else //add abl
+			{
+				if ( pCharPart )
+				{
+					if ( m_pSkinChar->m_pSkinCharPiece[PIECE_RHAND] && emPiece != PIECE_LHAND ) m_pSkinChar->ResetPiece(emPiece);
+					else
+					{
+						if ( emPiece != PIECE_LHAND ) m_pSkinChar->ResetPiece(emPiece);
+						
+						EMSLOT emRHand = GetCurRHand();
+						SITEM* pRHAND = GET_SLOT_ITEMDATA ( emRHand );
+						if ( pRHAND )// dual cps fix
+						{
+							EMCHARCLASS emSex = CharClassGetSex( emIndex );
+							EMCPSINDEX	emLeft = CPSIND_NULL;
+							if ( emSex == GLCC_MAN ) emLeft = CPSIND_M_LEFT;
+							else emLeft = CPSIND_W_LEFT;
+
+							if (strcmp(pRHAND->GetCpsFile(emLeft), "") == 0) m_pSkinChar->ResetPiece(emPiece);
+						}
+						else
+						{
+							if ( !m_pSkinChar->m_pSkinCharPiece[PIECE_RHAND] && emPiece == PIECE_LHAND ) m_pSkinChar->ResetPiece(emPiece);
+						}
+
+							if ( emPiece == PIECE_UPBODY )		m_pSkinChar->ResetPiece(PIECE_EFF_UPBODY);
+							else if ( emPiece == PIECE_LOBODY )	m_pSkinChar->ResetPiece(PIECE_EFF_LOBODY);
+							else if ( emPiece == PIECE_GLOVE )	m_pSkinChar->ResetPiece(PIECE_EFF_GLOVE);
+							else if ( emPiece == PIECE_FOOT ) 	m_pSkinChar->ResetPiece(PIECE_EFF_FOOT);
+					}
+				}
+			}
+		}
+		else
+		{
+			SITEM* pItem = GLItemMan::GetInstance().GetItem ( nidITEM );
+			if ( pItem ) //add abl
+			{
+				EMCHARCLASS emSex = CharClassGetSex( emIndex );
+				EMCPSINDEX	emLeft = CPSIND_NULL;
+				EMCPSINDEX	emRight = CPSIND_NULL;
+
+				//add upgradeeffect
+				{
+						if (  EMSLOT(i) == SLOT_UPPER )	m_pSkinChar->SetGradeEffect(0,emIndex,ItemClient.GETGRADE_EFFECT(),m_pd3dDevice,TRUE);
+						if (  EMSLOT(i) == SLOT_LOWER )	m_pSkinChar->SetGradeEffect(1,emIndex,ItemClient.GETGRADE_EFFECT(),m_pd3dDevice,TRUE);
+						if (  EMSLOT(i) == SLOT_HAND )	m_pSkinChar->SetGradeEffect(2,emIndex,ItemClient.GETGRADE_EFFECT(),m_pd3dDevice,TRUE);
+						if (  EMSLOT(i) == SLOT_FOOT ) 	m_pSkinChar->SetGradeEffect(3,emIndex,ItemClient.GETGRADE_EFFECT(),m_pd3dDevice,TRUE);
+				}
+
+				if ( emSex == GLCC_MAN )
+				{
+					emLeft = CPSIND_M_LEFT;
+					emRight = CPSIND_M_RIGHT;
+				}
+				else
+				{
+					emLeft = CPSIND_W_LEFT;
+					emRight = CPSIND_W_RIGHT;
+				}
+				
+				{
+					DxSkinPieceRootData* pPieceDataRoot;
+					pPieceDataRoot = DxSkinPieceRootDataContainer::GetInstance().LoadData( pItem->GetCpsFile(emRight) , m_pd3dDevice , TRUE );
+					if ( pPieceDataRoot )
+					{
+						if ( pPieceDataRoot->GetUseCPS() )
+						{
+								m_pSkinChar->SetPiece( pPieceDataRoot->GetCpsName().c_str(), m_pd3dDevice, NULL, ItemClient.GETGRADE_EFFECT(), TRUE );
+						}
+						else m_pSkinChar->ResetCPS (  PIECE_RHAND );//remove existing cps when the abl data dont have cps
+						
+							m_pSkinChar->SetCharPieceData( pPieceDataRoot->GetData(), m_pd3dDevice, pPieceDataRoot->GetBoneLink(), pPieceDataRoot->GetWeaponSlot(), (DWORD) PIECE_RHAND, NULL, ItemClient.GETGRADE_EFFECT(), TRUE );
+						
+						m_pSkinChar->Clear( PIECE_LHAND );
+					}
+					else 
+						m_pSkinChar->SetPiece ( pItem->GetCpsFile(emRight), m_pd3dDevice, NULL, ItemClient.GETGRADE_EFFECT(), TRUE );
+				}
+				
+				{
+					DxSkinPieceRootData* pPieceDataRoot;
+					pPieceDataRoot = DxSkinPieceRootDataContainer::GetInstance().LoadData( pItem->GetCpsFile(emLeft) , m_pd3dDevice , TRUE );
+					if ( pPieceDataRoot )
+					{
+						if ( pPieceDataRoot->GetUseCPS() )
+						{
+								m_pSkinChar->SetPiece( pPieceDataRoot->GetCpsName().c_str(), m_pd3dDevice, NULL, ItemClient.GETGRADE_EFFECT(), TRUE );
+						}
+						else m_pSkinChar->ResetCPS (  PIECE_LHAND );//remove existing cps when the abl data dont have cps
+						
+							m_pSkinChar->SetCharPieceData( pPieceDataRoot->GetData(), m_pd3dDevice, pPieceDataRoot->GetBoneLink(), pPieceDataRoot->GetWeaponSlot(), (DWORD) PIECE_LHAND, NULL, ItemClient.GETGRADE_EFFECT(), TRUE );
+					}
+					else 
+					{
+							m_pSkinChar->SetPiece ( pItem->GetCpsFile(emLeft), m_pd3dDevice, NULL, ItemClient.GETGRADE_EFFECT(), TRUE );
+					}
+				}
+
+				{
+					PLANDMANCLIENT pLand = GLGaeaClient::GetInstance().GetActiveMap();
+					if ( pItem->sBasicOp.emItemType != ITEM_VEHICLE )
+					{
+						{
+							EMPIECECHAR emPiece = SLOT_2_PIECE(EMSLOT(i));
+							DxSkinPieceRootData* pPieceDataRoot;
+							pPieceDataRoot = DxSkinPieceRootDataContainer::GetInstance().LoadData( pItem->GetWearingFile(emIndex) , m_pd3dDevice , TRUE );
+							if ( pPieceDataRoot )
+							{
+								if ( pPieceDataRoot->GetUseCPS() )
+								{
+										m_pSkinChar->SetPiece( pPieceDataRoot->GetCpsName().c_str(), m_pd3dDevice, NULL, ItemClient.GETGRADE_EFFECT(), TRUE );
+								}
+								else m_pSkinChar->ResetCPS( emPiece ); //clear abl when you remove an item
+									m_pSkinChar->SetCharPieceData( pPieceDataRoot->GetData(), m_pd3dDevice, pPieceDataRoot->GetBoneLink(), pPieceDataRoot->GetWeaponSlot(), pPieceDataRoot->GetType(), NULL, ItemClient.GETGRADE_EFFECT(), TRUE );
+							}
+						else if ( RANPARAM::bCHARACTER_SIMPLIFY == 1 ) //Character Simplify -- JohnArturooo 07-21-2016
+						{
+							if ( EMSLOT(i) == SLOT_HEADGEAR ) //We must use SetPiece here since only set need to be simplified! Chus! -- JohnArturooo
+							{
+								m_pSkinChar->SetPiece ( pItem->GetWearingFile(emIndex), m_pd3dDevice, NULL, ItemClient.GETGRADE_EFFECT(), TRUE );
+							}
+							if ( EMSLOT(i) == SLOT_RHAND ) //We must use SetPiece here since only set need to be simplified! Chus! -- JohnArturooo
+							{
+								m_pSkinChar->SetPiece ( pItem->GetWearingFile(emIndex), m_pd3dDevice, NULL, ItemClient.GETGRADE_EFFECT(), TRUE );
+							}
+						}
+						else if ( pLand->m_bRoyalRumble) //Character Simplify -- JohnArturooo 07-21-2016
+						{
+							if ( emSex == GLCC_MAN )
+							{
+								m_pSkinChar->SetPiece ( "m_cos_tranining_body01.cps", m_pd3dDevice, 0X0, 0, FALSE );//suit
+								m_pSkinChar->SetPiece ( "m_cos_tranining_leg01.cps", m_pd3dDevice, 0X0, 0, FALSE );//pants
+								m_pSkinChar->SetPiece ( "m_cos_tranining_foot01.cps", m_pd3dDevice, 0X0, 0, FALSE );//shoes
+								m_pSkinChar->SetPiece ( "m_cos_ny_hand.cps", m_pd3dDevice, 0X0, 0, FALSE );//gloves
+							}
+							else
+							{
+								m_pSkinChar->SetPiece ( "w_cos_tranining_body01.cps", m_pd3dDevice, 0X0, 0, FALSE );//suit
+								m_pSkinChar->SetPiece ( "w_cos_tranining_leg01.cps", m_pd3dDevice, 0X0, 0, FALSE );//pants
+								m_pSkinChar->SetPiece ( "w_cos_tranining_foot01.cps", m_pd3dDevice, 0X0, 0, FALSE );//shoes
+								m_pSkinChar->SetPiece ( "w_cos_ny_hand.cps", m_pd3dDevice, 0X0, 0, FALSE );//gloves
+							}
+
+							if ( EMSLOT(i) == SLOT_HEADGEAR ) //We must use SetPiece here since only set need to be simplified! Chus! -- JohnArturooo
+							{
+								m_pSkinChar->SetPiece ( pItem->GetWearingFile(emIndex), m_pd3dDevice, NULL, ItemClient.GETGRADE_EFFECT(), TRUE );
+							}
+							if ( EMSLOT(i) == SLOT_RHAND ) //We must use SetPiece here since only set need to be simplified! Chus! -- JohnArturooo
+							{
+								m_pSkinChar->SetPiece ( pItem->GetWearingFile(emIndex), m_pd3dDevice, NULL, ItemClient.GETGRADE_EFFECT(), TRUE );
+							}
+						}
+						else 
+							{
+									m_pSkinChar->SetPiece ( pItem->GetWearingFile(emIndex), m_pd3dDevice, NULL, ItemClient.GETGRADE_EFFECT(), TRUE );
+							}
+						}
+						//LEFT HAND
+						{
+							DxSkinPieceRootData* pPieceDataRoot;
+							pPieceDataRoot = DxSkinPieceRootDataContainer::GetInstance().LoadData( pItem->GetWearingFile2(emIndex) , m_pd3dDevice , TRUE );
+							if ( pPieceDataRoot )
+							{
+								if ( pPieceDataRoot->GetUseCPS() )
+								{
+										m_pSkinChar->SetPiece( pPieceDataRoot->GetCpsName().c_str(), m_pd3dDevice, NULL, ItemClient.GETGRADE_EFFECT(), TRUE );
+								}
+									m_pSkinChar->SetCharPieceData( pPieceDataRoot->GetData(), m_pd3dDevice, pPieceDataRoot->GetBoneLink(), pPieceDataRoot->GetWeaponSlot(), pPieceDataRoot->GetType(), NULL, ItemClient.GETGRADE_EFFECT(), TRUE );
+							}
+							else 
+							{
+									m_pSkinChar->SetPiece ( pItem->GetWearingFile2(emIndex), m_pd3dDevice, NULL, ItemClient.GETGRADE_EFFECT(), TRUE );
+							}
+						}
+					}
+					//Added by   | 11-8-2012 | add VPS and VCF code
+					else
+					{
+						if ( pItem->sVehicle.emVehicleType == VEHICLE_TYPE_BOARD ) m_pSkinChar->m_fLengthSRC = 150.0f;
+						else m_pSkinChar->m_fLengthSRC = 30.0f;
+						
+						DxSkinVehicleData* pVehicleData;
+						pVehicleData = DxSkinVehicleDataContainer::GetInstance().LoadData( pItem->GetWearingFile(emIndex) , m_pd3dDevice , TRUE );
+						if ( pVehicleData )
+						{
+							m_pSkinChar->SetVehicleData( pVehicleData
+														, m_pd3dDevice
+														, TRUE );
+							for( DWORD iLoopPart = ACCE_TYPE_SKIN ; iLoopPart < ACCE_TYPE_SIZE ; iLoopPart++ )
+							{
+								SITEM* pItemPart = GLItemMan::GetInstance().GetItem ( m_sVehicle.m_PutOnItems[iLoopPart].sNativeID );
+
+								if ( pItemPart )
+								{
+									if ( m_pSkinChar->m_pSkinVehicle ) m_pSkinChar->m_pSkinVehicle->SetPiece( pItemPart->GetVpsFile(), m_pd3dDevice, NULL, ItemClient.GETGRADE_EFFECT(), TRUE );
+								}
+							}
+							//m_pSkinChar->m_pSkinVehicle->SetColor( m_CharData.m_sVehicle.m_wColor,m_CharData.m_sVehicle.m_wColor1,m_CharData.m_sVehicle.m_wColor2,m_CharData.m_sVehicle.m_wColor3,m_CharData.m_sVehicle.m_wColor4,m_CharData.m_sVehicle.m_wColor5 );
+						}
+						else m_pSkinChar->SetPiece ( pItem->GetWearingFile(emIndex), m_pd3dDevice, NULL, ItemClient.GETGRADE_EFFECT(), TRUE );
+				//m_pSkinChar->SetColorAll( 32767 );
+
+			}
+		}
+	 }
+  }
+	
+}	
+
+
+
+	//	Note : ½ºÅ³ ¹öÇÁ, »óÅÂÀÌ?EÈ¿?E»ý¼º.
+	FACTEFF::ReNewEffect ( STARGETID(CROW_PC,m_dwGaeaID,m_vPos), m_pSkinChar, m_sSKILLFACT, m_sSTATEBLOWS, m_matTrans, m_vDir );
+	if( GLCONST_CHAR::cCONSTCLASS[emIndex].strCLASS_EFFECT.size() != 0 ) DxEffcharDataMan::GetInstance().PutPassiveEffect ( m_pSkinChar, GLCONST_CHAR::cCONSTCLASS[emIndex].strCLASS_EFFECT.c_str(), &m_vDir );
+
+
+	return S_OK;
+}
+
+WORD GLCharClient::GetBodyRadius ()
+{
+	return GETBODYRADIUS();
+}
+
+void GLCharClient::DisableSkillFact()
+{
+	EMSLOT emRHand = GetCurRHand();	
+	SITEM* pRightItem = GET_SLOT_ITEMDATA(emRHand);	
+	
+	for ( int i=0; i<SKILLFACT_SIZE; ++i )
+	{
+		if ( m_sSKILLFACT[i].sNATIVEID == NATIVEID_NULL() ) continue;
+	
+        PGLSKILL pSkill = GLSkillMan::GetInstance().GetData ( m_sSKILLFACT[i].sNATIVEID );
+		if ( !pSkill ) continue;
+
+		// ½ºÅ³ ÀÚ½Å ¹öÇÁ
+		if ( pSkill->m_sBASIC.emIMPACT_TAR != TAR_SELF || pSkill->m_sBASIC.emIMPACT_REALM != REALM_SELF ) continue;
+					
+		GLITEM_ATT emSKILL_RITEM = pSkill->m_sBASIC.emUSE_RITEM;
+
+		// ½ºÅ³ µµ±¸ Á¾¼Ó ¾øÀ½
+		if ( emSKILL_RITEM == ITEMATT_NOCARE )	continue;
+
+		// ½ºÅ³ ?E¹«±â°¡ ºÒÀÏÄ¡
+		if( !pRightItem || !CHECHSKILL_ITEM(emSKILL_RITEM,pRightItem->sSuitOp.emAttack) )
+		{
+			FACTEFF::DeleteSkillFactEffect ( STARGETID(CROW_PC,m_dwGaeaID,m_vPos), m_pSkinChar, m_sSKILLFACT[i].sNATIVEID );
+			DISABLESKEFF( i );
+		}
+	}
+}
+
+
+void GLCharClient::ReSelectAnimation ()
+{
+	EMSLOT emRHand = GetCurRHand();
+	EMSLOT emLHand = GetCurLHand();
+
+	SITEM* pRHAND = NULL;
+	SITEM* pLHAND = NULL;
+
+	if ( m_CharData.m_PutOnItems[emRHand].sNativeID!=NATIVEID_NULL() )
+		pRHAND = GLItemMan::GetInstance().GetItem ( m_CharData.m_PutOnItems[emRHand].sNativeID );
+	
+	if ( m_CharData.m_PutOnItems[emLHand].sNativeID!=NATIVEID_NULL() )
+		pLHAND = GLItemMan::GetInstance().GetItem ( m_CharData.m_PutOnItems[emLHand].sNativeID );
+
+	m_emANISUBTYPE = CHECK_ANISUB ( pRHAND, pLHAND );
+
+	// Á¦½ºÃ³ÁßÀÌ?E¾Ö´Ï¸ÞÀÌ¼Ç ¸®¼Â ¾ÈÇÔ.
+	if ( IsACTION ( GLAT_TALK ) || IsACTION(GLAT_GATHERING) )
+	{
+		//	Note : ¿¡´Ï¸ÞÀÌ¼Ç ÃÊ±âÈ­.
+		//
+		m_pSkinChar->SELECTANI ( m_pSkinChar->GETCURMTYPE(), m_emANISUBTYPE );
+	}
+}
+
+void GLCharClient::SetPosition ( const D3DXVECTOR3 &vPos )
+{
+	m_vPos = vPos;
+	m_actorMove.SetPosition ( m_vPos, -1 );
+	if ( m_actorMove.PathIsActive() )		m_actorMove.Stop();
+}
+
+void GLCharClient::TurnAction ( EMACTIONTYPE toAction )
+{
+	//	Note : ÀÌ?E¾×¼Ç ?E?
+	//
+	switch ( m_Action )
+	{
+	case GLAT_IDLE:
+		break;
+
+	case GLAT_FALLING:
+		if ( toAction==GLAT_FALLING )	return;
+		break;
+		
+	case GLAT_DIE:
+		if ( toAction==GLAT_FALLING || toAction==GLAT_DIE )	return;
+		break;
+
+	case GLAT_CONFT_END:
+		ReSetSTATE(EM_ACT_CONFT_WIN);
+		break;
+
+	default:
+		break;
+	};
+
+	//	Note : ¾×¼Ç ÃÊ±âÈ­.
+	//
+	m_Action = toAction;
+
+	switch ( m_Action )
+	{
+	case GLAT_IDLE:
+		m_fIdleTime = 0.0f;
+		break;
+
+	case GLAT_ATTACK:
+		StartAttackProc ();
+		m_bINVISIBLE=false;
+		break;
+
+	case GLAT_SKILL:
+		{
+			//	Note : ½ºÅ³ Á¤º¸ °¡Á®¿È.
+			PGLSKILL pSkill = GLSkillMan::GetInstance().GetData ( m_idACTIVESKILL.wMainID, m_idACTIVESKILL.wSubID );
+			if ( !pSkill )								return;
+
+			m_emANIMAINSKILL = pSkill->m_sEXT_DATA.emANIMTYPE;
+			m_emANISUBSKILL = pSkill->m_sEXT_DATA.emANISTYPE;
+			StartSkillProc ();
+			m_bINVISIBLE=false;
+		}
+		break;
+
+	case GLAT_FALLING:
+		FACTEFF::DeleteEffect ( STARGETID(CROW_PC,m_dwGaeaID,m_vPos), m_pSkinChar, m_sSKILLFACT, m_sSTATEBLOWS );
+		break;
+
+	case GLAT_CONFT_END:
+		break;
+
+	case GLAT_DIE:
+		FACTEFF::DeleteEffect ( STARGETID(CROW_PC,m_dwGaeaID,m_vPos), m_pSkinChar, m_sSKILLFACT, m_sSTATEBLOWS );
+		break;
+	case GLAT_GATHERING:		
+		break;
+
+	default:
+		GASSERT("GLCharacter::TurnAction() ÁØºñµÇ?E¾ÊÀº ACTION ÀÌ µé¾ûÛÔ½À´Ï´Ù.");
+		break;
+	};
+
+	if ( m_actorMove.PathIsActive() )
+	{
+		if ( !IsACTION(GLAT_MOVE) && !IsACTION(GLAT_PUSHPULL) )		m_actorMove.Stop();
+	}
+}
+
+HRESULT GLCharClient::UpateAnimation ( float fTime, float fElapsedTime )
+{
+	HRESULT hr=S_OK;
+
+	BOOL bPeaceZone = GLGaeaClient::GetInstance().GetActiveMap()->IsPeaceZone();
+	if ( !bPeaceZone && IsSTATE(EM_ACT_PEACEMODE) )		bPeaceZone = TRUE;
+
+//	if ( !IsSTATE (EM_ACT_PEACEMODE) ) SetSTATE(EM_ACT_PEACEMODE);
+	bool	IsBooster = IsSTATE( EM_ACT_BOOSTER ); //add bike booster
+
+	BOOL bLowSP = FALSE;
+	BOOL bFreeze = FALSE;
+
+	EMANI_MAINTYPE emMType;
+	EMANI_SUBTYPE emSType;
+	GLCharacter* pChar = GLGaeaClient::GetInstance().GetCharacter();
+	SITEM* pRHand = GLItemMan::GetInstance().GetItem( pChar->m_PutOnItems[5].sNativeID );
+	
+	GLITEM_ATT emRHAtt = ITEMATT_NOTHING;
+	if ( pRHand )		emRHAtt = pRHand->sSuitOp.emAttack;
+
+	switch ( m_Action )
+	{
+	case GLAT_IDLE:
+		{
+			m_fIdleTime += fElapsedTime;
+		
+			if ( bPeaceZone && m_pSkinChar->GETANI ( AN_PLACID, AN_SUB_NONE ) )
+			{
+				emMType = AN_PLACID;
+				emSType = AN_SUB_NONE;
+       
+                // this must be disabled. it causes client side animation run/ idle bug.
+				/*if (pRHand)
+				{
+					switch ( emRHAtt )
+					{
+
+					case ITEMATT_CUBE:
+						emMType = AN_GUARD_N;
+						emSType = AN_SUB_CUBE;
+						break;
+					case ITEMATT_WHIP:
+						emMType = AN_GUARD_N;
+						emSType = AN_SUB_WHIP;
+						break;
+					};
+				}*/
+				if ( m_bVehicle )
+				{
+					int emType = m_sVehicle.m_emTYPE ;
+					if ( emType == VEHICLE_TYPE_BOARD )
+					{
+						emSType = (EMANI_SUBTYPE) (AN_SUB_HOVERBOARD ) ;
+					}
+					else
+					{
+						emMType = m_sVehicle.GetVehicleMainAni( m_sVehicle.m_emTYPE ); //modify vehicle anim
+
+						if (IsBooster) emSType = m_sVehicle.GetVehicleSubAni(AN_ATTACK,false); //add bike booster
+						else emSType = m_sVehicle.GetVehicleSubAni(AN_PLACID,false);
+					}
+				}
+			}
+			else
+			{
+				BOOL bPANT(FALSE); // ïž“é›‡å‰ªè‘¡.
+				
+				if ( m_pSkinChar->GETANI ( AN_GUARD_L, m_emANISUBTYPE ) )
+				{
+					bPANT = bLowSP || m_bSTATE_PANT;
+				}
+
+				if ( bPANT )
+				{
+					emMType = AN_GUARD_L;
+					emSType = m_emANISUBTYPE;
+				}
+				else
+				{
+					emMType = AN_GUARD_N;
+					emSType = m_emANISUBTYPE;
+				}
+			}
+			//add abl
+
+			if ( m_pSkinChar->m_pSkinCharPiece[PIECE_RHAND] )
+			{
+				m_pSkinChar->m_pSkinCharPiece[PIECE_RHAND]->SELECTANI( AN_GUARD_N , AN_SUB_NONE );
+			}
+			if ( m_pSkinChar->m_pSkinCharPiece[PIECE_LHAND] )
+			{
+				m_pSkinChar->m_pSkinCharPiece[PIECE_LHAND]->SELECTANI( AN_GUARD_N , AN_SUB_NONE );
+			}
+
+			//add vcf
+			if ( m_pSkinChar->m_pSkinVehicle )
+			{
+				if (IsBooster) m_pSkinChar->m_pSkinVehicle->SELECTANI( ANI_VEHICLE_BOOSTER , AN_SUB_NONE ); //add bike booster
+				else m_pSkinChar->m_pSkinVehicle->SELECTANI( AN_GUARD_N , AN_SUB_NONE );
+			}
+			
+			bool bDance = false;
+			if ( m_bTRANSFORM_EFF )
+			{
+				for ( int _k = 0; _k < SKILLFACT_SIZE; _k++ )
+				{
+					SNATIVEID sSkillID = m_sSKILLFACT[_k].sNATIVEID;
+					if ( GLCONST_CHAR::sSkillID_Transform[sSkillID.wMainID][sSkillID.wSubID] != NATIVEID_NULL() )
+					{
+						if ( GLCONST_CHAR::bDANCE[sSkillID.wMainID][sSkillID.wSubID] ) 
+						{
+							bDance = true;
+							break;
+						}
+					}
+				}
+			}
+
+			if ( bDance ) 
+				m_pSkinChar->SELECTANI( AN_GESTURE, AN_SUB_27 );
+			else if ( !bDance && m_bTRANSFORM_EFF ) 
+				m_pSkinChar->SELECTANI( AN_GUARD_N );
+			else 
+				m_pSkinChar->SELECTANI ( emMType, emSType );
+		}
+		break;
+
+	case GLAT_MOVE:
+		emMType = IsSTATE(EM_ACT_RUN) ? AN_RUN : AN_WALK;
+		emSType = bPeaceZone ? AN_SUB_NONE : m_emANISUBTYPE;
+		if ( m_bVehicle )
+		{
+			int emType = m_sVehicle.m_emTYPE;
+
+			if (emType == VEHICLE_TYPE_BOARD )
+			{
+				emSType = (EMANI_SUBTYPE) ( AN_SUB_HOVERBOARD );
+			}
+			else //modify vehicle anim
+			{
+				emMType = m_sVehicle.GetVehicleMainAni(m_sVehicle.m_emTYPE);
+				emSType = m_sVehicle.GetVehicleSubAni( IsSTATE(EM_ACT_RUN) ? AN_RUN : AN_WALK ,false);
+			}
+
+			if ( m_pSkinChar->m_pSkinVehicle )
+			{
+				if ( emSType == AN_RUN )
+				{
+					m_pSkinChar->m_pSkinVehicle->SELECTANI( AN_RUN , AN_SUB_NONE );
+				}
+				else if ( emSType == AN_WALK )
+				{
+					m_pSkinChar->m_pSkinVehicle->SELECTANI( AN_PLACID , AN_SUB_NONE );
+				}
+
+			}
+		}
+		
+		if ( m_bTRANSFORM_EFF )
+		{
+			if ( emSType == AN_RUN ) m_pSkinChar->SELECTANI( AN_RUN , AN_SUB_NONE );
+			else if ( emSType == AN_WALK ) m_pSkinChar->SELECTANI( AN_PLACID , AN_SUB_NONE );
+		} 
+
+		if ( !m_bTRANSFORM_EFF ) m_pSkinChar->SELECTANI ( emMType, emSType );
+		else m_pSkinChar->SELECTANI ( emMType );
+
+		break;
+
+	case GLAT_ATTACK:
+    	{   
+            if( m_bTRANSFORM_EFF )
+            {
+                EMSLOT emRHand = GetCurRHand();
+				EMSLOT emLHand = GetCurLHand();
+
+				SITEM* pRHAND = NULL;
+				SITEM* pLHAND = NULL;
+
+				EMANI_SUBTYPE emANISUBTYPE = CHECK_ATTACK_ANISUB ( pRHAND, pLHAND );
+                emANISUBTYPE = AN_SUB_NONE;
+                m_pSkinChar->SELECTANI ( AN_ATTACK, emANISUBTYPE, NULL, m_dwANISUBSELECT );
+                if ( m_pSkinChar->ISENDANIM() ) TurnAction ( GLAT_IDLE );
+            }
+			else
+			{
+
+				EMSLOT emRHand = GetCurRHand();
+				EMSLOT emLHand = GetCurLHand();
+
+				SITEM* pRHAND = NULL;
+				SITEM* pLHAND = NULL;
+
+				if ( m_CharData.m_PutOnItems[emRHand].sNativeID!=NATIVEID_NULL() )
+					pRHAND = GLItemMan::GetInstance().GetItem ( m_CharData.m_PutOnItems[emRHand].sNativeID );
+				
+				if ( m_CharData.m_PutOnItems[emLHand].sNativeID!=NATIVEID_NULL() )
+					pLHAND = GLItemMan::GetInstance().GetItem ( m_CharData.m_PutOnItems[emLHand].sNativeID );
+
+				EMANI_SUBTYPE emANISUBTYPE = CHECK_ATTACK_ANISUB ( pRHAND, pLHAND );
+				m_pSkinChar->SELECTANI ( AN_ATTACK, emANISUBTYPE, NULL, m_dwANISUBSELECT );
+
+				if ( m_pSkinChar->m_pSkinCharPiece[PIECE_RHAND] )
+				{
+					m_pSkinChar->m_pSkinCharPiece[PIECE_RHAND]->SELECTANI( AN_PLACID , AN_SUB_NONE );
+				}
+				if ( m_pSkinChar->m_pSkinCharPiece[PIECE_LHAND] )
+				{
+					m_pSkinChar->m_pSkinCharPiece[PIECE_LHAND]->SELECTANI( AN_PLACID , AN_SUB_NONE );
+				}
+				if ( m_pSkinChar->ISENDANIM () )	TurnAction ( GLAT_IDLE );
+			}
+		}
+
+		break;
+
+		//Invisible Fix
+	case GLAT_SKILL:// abl skill fix
+		{
+			m_pSkinChar->SELECTANI ( m_emANIMAINSKILL, m_emANISUBSKILL );
+
+			if ( m_pSkinChar->m_pSkinCharPiece[PIECE_RHAND] )
+			{
+				m_pSkinChar->m_pSkinCharPiece[PIECE_RHAND]->SELECTANI( AN_PLACID , AN_SUB_NONE );
+			}
+			if ( m_pSkinChar->m_pSkinCharPiece[PIECE_LHAND] )
+			{
+				m_pSkinChar->m_pSkinCharPiece[PIECE_LHAND]->SELECTANI( AN_PLACID , AN_SUB_NONE );
+			}
+
+			if ( m_pSkinChar->ISENDANIM () )	
+			{
+				TurnAction ( GLAT_IDLE );
+
+				if ( m_pSkinChar->m_pSkinCharPiece[PIECE_RHAND] )
+				{
+					m_pSkinChar->m_pSkinCharPiece[PIECE_RHAND]->SELECTANI( AN_GUARD_N , AN_SUB_NONE );
+				}
+				if ( m_pSkinChar->m_pSkinCharPiece[PIECE_LHAND] )
+				{
+					m_pSkinChar->m_pSkinCharPiece[PIECE_LHAND]->SELECTANI( AN_GUARD_N , AN_SUB_NONE );
+				}
+			}
+		}
+
+		break;
+
+	case GLAT_TALK:
+		{
+			BOOL bOK = m_pSkinChar->SELECTANI ( AN_GESTURE, EMANI_SUBTYPE(m_dwANISUBGESTURE) );
+			if ( !bOK )
+			{
+				TurnAction ( GLAT_IDLE );
+				break;
+			}
+
+			PSANIMCONTAINER pANIMCON = m_pSkinChar->GETCURANIM();
+			if ( !(pANIMCON->m_dwFlag&ACF_LOOP) && m_pSkinChar->ISENDANIM ()) TurnAction ( GLAT_IDLE );
+		}
+		break;
+
+	case GLAT_SHOCK:
+		
+		emSType = m_emANISUBTYPE;
+		if ( m_bVehicle )
+		{
+			int emType = m_sVehicle.m_emTYPE;
+			if ( emType == VEHICLE_TYPE_BOARD )
+			{
+				emSType = (EMANI_SUBTYPE) ( AN_SUB_HOVERBOARD );
+			}
+			else
+			{
+				emMType = m_sVehicle.GetVehicleMainAni( m_sVehicle.m_emTYPE ); //modify vehicle anim
+				emSType = m_sVehicle.GetVehicleSubAni(AN_SHOCK,false);
+			}
+		}
+		else emMType = AN_SHOCK;
+
+		if ( !m_bTRANSFORM_EFF ) m_pSkinChar->SELECTANI ( emMType, emSType ); //Transform Function 
+		if ( m_pSkinChar->ISENDANIM () )	TurnAction ( GLAT_IDLE );
+		break;
+
+	case GLAT_PUSHPULL:
+		//m_pSkinChar->SELECTANI ( AN_SHOCK, m_emANISUBTYPE );
+		break;
+
+	case GLAT_FALLING:
+		
+		emSType = AN_SUB_NONE;
+		if ( m_bVehicle )
+		{
+			int emType = m_sVehicle.m_emTYPE;
+			if ( emType == VEHICLE_TYPE_BOARD )
+			{
+				emMType = AN_DIE;//fix board die
+				emSType = (EMANI_SUBTYPE) ( AN_SUB_HOVERBOARD );
+			}
+			else
+			{
+				emMType = m_sVehicle.GetVehicleMainAni( m_sVehicle.m_emTYPE ); //modify vehicle anim
+				emSType = m_sVehicle.GetVehicleSubAni(AN_DIE,false);
+			}
+		}
+		else emMType = AN_DIE;
+		
+		m_pSkinChar->SELECTANI ( emMType, emSType, EMANI_ENDFREEZE );
+
+		//add vcf
+		if ( m_pSkinChar->m_pSkinVehicle )
+		{
+			m_pSkinChar->m_pSkinVehicle->SELECTANI( AN_ATTACK , AN_SUB_NONE );
+		}
+		if ( m_pSkinChar->ISENDANIM () )	 TurnAction ( GLAT_DIE );
+		break;
+
+	case GLAT_DIE:
+		bFreeze = TRUE;
+		m_pSkinChar->SELECTANI ( AN_DIE, AN_SUB_NONE, EMANI_ENDFREEZE );
+		m_pSkinChar->TOENDTIME();
+		break;
+
+	case GLAT_CONFT_END:
+		{
+			EMANI_MAINTYPE emMTYPE(AN_CONFT_LOSS);
+			if ( IsSTATE(EM_ACT_CONFT_WIN) )	emMTYPE = AN_CONFT_WIN;
+
+			m_pSkinChar->SELECTANI ( emMTYPE, AN_SUB_NONE );
+			if ( m_pSkinChar->ISENDANIM () )	TurnAction ( GLAT_IDLE );
+		}
+		break;
+	case GLAT_GATHERING:
+		{
+			BOOL bOK = m_pSkinChar->SELECTANI ( AN_GATHERING, EMANI_SUBTYPE(m_dwANISUBGESTURE) );
+			if ( !bOK )
+			{
+				TurnAction ( GLAT_IDLE );
+				break;
+			}
+
+			PSANIMCONTAINER pANIMCON = m_pSkinChar->GETCURANIM();
+			if ( !(pANIMCON->m_dwFlag&ACF_LOOP) && m_pSkinChar->ISENDANIM () )
+			{
+				TurnAction ( GLAT_IDLE );
+			}
+		}
+		break;
+	};
+
+	//	Note : ½ºÅ² ¾÷µ¥ÀÌÆ®.
+	//
+	m_pSkinChar->SetPosition ( m_vPos );
+
+
+	BOOL bContinue = IsACTION(GLAT_ATTACK) || IsACTION(GLAT_SKILL);
+
+	//	Note : »óÅÂ ÀÌ»ó¿¡ µû?E¸ð¼Ç ¼Óµµ¸¦ Á¶Á¤ÇÑ´Ù.
+	//
+	float fSkinAniElap = fElapsedTime;
+	switch ( m_Action )
+	{
+	case GLAT_MOVE:
+		fSkinAniElap *= ( GETMOVE_ITEM() + GETMOVEVELO() );
+		break;
+
+	case GLAT_ATTACK:
+	case GLAT_SKILL:
+		fSkinAniElap *= GETATTVELO();;
+		fSkinAniElap += GETATT_ITEM();;
+		break;
+	};
+
+	m_pSkinChar->FrameMove ( fTime, fSkinAniElap, bContinue, bFreeze, !bPeaceZone );
+
+	//	Note : ?E?EEÁö¿ªÀÏ¶§ Ç¥½Ã ¾ÈµÇ¾ß ÇÏ´Â ¾ÆÀÌÅÛ(´Ü°Ë,ÅõÃ´) ÀÎ?E°Ë»çÈÄ ·£?E²ô?E
+	//
+	if ( bPeaceZone )
+	{
+		EMSLOT emRHand = GetCurRHand();
+		EMSLOT emLHand = GetCurLHand();
+
+		SITEM *pItemR(NULL);
+		SITEM *pItemL(NULL);
+
+		if ( VALID_SLOT_ITEM(emRHand) )
+		{
+			pItemR = GLItemMan::GetInstance().GetItem ( GET_SLOT_ITEM(emRHand).sNativeID );
+		}
+
+		if ( VALID_SLOT_ITEM(emLHand) )
+		{
+			pItemL = GLItemMan::GetInstance().GetItem ( GET_SLOT_ITEM(emLHand).sNativeID );
+		}
+
+		if ( pItemR )
+		{
+			BOOL bRend = !( pItemR->sSuitOp.emAttack==ITEMATT_DAGGER || pItemR->sSuitOp.emAttack==ITEMATT_THROW );
+			m_pSkinChar->SetPartRend ( PIECE_RHAND, bRend );
+		}
+
+		if ( pItemL )
+		{
+			BOOL bRend = !( pItemL->sSuitOp.emAttack==ITEMATT_DAGGER || pItemL->sSuitOp.emAttack==ITEMATT_THROW );
+			m_pSkinChar->SetPartRend ( PIECE_LHAND, bRend );
+		}
+	}
+	else
+	{
+		m_pSkinChar->SetPartRend ( PIECE_RHAND, TRUE );
+		m_pSkinChar->SetPartRend ( PIECE_LHAND, TRUE );
+	}
+
+	return S_OK;
+}
+
+BOOL GLCharClient::IsCollisionVolume ()
+{
+	const CLIPVOLUME &CV = DxViewPort::GetInstance().GetClipVolume();
+	if ( COLLISION::IsCollisionVolume ( CV, m_vMax, m_vMin ) )	return TRUE;
+
+	return FALSE;
+}
+
+float GLCharClient::GETATTVELO ()
+{
+//	return m_fATTVELO<0.0f?0.0f:m_fATTVELO;
+	float fATTVELO = m_fATTVELO + m_fITEMATTVELO_R;
+	return fATTVELO<0.0f?0.0f:fATTVELO;
+}
+
+float GLCharClient::GETMOVEVELO ()
+{
+	float fMOVE = m_fSTATE_MOVE + m_fSKILL_MOVE + m_fITEM_MOVE_R; 
+
+	PLANDMANCLIENT pLand = GLGaeaClient::GetInstance().GetActiveMap();
+	if( pLand )
+	{
+		fMOVE += pLand->m_fLandBonusMSpeed;
+	}
+
+	return fMOVE<0.0f?0.0f:fMOVE;
+}
+
+float GLCharClient::GETATT_ITEM ()
+{
+	float fATTVELO = m_fITEMATTVELO / 100;
+	return fATTVELO;
+}
+float GLCharClient::GETMOVE_ITEM ()
+{
+	float fMOVE = m_fITEM_MOVE / GLCONST_CHAR::cCONSTCLASS[m_CHARINDEX].fRUNVELO;
+	return fMOVE<0.0f?0.0f:fMOVE;
+}
+
+float GLCharClient::GetMoveVelo ()
+{
+	float fDefaultVelo = IsSTATE(EM_ACT_RUN) ? GLCONST_CHAR::cCONSTCLASS[m_CHARINDEX].fRUNVELO : GLCONST_CHAR::cCONSTCLASS[m_CHARINDEX].fWALKVELO;
+	float fMoveVelo = fDefaultVelo * ( GETMOVEVELO() + GETMOVE_ITEM() );
+	return fMoveVelo;
+}
+
+void GLCharClient::UpdateCharacterSimplify()//Character Simplify recoded <3 - AnFire16 (7/23/2017)
+{
+	EMCHARCLASS emClass = m_CharData.emClass;
+	EMCHARINDEX emIndex = CharClassToIndex(m_CharData.emClass);
+	EMCHARCLASS emSex = CharClassGetSex( emIndex );
+	EMCPSINDEX	emLeft = CPSIND_NULL;
+	EMCPSINDEX	emRight = CPSIND_NULL;
+
+	if (RANPARAM::bCHARACTER_SIMPLIFY )
+	{
+		m_bSimplifySet = true;
+		if ( emSex == GLCC_MAN )
+		{
+			m_pSkinChar->SetPiece ( "m_cos_tranining_body01.cps", m_pd3dDevice, 0X0, 0, FALSE );//suit
+			m_pSkinChar->SetPiece ( "m_cos_tranining_leg01.cps", m_pd3dDevice, 0X0, 0, FALSE );//pants
+			m_pSkinChar->SetPiece ( "m_cos_tranining_foot01.cps", m_pd3dDevice, 0X0, 0, FALSE );//shoes
+			m_pSkinChar->SetPiece ( "m_cos_ny_hand.cps", m_pd3dDevice, 0X0, 0, FALSE );//gloves
+		}
+		else
+		{
+			m_pSkinChar->SetPiece ( "w_cos_tranining_body01.cps", m_pd3dDevice, 0X0, 0, FALSE );//suit
+			m_pSkinChar->SetPiece ( "w_cos_tranining_leg01.cps", m_pd3dDevice, 0X0, 0, FALSE );//pants
+			m_pSkinChar->SetPiece ( "w_cos_tranining_foot01.cps", m_pd3dDevice, 0X0, 0, FALSE );//shoes
+			m_pSkinChar->SetPiece ( "w_cos_ny_hand.cps", m_pd3dDevice, 0X0, 0, FALSE );//gloves
+		}
+	}
+	else
+	{
+		if ( m_bSimplifySet )
+		{
+			m_bSimplifySet = false;
+			EMCHARINDEX emIndex = CharClassToIndex(m_CharData.emClass);
+			DxSkinCharData* pSkinChar = DxSkinCharDataContainer::GetInstance().LoadData( GLCONST_CHAR::szCharSkin[emIndex], m_pd3dDevice, TRUE );
+			SAFE_DELETE(m_pSkinChar);
+			m_pSkinChar = new DxSkinChar;
+			m_pSkinChar->SetCharData ( pSkinChar, m_pd3dDevice, TRUE);
+			UpdateSuit();
+			m_pSkinChar->GetAABBBox( m_vMaxOrg, m_vMinOrg );
+			m_fHeight = m_vMaxOrg.y - m_vMinOrg.y;
+		}
+	}
+
+	/*PLANDMANCLIENT pLand = GLGaeaClient::GetInstance().GetActiveMap();
+	if ( pLand->m_bRoyalRumble )
+	{
+		m_bSimplifySet = true;
+		if ( emSex == GLCC_MAN )
+		{
+			m_pSkinChar->SetPiece ( "m_cos_tranining_body01.cps", m_pd3dDevice, 0X0, 0, FALSE );//suit
+			m_pSkinChar->SetPiece ( "m_cos_tranining_leg01.cps", m_pd3dDevice, 0X0, 0, FALSE );//pants
+			m_pSkinChar->SetPiece ( "m_cos_tranining_foot01.cps", m_pd3dDevice, 0X0, 0, FALSE );//shoes
+			m_pSkinChar->SetPiece ( "m_cos_ny_hand.cps", m_pd3dDevice, 0X0, 0, FALSE );//gloves
+		}
+		else
+		{
+			m_pSkinChar->SetPiece ( "w_cos_tranining_body01.cps", m_pd3dDevice, 0X0, 0, FALSE );//suit
+			m_pSkinChar->SetPiece ( "w_cos_tranining_leg01.cps", m_pd3dDevice, 0X0, 0, FALSE );//pants
+			m_pSkinChar->SetPiece ( "w_cos_tranining_foot01.cps", m_pd3dDevice, 0X0, 0, FALSE );//shoes
+			m_pSkinChar->SetPiece ( "w_cos_ny_hand.cps", m_pd3dDevice, 0X0, 0, FALSE );//gloves
+		}
+	}
+	else
+	{
+		if ( m_bSimplifySet )
+		{
+			m_bSimplifySet = false;
+			EMCHARINDEX emIndex = CharClassToIndex(m_CharData.emClass);
+			DxSkinCharData* pSkinChar = DxSkinCharDataContainer::GetInstance().LoadData( GLCONST_CHAR::szCharSkin[emIndex], m_pd3dDevice, TRUE );
+			SAFE_DELETE(m_pSkinChar);
+			m_pSkinChar = new DxSkinChar;
+			m_pSkinChar->SetCharData ( pSkinChar, m_pd3dDevice, TRUE);
+			UpdateSuit();
+			m_pSkinChar->GetAABBBox( m_vMaxOrg, m_vMinOrg );
+			m_fHeight = m_vMaxOrg.y - m_vMinOrg.y;
+		}
+	}*/
+}
+
+HRESULT GLCharClient::FrameMove ( float fTime, float fElapsedTime )
+{
+	HRESULT hr=S_OK;
+
+
+	// Áö?EÈ¿?E¾÷µ¥ÀÌÆ®
+	UpdateLandEffect();
+	//	Note : »óÅÂ °»½Å.
+	//
+	UPDATE_DATA ( fTime, fElapsedTime, TRUE );
+
+	//	Note : ÄÉ¸¯ ÇöÁ¦ À§Ä¡ ¾÷?EÌÆ?
+	//
+	m_vPos = m_actorMove.Position ();
+
+	//	Note : °ø°Ý ¸ñÇ¥ÀÇ À¯È¿¼º °Ë?E
+	//		(ÁÖÀÇ) Å¸°¹Á¤º¸ »ç?EE¹Ýµå½Ã È£ÃâÇÏ¿© À¯È¿¼º °Ë?EÇÊ?E
+	//
+	GLCOPY* pTarget = GLGaeaClient::GetInstance().GetCopyActor ( m_sTargetID );
+	if ( !pTarget )
+	{
+		m_sTargetID.dwID = EMTARGET_NULL;
+		if ( IsACTION(GLAT_ATTACK) )	TurnAction ( GLAT_IDLE );
+	}
+
+	//	Note : ¿¡´Ï¸ÞÀÌ¼Ç, ½ºÅ² ¾÷µ¥ÀÌÆ®.
+	//
+	UpateAnimation ( fTime, fElapsedTime );
+
+	switch ( m_Action )
+	{
+	case GLAT_IDLE://Sid | 8-25-2015 | UpdateSuit when idle after skill
+		{
+			if ( ITEMATT_EXTREMEFIST )
+			{
+				m_pSkinChar->ResetPiece(PIECE_RFINGER);// | 8-25-2015 | Remove ExtremeReboot after Skill 
+				m_pSkinChar->ResetPiece(PIECE_LFINGER);// | 8-25-2015 | Remove ExtremeReboot after Skill
+			} 
+		}
+		break;
+	case GLAT_MOVE:
+		{
+			if ( ITEMATT_EXTREMEFIST )
+			{
+				m_pSkinChar->ResetPiece(PIECE_RFINGER);
+				m_pSkinChar->ResetPiece(PIECE_LFINGER);
+			}
+
+			m_actorMove.SetMaxSpeed ( GetMoveVelo () );
+			m_actorMove.Update ( fElapsedTime );
+			if ( !m_actorMove.PathIsActive() )
+			{
+				m_actorMove.Stop ();
+				TurnAction ( GLAT_IDLE );
+			}
+
+			//	Note : ÄÉ¸¯ÀÇ ÇöÁ¦ À§Ä¡ ¾÷µ¥ÀÌÆ®.
+			//
+			m_vPos = m_actorMove.Position();
+
+			//	Note : ÇöÁ¦ ¹æÇâ ¾÷µ¥ÀÌÆ®.
+			//
+			D3DXVECTOR3 vMovement = m_actorMove.NextPosition();
+			if ( vMovement.x != FLT_MAX && vMovement.y != FLT_MAX && vMovement.z != FLT_MAX )
+			{
+				D3DXVECTOR3 vDirection = vMovement - m_vPos;
+				if ( !DxIsMinVector(vDirection,0.2f) )
+				{
+					D3DXVec3Normalize ( &vDirection, &vDirection );
+					m_vDir = vDirection;
+				}
+			}
+		}
+		break;
+
+	case GLAT_ATTACK:
+		{
+			if ( ITEMATT_EXTREMEFIST )
+			{
+				m_pSkinChar->ResetPiece(PIECE_RFINGER);
+				m_pSkinChar->ResetPiece(PIECE_LFINGER);
+			}
+			AttackProc ( fElapsedTime );
+
+			//	Note : °ø°Ý ¹æÇâÀ¸·Î È¸Àü.
+			//
+			GLCOPY* pTarget = GLGaeaClient::GetInstance().GetCopyActor ( m_sTargetID );
+			if ( pTarget )
+			{
+				D3DXVECTOR3 vDirection = pTarget->GetPosition() - m_vPos;
+				D3DXVec3Normalize ( &vDirection, &vDirection );
+				m_vDir = vDirection;
+			}
+		}
+		break;
+
+	case GLAT_SKILL:
+		{
+			EMSLOT emRHand = GetCurRHand();
+			SITEM* pRItem = GET_SLOT_ITEMDATA(emRHand);
+			if ( pRItem )
+			{
+				if ( pRItem->sSuitOp.emAttack == ITEMATT_EXTREMEFIST )
+				{
+					PGLSKILL pSkill = GLSkillMan::GetInstance().GetData ( m_idACTIVESKILL.wMainID, m_idACTIVESKILL.wSubID );
+					if ( !pSkill )
+					{
+						m_pSkinChar->ResetPiece(PIECE_RFINGER);
+						m_pSkinChar->ResetPiece(PIECE_LFINGER);
+						//TurnAction(GLAT_IDLE);
+						break;
+					}
+					else 
+					{
+						if ( pSkill->m_sLEARN.sWEAPON != NATIVEID_NULL())
+						{
+							SITEM* pItem = GLItemMan::GetInstance().GetItem (pSkill->m_sLEARN.sWEAPON.wMainID,pSkill->m_sLEARN.sWEAPON.wSubID);
+							if ( pItem )
+							{
+								SNATIVEID sITEMID(pSkill->m_sLEARN.sWEAPON.wMainID,pSkill->m_sLEARN.sWEAPON.wSubID);
+								ItemPreviewUpdate(sITEMID);
+							}
+						}
+					}
+				}
+			}
+
+			SkillProc ( fElapsedTime );
+
+			//	Note : °ø°Ý ¹æÇâÀ¸·Î È¸?E
+			//
+			m_vDir = UpdateSkillDirection ( m_vPos, m_vDir, m_idACTIVESKILL, m_vTARPOS, m_sTARIDS );
+		}
+		break;
+
+	case GLAT_PUSHPULL:
+		{
+			if ( m_bTRANSFORM_EFF ) break; //Transform Function 
+			else
+			{
+				m_actorMove.Update ( fElapsedTime );
+				if ( !m_actorMove.PathIsActive() )
+				{
+					if ( ITEMATT_EXTREMEFIST )
+					{
+						m_pSkinChar->ResetPiece(PIECE_RFINGER);
+						m_pSkinChar->ResetPiece(PIECE_LFINGER);
+					}
+					m_actorMove.Stop ();
+					TurnAction ( GLAT_IDLE );
+				}
+			}
+		}
+		break;
+
+	case GLAT_TALK:
+	case GLAT_SHOCK: 
+	case GLAT_FALLING:
+	case GLAT_DIE:
+	case GLAT_GATHERING:
+		if ( ITEMATT_EXTREMEFIST )
+		{
+			m_pSkinChar->ResetPiece(PIECE_RFINGER);
+			m_pSkinChar->ResetPiece(PIECE_LFINGER);
+		}
+		break;
+	};
+	if ( !m_bTRANSFORM_EFF ) ResetTransform(); //Transform Function 
+
+	FACTEFF::UpdateSkillEffect ( STARGETID(CROW_PC,m_dwGaeaID,m_vPos), m_pSkinChar, m_sSKILLFACT, m_sSTATEBLOWS );
+
+	UpdateCharacterSimplify(); //Character Simplify recoded <3 - AnFire16 (7/23/2017)
+
+	//	Note : ÇöÁ¦ À§Ä¡ ¾÷µ¥ÀÌÆ®.
+	//
+	m_vPos = m_actorMove.Position();
+
+	//	Note : ÇöÁ¦ À§Ä¡¿Í ¹æÇâÀ¸·Î Transform ¸ÞÆ®¸¯½º °è?E
+	//
+	D3DXMATRIX matTrans, matYRot;
+	D3DXMatrixTranslation ( &matTrans, m_vPos.x, m_vPos.y, m_vPos.z );
+	float fThetaY = DXGetThetaYFromDirection ( m_vDir, m_vDirOrig );
+	D3DXMatrixRotationY ( &matYRot, fThetaY );
+
+	m_matTrans = matYRot * matTrans;
+
+	//	Note : AABB °è»ê.
+	//
+	m_vMax = m_vPos + m_vMaxOrg;
+	m_vMin = m_vPos + m_vMinOrg;
+
+	return S_OK;
+}
+
+float GLCharClient::GetDirection ()
+{
+	return DXGetThetaYFromDirection ( m_vDir, m_vDirOrig );
+}
+
+HRESULT GLCharClient::Render ( LPDIRECT3DDEVICEQ pd3dDevice, CLIPVOLUME &cv, BOOL bRendAABB )
+{
+	HRESULT hr;
+	if ( !IsVisibleDetect() )			return S_FALSE;
+
+	//	Note : m_bINVISIBLE °¡ ?E?°æ?E¹ÝÅõ¸úãÏ°Ô Ç¥ÇöÇØ¾ßÇÔ.
+	//
+	if ( m_bINVISIBLE )
+	{
+		DxEffcharDataMan::GetInstance().PutPassiveEffect ( m_pSkinChar, GLCONST_CHAR::strHALFALPHA_EFFECT.c_str(), &m_vDir );
+	}
+	else
+	{
+		DxEffcharDataMan::GetInstance().OutEffect ( m_pSkinChar, GLCONST_CHAR::strHALFALPHA_EFFECT.c_str() );
+	}
+
+	//	TODO : m_bINVISIBLE °¡ ?E?°æ?E¹ÝÅõ¸úãÏ°Ô Ç¥ÇöÇØ¾ßÇÔ.
+
+	if ( !COLLISION::IsCollisionVolume ( cv, m_vMax, m_vMin ) )	return S_OK;
+
+	if ( m_pSkinChar )//add vcf
+	{
+		if ( m_pSkinChar->m_pSkinVehicle )
+		{
+			m_pSkinChar->RenderVehicle( pd3dDevice, m_matTrans );
+			DxBoneTrans *pBoneCur = NULL;
+			pBoneCur = m_pSkinChar->m_pSkinVehicle->GetSkeleton()->FindBone( m_pSkinChar->m_pSkinVehicle->m_strChar_Font.c_str() );
+			if ( pBoneCur )
+			{
+				D3DXVECTOR3			vRotation_Font, vTransform_Font;
+
+				vRotation_Font = m_pSkinChar->m_pSkinVehicle->m_vRotation_Font;
+				vTransform_Font = m_pSkinChar->m_pSkinVehicle->m_vTransform_Font;
+
+				D3DXMATRIXA16	matLocalRot, matScale, matRot;
+				matRot = pBoneCur->matCombined;
+				D3DXMatrixIdentity( &matScale );
+
+				D3DXMatrixRotationYawPitchRoll( &matScale, vRotation_Font.x, vRotation_Font.y, vRotation_Font.z );
+
+				D3DXMatrixMultiply( &matLocalRot, &matScale, &matRot );
+
+				D3DXVECTOR3	vVelocity;
+				D3DXVec3TransformNormal ( &vVelocity, &vTransform_Font, &matRot );
+				matLocalRot._41 += vVelocity.x;
+				matLocalRot._42 += vVelocity.y;
+				matLocalRot._43 += vVelocity.z;
+
+				hr = m_pSkinChar->Render ( pd3dDevice, matLocalRot );
+			}
+		}else{
+			hr = m_pSkinChar->Render ( pd3dDevice, m_matTrans );
+		}
+	}
+	if ( FAILED(hr) )	return hr;
+
+	#ifdef _SYNC_TEST
+	{
+		EDITMESHS::RENDERSPHERE ( pd3dDevice, m_vServerPos, 2.0f );
+	}
+	#endif
+
+	return S_OK;
+}
+
+HRESULT GLCharClient::RenderShadow ( LPDIRECT3DDEVICEQ pd3dDevice, CLIPVOLUME &cv )
+{
+	HRESULT hr;
+	if ( !IsVisibleDetect() )									return S_FALSE;
+	if ( IsACTION(GLAT_DIE) )									return S_FALSE;
+	if ( !COLLISION::IsCollisionVolume ( cv, m_vMax, m_vMin ) )	return S_OK;
+
+	//	Note : ±×¸²ÀÚ ·£´õ¸µ.
+	//
+	hr = DxShadowMap::GetInstance().RenderShadowCharMob ( m_pSkinChar, m_matTrans, pd3dDevice );
+	if ( FAILED(hr) )	return hr;
+
+	return S_OK;
+}
+
+HRESULT GLCharClient::RestoreDeviceObjects ( LPDIRECT3DDEVICEQ pd3dDevice )
+{
+	m_pSkinChar->RestoreDeviceObjects ( pd3dDevice );
+	return S_OK;
+}
+
+HRESULT GLCharClient::InvalidateDeviceObjects ()
+{
+	m_pSkinChar->InvalidateDeviceObjects ();
+	return S_OK;
+}
+
+EMELEMENT GLCharClient::GET_ITEM_ELMT ()
+{
+	EMSLOT emRHand = GetCurRHand();
+	EMSLOT emLHand = GetCurLHand();
+
+	SITEM* pRHandItem = GET_SLOT_ITEMDATA(emRHand);
+	SITEM* pLHandItem = GET_SLOT_ITEMDATA(emLHand);
+
+	EMELEMENT emELEMENT(EMELEMENT_SPIRIT);
+	if ( pRHandItem && pRHandItem->sSuitOp.sBLOW.emTYPE!=EMBLOW_NONE )
+	{
+		emELEMENT = STATE_TO_ELEMENT ( pRHandItem->sSuitOp.sBLOW.emTYPE );
+	}
+	else if ( pLHandItem && pLHandItem->sSuitOp.sBLOW.emTYPE!=EMBLOW_NONE )
+	{
+		emELEMENT = STATE_TO_ELEMENT ( pLHandItem->sSuitOp.sBLOW.emTYPE );
+	}
+
+	return emELEMENT;
+}
+
+void GLCharClient::ReceiveDamage ( DWORD wDamage, DWORD dwDamageFlag, STARGETID sACTOR )
+{
+	if ( dwDamageFlag & DAMAGE_TYPE_SHOCK )	TurnAction ( GLAT_SHOCK );
+
+	D3DXVECTOR3 vPos = GetPosBodyHeight();
+	CInnerInterface::GetInstance().SetDamage( vPos, wDamage, dwDamageFlag, UI_ATTACK );
+
+	IsHit(); //Transform Function 
+	if ( dwDamageFlag & DAMAGE_TYPE_CRUSHING_BLOW )
+	{
+		// °­ÇÑÅ¸°Ý ÀÌÆåÆ®
+		D3DXVECTOR3 vDIR = sACTOR.vPos - m_vPos;
+
+		D3DXVECTOR3 vDIR_ORG(1,0,0);
+		float fdir_y = DXGetThetaYFromDirection ( vDIR, vDIR_ORG );
+
+		D3DXMATRIX matTrans;
+		D3DXMatrixRotationY ( &matTrans, fdir_y );
+		matTrans._41 = m_vPos.x;
+		matTrans._42 = m_vPos.y + 10.0f;
+		matTrans._43 = m_vPos.z;
+
+		//	Note : ÀÚ?EÀ§Ä¡ ÀÌÆåÆ® ¹ß»ý½ÃÅ´.
+		DxEffGroupPlayer::GetInstance().NewEffGroup ( GLCONST_CHAR::strCRUSHING_BLOW_EFFECT.c_str(), matTrans, &sACTOR );
+	}
+
+	m_CharData.sHP.DECREASE(wDamage);
+	m_CharData.sHP.dwNow;
+
+	//	Note : ¹æ¾ûÙºÅ³ÀÇ ÀÌÆåÆ®°¡ ÀÖÀ»¶§ ¹ßµ¿½ÃÅ´.
+	SKT_EFF_HOLDOUT ( sACTOR, dwDamageFlag );
+}
+
+void GLCharClient::ReceiveAVoid ()
+{
+	if ( IsCollisionVolume() )
+	{
+		D3DXVECTOR3 vPos = GetPosBodyHeight();
+		CInnerInterface::GetInstance().SetDamage( vPos, 0, DAMAGE_TYPE_NONE, UI_ATTACK );
+	}
+}
+
+void GLCharClient::ReceiveSwing ()
+{
+	m_pSkinChar->DOSHOCKMIX();
+}
+
+HRESULT GLCharClient::MsgMoveState ( NET_MSG_GENERIC* nmg )
+{
+	GLMSG::SNETPC_MOVESTATE_BRD *pNetMsg = reinterpret_cast<GLMSG::SNETPC_MOVESTATE_BRD*> ( nmg );
+
+	BOOL bRun = IsSTATE ( EM_ACT_RUN );
+	BOOL bToRun = pNetMsg->dwActState&EM_ACT_RUN;
+
+	if ( bRun != bToRun )
+
+
+	{
+		//	Note : ÀÌµ¿ »óÅÂ º¯?E
+		if ( bToRun )		SetSTATE(EM_ACT_RUN);
+		else				ReSetSTATE(EM_ACT_RUN);
+
+		m_actorMove.SetMaxSpeed ( GetMoveVelo () );
+	}
+
+	if ( pNetMsg->dwActState & EM_REQ_VISIBLENONE )	SetSTATE ( EM_REQ_VISIBLENONE );
+	else											ReSetSTATE ( EM_REQ_VISIBLENONE );
+
+	if ( pNetMsg->dwActState & EM_REQ_VISIBLEOFF )	SetSTATE ( EM_REQ_VISIBLEOFF );
+	else											ReSetSTATE ( EM_REQ_VISIBLEOFF );
+
+	if ( pNetMsg->dwActState & EM_ACT_PEACEMODE )	SetSTATE ( EM_ACT_PEACEMODE );
+	else											ReSetSTATE ( EM_ACT_PEACEMODE );
+
+	if ( pNetMsg->dwActState & EM_ACT_BOOSTER  )	SetSTATE (EM_ACT_BOOSTER);//add bike booster
+	else  ReSetSTATE( EM_ACT_BOOSTER );
+
+	return S_OK;
+}
+
+HRESULT GLCharClient::MsgGoto ( NET_MSG_GENERIC* nmg )
+{
+	GLMSG::SNETPC_GOTO_BRD *pNetMsg = reinterpret_cast<GLMSG::SNETPC_GOTO_BRD*> ( nmg );
+
+	if ( pNetMsg->dwActState&EM_ACT_RUN )	SetSTATE ( EM_ACT_RUN );
+	else									ReSetSTATE ( EM_ACT_RUN );
+
+	m_sTargetID.vPos = pNetMsg->vTarPos;
+	TurnAction ( GLAT_MOVE );
+
+	BOOL bSucceed = m_actorMove.GotoLocation
+	(
+		m_sTargetID.vPos+D3DXVECTOR3(0,+10,0),
+		m_sTargetID.vPos+D3DXVECTOR3(0,-10,0)
+	);
+
+	if ( bSucceed )
+	{
+		m_actorMove.SetMaxSpeed ( GetMoveVelo() );
+	}
+
+	return S_OK;
+}
+
+void GLCharClient::MsgProcess ( NET_MSG_GENERIC* nmg )
+{
+	switch ( nmg->nType )
+	{
+	case NET_MSG_GCTRL_MOVESTATE_BRD:				MsgMoveState ( nmg ); break;
+	case NET_MSG_GCTRL_GOTO_BRD:					MsgGoto ( nmg ); break;
+
+	case NET_MSG_GCTRL_JUMP_POS_BRD:
+		{
+			GLMSG::SNETPC_JUMP_POS_BRD *pNetMsg = (GLMSG::SNETPC_JUMP_POS_BRD *) nmg;
+			m_vPos = pNetMsg->vPOS;
+			SetPosition ( m_vPos );
+		}
+		break;
+
+	case NET_MSG_GCTRL_ATTACK_BRD:
+		{
+			GLMSG::SNETPC_ATTACK_BRD *pNetMsg = (GLMSG::SNETPC_ATTACK_BRD *) nmg;
+
+			//	Note : °ø°Ý ¼ö?E
+			m_sTargetID.emCrow = pNetMsg->emTarCrow;
+			m_sTargetID.dwID = pNetMsg->dwTarID;
+			m_dwANISUBSELECT = pNetMsg->dwAniSel;
+			TurnAction ( GLAT_ATTACK );
+		}
+		break;
+
+	case NET_MSG_GCTRL_ATTACK_CANCEL_BRD:
+		{
+			if ( IsACTION(GLAT_ATTACK) )	TurnAction ( GLAT_IDLE );
+		}
+		break;
+
+	case NET_MSG_GCTRL_REQ_DISABLESKILLEFF_BRD: //disable skill effect NaJDeV
+		{
+			GLMSG::SNETPC_REQ_DISABLESKILLEFF_BRD *pNetMsg = (GLMSG::SNETPC_REQ_DISABLESKILLEFF_BRD *)nmg;
+			FACTEFF::DeleteSkillFactEffect ( STARGETID(CROW_PC,m_dwGaeaID,m_vPos), m_pSkinChar, m_sSKILLFACT[pNetMsg->dwSKILL].sNATIVEID );
+			DISABLESKEFF(pNetMsg->dwSKILL);
+		}
+		break;
+
+	case NET_MSG_GCTRL_ATTACK_AVOID_BRD:
+		{
+			GLMSG::SNETPC_ATTACK_AVOID_BRD *pNetMsg = (GLMSG::SNETPC_ATTACK_AVOID_BRD *) nmg;
+
+			GLCOPY* pActor = GLGaeaClient::GetInstance().GetCopyActor ( pNetMsg->emTarCrow, pNetMsg->dwTarID );
+			if ( pActor )	pActor->ReceiveAVoid ();
+		}
+		break;
+
+	case NET_MSG_GCTRL_ATTACK_DAMAGE_BRD:
+		{
+			GLMSG::SNETPC_ATTACK_DAMAGE_BRD *pNetMsg = (GLMSG::SNETPC_ATTACK_DAMAGE_BRD *) nmg;
+
+			GLCOPY* pActor = GLGaeaClient::GetInstance().GetCopyActor ( pNetMsg->emTarCrow, pNetMsg->dwTarID );
+			if ( pActor )
+			{
+				STARGETID sACTOR(GetCrow(),GetCtrlID(),GetPosition());
+				pActor->ReceiveDamage ( pNetMsg->nDamage, pNetMsg->dwDamageFlag, sACTOR );
+			}
+		}
+		break;
+
+	case NET_MSG_GCTRL_ACTION_BRD:
+		{
+			GLMSG::SNET_ACTION_BRD *pNetMsg = (GLMSG::SNET_ACTION_BRD *)nmg;
+			TurnAction ( pNetMsg->emAction );
+		}
+		break;
+
+	case NET_MSG_GCTRL_PUTON_RELEASE_BRD:
+		{
+			GLMSG::SNETPC_PUTON_RELEASE_BRD *pNetMsg = (GLMSG::SNETPC_PUTON_RELEASE_BRD *)nmg;
+
+			//	Á¦°ÅµÇ´Â ¾ÆÀÌÅÆ ¹Ý¿µ.
+			m_CharData.m_PutOnItems[pNetMsg->emSlot] = SITEMCLIENT ( SNATIVEID(false) );
+			UpdateSuit ();
+			UPDATE_ITEM();
+
+			ReSelectAnimation ();
+
+			// ¹«±â¿¡ µû¸¥ ¹öÇÁ¸¦ ÃÊ±âÈ­ ÇÑ´Ù.
+			DisableSkillFact();
+		}
+		break;
+
+	case NET_MSG_GCTRL_PUTON_UPDATE_BRD:
+		{
+			GLMSG::SNETPC_PUTON_UPDATE_BRD *pNetMsg = (GLMSG::SNETPC_PUTON_UPDATE_BRD *)nmg;
+
+			//	Á¦°ÅµÇ´Â ¾ÆÀÌÅÆÀÌ ÀÖÀ» °æ?E
+			if ( pNetMsg->emSlotRelease != SLOT_NSIZE_S_2 )
+				m_CharData.m_PutOnItems[pNetMsg->emSlotRelease] = SITEMCLIENT ( SNATIVEID(false) );
+
+			//	º¯°æµÇ´Â ¾ÆÀÌÅÆ ¹Ý¿µ.
+			m_CharData.m_PutOnItems[pNetMsg->emSlot] = pNetMsg->sItemClient;
+			UpdateSuit ();
+			UPDATE_ITEM();
+
+			ReSelectAnimation ();
+
+			// ¹«±â¿¡ µû¸¥ ¹öÇÁ¸¦ ÃÊ±âÈ­ ÇÑ´Ù.
+			DisableSkillFact();
+		}
+		break;
+
+	case NET_MSG_GCTRL_PUTON_CHANGE_BRD:
+		{
+			GLMSG::SNETPC_PUTON_CHANGE_BRD *pNetMsg = (GLMSG::SNETPC_PUTON_CHANGE_BRD *)nmg;
+
+			SetUseArmSub( pNetMsg->bUseArmSub );
+
+			UpdateSuit ();
+			UPDATE_ITEM();
+
+			ReSelectAnimation ();
+
+			// ¹«±â¿¡ µû¸¥ ¹öÇÁ¸¦ ÃÊ±âÈ­ ÇÑ´Ù.
+			DisableSkillFact();
+		}
+		break;
+
+	case NET_MSG_GCTRL_REQ_LEVELUP_BRD:
+		{
+			D3DXMATRIX matEffect;
+			D3DXMatrixTranslation ( &matEffect, m_vPos.x, m_vPos.y, m_vPos.z );
+
+			STARGETID sTargetID(CROW_PC,m_dwGaeaID,m_vPos);
+			DxEffGroupPlayer::GetInstance().NewEffGroup
+			(
+				GLCONST_CHAR::strLEVELUP_EFFECT.c_str(),
+				matEffect,
+				&sTargetID
+			);
+
+			m_CharData.wLevel += 1;
+		}
+		break;
+
+	case NET_MSG_GCTRL_REQ_SKILL_BRD:
+		{
+			GLMSG::SNETPC_REQ_SKILL_BRD *pNetMsg = (GLMSG::SNETPC_REQ_SKILL_BRD *)nmg;
+			
+			m_idACTIVESKILL = pNetMsg->skill_id;
+			m_wACTIVESKILL_LEVEL = pNetMsg->wLEVEL;
+			m_vTARPOS = pNetMsg->vTARPOS;
+
+			m_wTARNUM = pNetMsg->wTARNUM;
+			if ( m_wTARNUM > EMTARGET_NET )
+			{
+				break;
+			}
+			else
+			{
+				memcpy ( m_sTARIDS, pNetMsg->sTARIDS, sizeof(STARID)*m_wTARNUM );
+				//	Note : ½ºÅ³ÀÌ ¹ßµ¿µÊ.
+				TurnAction ( GLAT_SKILL );
+			}
+		}
+		break;
+
+	case NET_MSG_GCTRL_SKILL_CANCEL_BRD:
+		{
+			if ( IsACTION(GLAT_SKILL) )	TurnAction ( GLAT_IDLE );
+		}
+		break;
+
+	case NET_MSG_GCTRL_SKILLFACT_BRD:
+		{
+			GLMSG::SNETPC_SKILLFACT_BRD *pNetMsg = (GLMSG::SNETPC_SKILLFACT_BRD *)nmg;
+
+			m_CharData.sHP.VARIATION ( pNetMsg->nVAR_HP );
+
+			//	µ¥¹Ì?E¸Þ½Ã?E
+			if ( pNetMsg->nVAR_HP < 0 )
+			{
+				if ( pNetMsg->dwDamageFlag & DAMAGE_TYPE_SHOCK )	TurnAction ( GLAT_SHOCK );
+				else					ReceiveSwing ();
+
+				D3DXVECTOR3 vPos = GetPosBodyHeight();
+				//Added by   | 21-6-2012 | Bypass damage
+				//CInnerInterface::GetInstance().SetDamage( vPos, static_cast<WORD>(-pNetMsg->nVAR_HP), pNetMsg->dwDamageFlag, UI_UNDERATTACK );
+				CInnerInterface::GetInstance().SetDamage( vPos, static_cast<DWORD>(-pNetMsg->nVAR_HP), pNetMsg->dwDamageFlag, UI_UNDERATTACK );
+			
+				IsHit(); //Transform Function 
+
+				STARGETID sACTOR(pNetMsg->sACTOR.GETCROW(),pNetMsg->sACTOR.GETID());
+				sACTOR.vPos = GLGaeaClient::GetInstance().GetTargetPos ( sACTOR );
+				
+				SKT_EFF_HOLDOUT ( sACTOR, pNetMsg->dwDamageFlag );
+
+				if ( pNetMsg->dwDamageFlag & DAMAGE_TYPE_CRUSHING_BLOW )
+				{
+					// °­ÇÑÅ¸°Ý ÀÌÆåÆ®
+
+					D3DXVECTOR3 vDIR = sACTOR.vPos - m_vPos;
+
+					D3DXVECTOR3 vDIR_ORG(1,0,0);
+					float fdir_y = DXGetThetaYFromDirection ( vDIR, vDIR_ORG );
+
+					D3DXMATRIX matTrans;
+					D3DXMatrixRotationY ( &matTrans, fdir_y );
+					matTrans._41 = m_vPos.x;
+					matTrans._42 = m_vPos.y + 10.0f;
+					matTrans._43 = m_vPos.z;
+
+					//	Note : ÀÚ?EÀ§Ä¡ ÀÌÆåÆ® ¹ß»ý½ÃÅ´.
+					DxEffGroupPlayer::GetInstance().NewEffGroup ( GLCONST_CHAR::strCRUSHING_BLOW_EFFECT.c_str(), matTrans, &sACTOR );
+				}
+			}
+
+			//	Èú¸µ ¸Þ½Ã?E
+			//if ( pNetMsg->nVAR_HP > 0 )
+			//{
+			//	CPlayInterface::GetInstance().InsertText ( GetPosition(), static_cast<WORD>(pNetMsg->nVAR_HP), pNetMsg->bCRITICAL, 1 );
+			//}
+		}
+		break;
+
+	case NET_MSG_GCTRL_SKILLHOLD_BRD:
+		{
+			GLMSG::SNETPC_SKILLHOLD_BRD *pNetMsg = (GLMSG::SNETPC_SKILLHOLD_BRD *)nmg;
+
+			//	Áö¼Ó?E½ºÅ³ÀÇ °æ?E½ºÅ³ ÆÑÅÍ Ãß°¡µÊ.
+			if ( pNetMsg->skill_id != SNATIVEID(false) )
+			{
+				RECEIVE_SKILLFACT ( pNetMsg->skill_id, pNetMsg->wLEVEL, pNetMsg->wSELSLOT );
+				FACTEFF::NewSkillFactEffect ( STARGETID(CROW_PC,m_dwGaeaID,m_vPos), m_pSkinChar, pNetMsg->skill_id, m_matTrans, m_vDir );
+			}
+		}
+		break;
+
+	case NET_MSG_GCTRL_SKILLHOLD_RS_BRD:
+		{
+			GLMSG::SNETPC_SKILLHOLD_RS_BRD *pNetMsg = (GLMSG::SNETPC_SKILLHOLD_RS_BRD *)nmg;
+
+			//	Note : ½ºÅ³ fact µéÀ» Á¾?E
+			//		¹Ù·Î ¸®?EÇÏ?E¾Ê?E¿©±â¼­ ½Ã°£ Á¶Á¾ÇÏ¿© Á¤?EÁ¾·áµÇ°Ô ÇÔ. ( ÀÌÆÑÆ® Á¾?E¶§¹®. )
+			for ( int i=0; i<SKILLFACT_SIZE; ++i )
+			{
+				if ( pNetMsg->bRESET[i] )
+				{
+					FACTEFF::DeleteSkillFactEffect ( STARGETID(CROW_PC,m_dwGaeaID,m_vPos), m_pSkinChar, m_sSKILLFACT[i].sNATIVEID );
+
+					DISABLESKEFF(i);
+				}
+			}
+		}
+		break;
+
+	case NET_MSG_GCTRL_STATEBLOW_BRD:
+		{
+			GLMSG::SNETPC_STATEBLOW_BRD *pNetMsg = (GLMSG::SNETPC_STATEBLOW_BRD *)nmg;
+
+			if ( pNetMsg->emBLOW <= EMBLOW_SINGLE )
+				FACTEFF::DeleteBlowSingleEffect ( STARGETID(CROW_PC,m_dwGaeaID,m_vPos), m_pSkinChar, m_sSTATEBLOWS );
+
+			SSTATEBLOW *pSTATEBLOW = NULL;
+			if ( pNetMsg->emBLOW <= EMBLOW_SINGLE )		pSTATEBLOW = &m_sSTATEBLOWS[0];
+			else										pSTATEBLOW = &m_sSTATEBLOWS[pNetMsg->emBLOW-EMBLOW_SINGLE];
+
+			pSTATEBLOW->emBLOW = pNetMsg->emBLOW;
+			pSTATEBLOW->fAGE = pNetMsg->fAGE;
+			pSTATEBLOW->fSTATE_VAR1 = pNetMsg->fSTATE_VAR1;
+			pSTATEBLOW->fSTATE_VAR2 = pNetMsg->fSTATE_VAR2;
+
+			//	Note : È¿?E»ý¼º.
+			FACTEFF::NewBlowEffect ( STARGETID(CROW_PC,m_dwGaeaID,m_vPos), m_pSkinChar, pSTATEBLOW->emBLOW, m_matTrans, m_vDir );
+		}
+		break;
+
+	case NET_MSG_GCTRL_CURESTATEBLOW_BRD:
+		{
+			GLMSG::SNETPC_CURESTATEBLOW_BRD *pNetMsg = (GLMSG::SNETPC_CURESTATEBLOW_BRD *)nmg;
+
+			for ( int i=0; i<EMBLOW_MULTI; ++i )
+			{
+				EMSTATE_BLOW emBLOW = m_sSTATEBLOWS[i].emBLOW;
+
+				if ( emBLOW==EMBLOW_NONE )						continue;
+
+				EMDISORDER emDIS = STATE_TO_DISORDER(emBLOW);
+				if ( !(pNetMsg->dwCUREFLAG&emDIS) )				continue;
+
+				DISABLEBLOW(i);
+				FACTEFF::DeleteBlowEffect ( STARGETID(CROW_PC,m_dwGaeaID,m_vPos), m_pSkinChar, emBLOW );
+			}
+		}
+		break;
+
+		
+	case NET_MSG_GCTRL_PUSHPULL_BRD:
+		{
+			GLMSG::SNET_PUSHPULL_BRD *pNetMsg = (GLMSG::SNET_PUSHPULL_BRD *)nmg;
+			const D3DXVECTOR3 &vMovePos = pNetMsg->vMovePos;
+
+			//	Note : ¹Ð·Á³¯ À§Ä¡·Î ÀÌµ¿ ½Ãµµ.
+			//
+			BOOL bSucceed = m_actorMove.GotoLocation
+			(
+				D3DXVECTOR3(vMovePos.x,vMovePos.y+5,vMovePos.z),
+				D3DXVECTOR3(vMovePos.x,vMovePos.y-5,vMovePos.z)
+			);
+
+			if ( bSucceed )
+			{
+				//	Note : ¹Ð·Á³ª´Â ¿¢¼Ç ½ÃÀÛ.
+				//
+				m_sTargetID.vPos = vMovePos;
+				TurnAction ( GLAT_PUSHPULL );
+
+				//	Note : ¹Ð¸®´Â ¼Óµµ ¼³Á¤.
+				//
+				if ( pNetMsg->fSpeed != 0.0f ) m_actorMove.SetMaxSpeed ( pNetMsg->fSpeed );
+				//else m_actorMove.SetMaxSpeed ( GLCONST_CHAR::fPUSHPULL_VELO );
+				if ( pNetMsg->bTeleport ){
+					SetPosition( m_sTargetID.vPos );
+				}
+			}
+		}
+		break;
+
+	case NET_MSG_GCTRL_LANDEFFECT:
+		{
+			GLMSG::SNETPC_LANDEFFECT* pNetMsg = ( GLMSG::SNETPC_LANDEFFECT* ) nmg;
+			memcpy( m_sLandEffect, pNetMsg->sLandEffect, sizeof(m_sLandEffect) );
+		}
+		break;
+
+
+	case NET_MSG_GCTRL_CONFRONT_END2_CLT_BRD:
+		{
+			GLMSG::SNETPC_CONFRONT_END2_CLT_BRD *pNetMsg = (GLMSG::SNETPC_CONFRONT_END2_CLT_BRD *)nmg;
+
+			switch ( pNetMsg->emEND )
+			{
+			case EMCONFRONT_END_WIN:
+				SetSTATE(EM_ACT_CONFT_WIN);
+				TurnAction ( GLAT_CONFT_END );
+				break;
+
+			case EMCONFRONT_END_LOSS:
+				ReSetSTATE(EM_ACT_CONFT_WIN);
+				TurnAction ( GLAT_CONFT_END );
+				break;
+
+			case EMCONFRONT_END_NOTWIN:
+				ReSetSTATE(EM_ACT_CONFT_WIN);
+				TurnAction ( GLAT_CONFT_END );
+				break;
+
+			case EMCONFRONT_END_TIME:
+				ReSetSTATE(EM_ACT_CONFT_WIN);
+				TurnAction ( GLAT_CONFT_END );
+				break;
+
+			case EMCONFRONT_END_DISWIN:
+				SetSTATE(EM_ACT_CONFT_WIN);
+				TurnAction ( GLAT_CONFT_END );
+				break;
+
+			case EMCONFRONT_END_DISLOSS:
+				ReSetSTATE(EM_ACT_CONFT_WIN);
+				TurnAction ( GLAT_CONFT_END );
+				break;
+
+			case EMCONFRONT_END_PWIN:
+				SetSTATE(EM_ACT_CONFT_WIN);
+				TurnAction ( GLAT_CONFT_END );
+				break;
+
+			case EMCONFRONT_END_PLOSS:
+				ReSetSTATE(EM_ACT_CONFT_WIN);
+				TurnAction ( GLAT_CONFT_END );
+				break;
+			};
+		}
+		break;
+
+	case NET_MSG_GCTRL_UPDATE_BRIGHT_BRD:
+		{
+			GLMSG::SNETPC_UPDATE_BRIGHT_BRD *pNetMsg = (GLMSG::SNETPC_UPDATE_BRIGHT_BRD *)nmg;
+			m_CharData.nBright = pNetMsg->nBright;
+		}
+		break;
+
+	case NET_MSG_GCTRL_UPDATE_STATE_BRD:
+		{
+			GLMSG::SNETPC_UPDATE_STATE_BRD *pNetMsg = (GLMSG::SNETPC_UPDATE_STATE_BRD *)nmg;
+			m_CharData.sHP = pNetMsg->sHP;
+
+			//CDebugSet::ToListView ( "NET_MSG_GCTRL_UPDATE_STATE_BRD %s,  %d/%d", m_CharData.szName, m_CharData.sHP.wNow, m_CharData.sHP.wMax );
+		}
+		break;
+
+	case NET_MSG_GCTRL_UPDATE_FLAGS:
+		{
+			GLMSG::SNETPC_UPDATE_FLAGS_BRD *pNetMsg = (GLMSG::SNETPC_UPDATE_FLAGS_BRD *)nmg;
+			m_CharData.dwFLAGS = pNetMsg->dwFLAGS;
+		}
+		break;
+
+	case NET_MSG_GCTRL_PARTY_BRD:
+		{
+			GLMSG::SNET_PARTY_BRD *pNetMsg = (GLMSG::SNET_PARTY_BRD *)nmg;
+			m_CharData.dwParty = pNetMsg->dwPartyID;
+			m_CharData.dwPMasterID = pNetMsg->dwPMasterID;
+		}
+		break;
+
+	case NET_MSG_GCTRL_UPDATE_PASSIVE_BRD:
+		{
+			GLMSG::SNETPC_UPDATE_PASSIVE_BRD *pNetMsg = (GLMSG::SNETPC_UPDATE_PASSIVE_BRD *)nmg;
+			m_CharData.sPASSIVE_SKILL = pNetMsg->sSKILL_DATA;
+		}
+		break;
+
+	case NET_MSG_GCTRL_POSITIONCHK_BRD:
+		{
+			GLMSG::SNET_POSITIONCHK_BRD *pNetNsg = (GLMSG::SNET_POSITIONCHK_BRD *)nmg;
+			m_vServerPos = pNetNsg->vPOS;
+		}
+		break;
+
+	case NET_MSG_GCTRL_PMARKET_OPEN_BRD:
+		{
+			GLMSG::SNETPC_PMARKET_OPEN_BRD *pNetNsg = (GLMSG::SNETPC_PMARKET_OPEN_BRD *)nmg;
+
+			m_sPMarket.SetTITLE ( pNetNsg->szPMarketTitle );
+			m_sPMarket.DoMarketOpen();
+		}
+		break;
+
+	case NET_MSG_GCTRL_PMARKET_CLOSE_BRD:
+		{
+			GLMSG::SNETPC_PMARKET_CLOSE_BRD *pNetNsg = (GLMSG::SNETPC_PMARKET_CLOSE_BRD *)nmg;
+
+			m_sPMarket.DoMarketClose();
+		}
+		break;
+
+	case NET_MSG_GCTRL_PMARKET_ITEM_UPDATE_BRD:
+		{
+			GLMSG::SNETPC_PMARKET_ITEM_UPDATE_BRD *pNetMsg = (GLMSG::SNETPC_PMARKET_ITEM_UPDATE_BRD *) nmg;
+
+			SSALEITEM *pSALEITEM = m_sPMarket.GetItem ( pNetMsg->sSALEPOS );
+			if ( pSALEITEM )
+			{
+				pSALEITEM->bSOLD = pNetMsg->bSOLD;
+				pSALEITEM->dwNUMBER = pNetMsg->dwNUMBER;
+				pSALEITEM->sITEMCUSTOM.wTurnNum = (WORD) pNetMsg->dwNUMBER;
+
+				SINVENITEM *pINVENITEM = m_sPMarket.GetInven().GetItem(pNetMsg->sSALEPOS.wMainID,pNetMsg->sSALEPOS.wSubID);
+				if ( pINVENITEM )
+				{
+					pINVENITEM->sItemCustom.wTurnNum = (WORD) pNetMsg->dwNUMBER;
+				}
+			}
+		}
+		break;
+
+	case NET_MSG_GCTRL_PMARKET_ITEM_INFO_BRD:
+		{
+			GLMSG::SNETPC_PMARKET_ITEM_INFO_BRD *pNetNsg = (GLMSG::SNETPC_PMARKET_ITEM_INFO_BRD *)nmg;
+
+			SINVENITEM sINVENITEM;
+			sINVENITEM.sItemCustom = pNetNsg->sITEMCUSTOM;
+			sINVENITEM.wPosX = pNetNsg->sINVENPOS.wMainID;
+			sINVENITEM.wPosY = pNetNsg->sINVENPOS.wSubID;
+			m_sPMarket.RegItem ( sINVENITEM, pNetNsg->llPRICE, pNetNsg->dwNUMBER, pNetNsg->sSALEPOS );
+			m_sPMarket.SetSaleState ( pNetNsg->sSALEPOS, pNetNsg->dwNUMBER, pNetNsg->bSOLD );
+		}
+		break;
+
+	case NET_MSG_GCTRL_CLUB_INFO_BRD:
+		{
+			GLMSG::SNET_CLUB_INFO_BRD *pNetMsg = (GLMSG::SNET_CLUB_INFO_BRD *)nmg;
+
+			m_CharData.dwGuild = pNetMsg->dwClubID;
+			m_CharData.dwGuildMarkVer = pNetMsg->dwMarkVer;
+
+			StringCchCopy ( m_CharData.szNick, CHAR_SZNAME, pNetMsg->szNickName );
+
+			//	Note : Å¬·´¸¶Å© ¹ö?EÈ®ÀÎ.
+			//
+			GLGaeaClient::GetInstance().GetCharacter()->ReqClubMarkInfo ( m_CharData.dwGuild, m_CharData.dwGuildMarkVer );
+		}
+		break;
+
+	case NET_MSG_GCTRL_CLUB_INFO_MARK_BRD:
+		{
+			GLMSG::SNET_CLUB_INFO_MARK_BRD *pNetMsg = (GLMSG::SNET_CLUB_INFO_MARK_BRD *)nmg;
+
+			m_CharData.dwGuildMarkVer = pNetMsg->dwMarkVer;
+			//	Note : Å¬·´¸¶Å© ¹ö?EÈ®ÀÎ.
+			//
+			GLGaeaClient::GetInstance().GetCharacter()->ReqClubMarkInfo ( m_CharData.dwGuild, m_CharData.dwGuildMarkVer );
+		}
+		break;
+
+	case NET_MSG_GCTRL_CLUB_INFO_NICK_BRD:
+		{
+			GLMSG::SNET_CLUB_INFO_NICK_BRD *pNetMsg = (GLMSG::SNET_CLUB_INFO_NICK_BRD *)nmg;
+			StringCchCopy ( m_CharData.szNick, CHAR_SZNAME, pNetMsg->szNickName );
+		}
+		break;
+
+	case NET_MSG_GCTRL_REQ_LINKSKILLEFF_BRD: //link skill
+		{
+			GLMSG::SNETPC_REQ_LINKSKILLEFF_BRD *pNetMsg = (GLMSG::SNETPC_REQ_LINKSKILLEFF_BRD *)nmg;
+
+			PGLSKILL pSkillLink = GLSkillMan::GetInstance().GetData ( pNetMsg->sSKILLID.wMainID, pNetMsg->sSKILLID.wSubID );
+			if ( pSkillLink->m_sBASIC.sNATIVEID != NATIVEID_NULL() && pSkillLink ) RECEIVE_SKILLFACT(pNetMsg->sSKILLID, pNetMsg->wSKILLLevel, pNetMsg->dwSelect );
+		}
+		break;
+
+	case NET_MSG_GCTRL_UPDATE_PKWIN_BRD: //add pk 
+		{
+			GLMSG::SNETPC_UPDATE_PKWIN_BRD *pNetMsg = (GLMSG::SNETPC_UPDATE_PKWIN_BRD *)nmg;
+			m_CharData.m_dwPkWin += 1 ;
+		}
+		break;
+
+	case NET_MSG_GCTRL_UPDATE_PKSTREAK_BRD: //add pk streak by njd
+		{
+			GLMSG::SNETPC_UPDATE_PKSTREAK_BRD *pNetMsg = (GLMSG::SNETPC_UPDATE_PKSTREAK_BRD *)nmg;
+			m_CharData.m_dwPkStreak += 1 ;
+		}
+		break;
+
+	case NET_MSG_GCTRL_UPDATE_PKLOSS_BRD: //add pk
+		{
+			GLMSG::SNETPC_UPDATE_PKLOSS_BRD *pNetMsg = (GLMSG::SNETPC_UPDATE_PKLOSS_BRD *)nmg;
+		}
+		break;
+
+	case NET_MSG_GCTRL_CLUB_DEL_BRD:
+		{
+			m_CharData.dwGuild = CLUB_NULL;
+			m_CharData.dwGuildMarkVer = 0;
+			StringCchCopy ( m_CharData.szNick, CHAR_SZNAME, "" );
+		}
+		break;
+	case NET_MSG_GCTRL_CLUB_AUTHORITY_BRD:
+		{
+			GLMSG::SNET_CLUB_AUTHORITY_BRD *pNetMsg = (GLMSG::SNET_CLUB_AUTHORITY_BRD *)nmg;
+			m_CharData.dwGuildMaster = pNetMsg->dwCharID;
+		}
+		break;
+	case NET_MSG_GCTRL_INVEN_HAIR_CHANGE_BRD:
+		{
+			GLMSG::SNETPC_INVEN_HAIR_CHANGE_BRD *pNetMsg = (GLMSG::SNETPC_INVEN_HAIR_CHANGE_BRD *)nmg;
+			
+			m_CharData.wHair = (WORD) pNetMsg->dwID;
+			UpdateSuit();
+		}
+		break;
+
+	case NET_MSG_GCTRL_INVEN_HAIRCOLOR_CHANGE_BRD:
+		{
+			GLMSG::SNETPC_INVEN_HAIRCOLOR_CHANGE_BRD *pNetMsg = (GLMSG::SNETPC_INVEN_HAIRCOLOR_CHANGE_BRD*)nmg;
+
+			m_CharData.wHairColor = pNetMsg->wHairColor;
+			UpdateSuit();
+		}
+		break;
+
+	case NET_MSG_GCTRL_INVEN_BIKECOLOR_CHANGE_BRD: //add bike color
+		{
+			GLMSG::SNETPC_INVEN_BIKECOLOR_CHANGE_BRD *pNetMsg = (GLMSG::SNETPC_INVEN_BIKECOLOR_CHANGE_BRD*)nmg;
+
+			m_CharData.m_sVehicle.m_wColor = pNetMsg->wBikeColor;
+			UpdateSuit();
+		}
+		break;
+
+
+	case NET_MSG_GCTRL_INVEN_FACE_CHANGE_BRD:
+		{
+			GLMSG::SNETPC_INVEN_FACE_CHANGE_BRD *pNetMsg = (GLMSG::SNETPC_INVEN_FACE_CHANGE_BRD *)nmg;
+			
+			m_CharData.wFace = (WORD) pNetMsg->dwID;
+			UpdateSuit();
+		}
+		break;
+
+	case NET_MSG_GCTRL_INVEN_RENAME_BRD:
+		{
+			GLMSG::SNETPC_INVEN_RENAME_BRD *pNetMsg = (GLMSG::SNETPC_INVEN_RENAME_BRD *)nmg;
+
+			StringCchCopy ( m_CharData.szName, CHAR_SZNAME, pNetMsg->szName );
+		}
+		break;
+
+	case NET_MSG_GCTRL_REQ_GESTURE_BRD:
+		{
+			GLMSG::SNETPC_REQ_GESTURE_BRD *pNetMsg = (GLMSG::SNETPC_REQ_GESTURE_BRD *)nmg;
+	
+			//	Note : ¸ð¼Ç Á¾·ù°¡ ÆòÈ­ ¸ðµåÀÏ °æ?E?Á¦½ºÃÄ¸¦ ÇÒ ?EÀÖ´Ù.
+			PLANDMANCLIENT pLand = GLGaeaClient::GetInstance().GetActiveMap();
+			BOOL bPeaceZone = pLand ? pLand->IsPeaceZone() : FALSE;
+			if ( !bPeaceZone && IsSTATE(EM_ACT_PEACEMODE) )		bPeaceZone = TRUE;
+
+			if ( !bPeaceZone )		return;
+
+			//	Note : ÇØ?EÁ¦½ºÃÄ ¿¡´Ï¸ÞÀÌ¼ÇÀÌ Á¸Á¦½Ã ±¸µ¿.
+			PANIMCONTNODE pNODE = m_pSkinChar->GETANI ( AN_GESTURE, EMANI_SUBTYPE(pNetMsg->dwID) );
+			if ( !pNODE )			return;
+
+			//	Note : ½ÅÃ¼°¡ Á¤»óÀûÀÏ¶§ ±¸µ¿.
+			if ( !IsValidBody() )	return;
+
+			//	Note : Á¦½ºÃÄ¸¦ ÇàÇÔ.
+			m_dwANISUBGESTURE = (DWORD) pNetMsg->dwID;
+			TurnAction(GLAT_TALK);
+		}
+		break;
+
+	case NET_MSG_GCTRL_QITEMFACT_BRD:
+		{
+			GLMSG::SNETPC_QITEMFACT_BRD *pNetMsg = (GLMSG::SNETPC_QITEMFACT_BRD *)nmg;
+			if ( m_bVehicle ) break;
+		
+			m_CharData.sQITEMFACT.emType = pNetMsg->sFACT.emType;
+			m_CharData.sQITEMFACT.fTime = pNetMsg->sFACT.fTime;
+			m_CharData.sQITEMFACT.wParam1 = pNetMsg->sFACT.wParam1;
+			m_CharData.sQITEMFACT.wParam2 = pNetMsg->sFACT.wParam2;
+		}
+		break;
+
+	case NET_MSG_GCTRL_QITEMFACT_END_BRD:
+		{
+			GLMSG::SNETPC_QITEMFACT_END_BRD *pNetMsg = (GLMSG::SNETPC_QITEMFACT_END_BRD *)nmg;
+			m_CharData.sQITEMFACT.RESET ();
+			CInnerInterface::GetInstance().UpdateQBoxTime( 0.0f ); //add qbox
+		}
+		break;
+
+	case NET_MSG_GCTRL_QITEMFACT_TIMEUPDATE_BRD: //add qbox
+		{
+			GLMSG::SNETPC_QITEMFACT_TIMEUPDATE_BRD *pNetMsg = (GLMSG::SNETPC_QITEMFACT_TIMEUPDATE_BRD *)nmg;
+			CInnerInterface::GetInstance().UpdateQBoxTime( pNetMsg->fQBoxTime ); //add qbox
+		}
+		break;
+
+	case NET_MSG_GCTRL_EVENTFACT_BRD:
+		{
+			GLMSG::SNETPC_EVENTFACT_BRD *pNetMsg = (GLMSG::SNETPC_EVENTFACT_BRD *)nmg;
+
+			m_CharData.sEVENTFACT.SetEVENT( pNetMsg->emType, pNetMsg->wValue );
+		}
+		break;
+
+	case NET_MSG_GCTRL_EVENTFACT_END_BRD:
+		{
+			GLMSG::SNETPC_EVENTFACT_END_BRD *pNetMsg = (GLMSG::SNETPC_EVENTFACT_END_BRD *)nmg;
+
+			m_CharData.sEVENTFACT.ResetEVENT( pNetMsg->emType );
+		}
+		break;
+	case NET_MSG_GCTRL_ACTIVE_VEHICLE_BRD:
+		{
+			GLMSG::SNETPC_ACTIVE_VEHICLE_BRD* pNetMsg = (GLMSG::SNETPC_ACTIVE_VEHICLE_BRD*) nmg;
+
+			if ( pNetMsg->bActive )
+			{
+				if ( m_bVehicle )	return;
+				m_bVehicle = TRUE;
+				int emType = m_sVehicle.m_emTYPE ;
+				if ( emType == VEHICLE_TYPE_BOARD ) //modify vehicle anim
+				{
+					m_emANISUBTYPE = (EMANI_SUBTYPE) (AN_SUB_HOVERBOARD ) ;  
+				}
+				SetSTATE(EM_ACT_PEACEMODE);
+
+				// ¹öÇÁ ½ºÅ³ Á¦°Å
+				for ( int i = 0; i < SKILLFACT_SIZE; ++i )
+				{
+					if ( m_sSKILLFACT[i].sNATIVEID == NATIVEID_NULL() ) continue;
+					
+					PGLSKILL pSkill = GLSkillMan::GetInstance().GetData( m_sSKILLFACT[i].sNATIVEID );
+
+					if ( pSkill && pSkill->m_sBASIC.emIMPACT_SIDE != SIDE_ENERMY )
+					{
+						FACTEFF::DeleteSkillFactEffect ( STARGETID(CROW_PC,m_dwGaeaID,m_vPos), m_pSkinChar, m_sSKILLFACT[i].sNATIVEID );
+						DISABLESKEFF( i );
+					}	
+				}
+
+				// Å¾½Â ÀÌÆÑÆ® Ãß°¡
+				STARGETID sTargetID(CROW_PC, m_dwGaeaID, m_vPos);
+				DxEffGroupPlayer::GetInstance().NewEffGroup
+				(
+					GLCONST_CHAR::strVEHICLE_GEN_EFFECT.c_str(),
+					m_matTrans,
+					&sTargetID
+				);
+
+				// Äù¼Ç ¾ÆÀÌÅÛ Á¦°Å
+				m_CharData.sQITEMFACT.RESET ();				
+				
+				UpdateSuit( );				
+				ReSelectAnimation();				
+				UPDATE_ITEM ();
+
+			}
+			else
+			{
+				if ( !m_bVehicle )	return;
+				m_bVehicle = FALSE;		
+				EMSLOT emRHand = GetCurRHand();
+				EMSLOT emLHand = GetCurLHand();
+
+				SITEM* pRHAND = NULL;
+				SITEM* pLHAND = NULL;
+
+				if ( m_CharData.m_PutOnItems[emRHand].sNativeID!=NATIVEID_NULL() )
+				pRHAND = GLItemMan::GetInstance().GetItem ( m_CharData.m_PutOnItems[emRHand].sNativeID );
+	
+				if ( m_CharData.m_PutOnItems[emLHand].sNativeID!=NATIVEID_NULL() )
+				pLHAND = GLItemMan::GetInstance().GetItem ( m_CharData.m_PutOnItems[emLHand].sNativeID );
+
+				m_emANISUBTYPE = CHECK_ANISUB ( pRHAND, pLHAND  );
+
+				// Disabled | Skills is still visible even though when riding
+				//   8-19-2013 11:28 PM
+				// ¹öÇÁ½ºÅ³ Á¦°Å
+				for ( int i = 0; i < SKILLFACT_SIZE; ++i )
+				{
+					if ( m_sSKILLFACT[i].sNATIVEID == NATIVEID_NULL() ) continue;
+					
+					PGLSKILL pSkill = GLSkillMan::GetInstance().GetData( m_sSKILLFACT[i].sNATIVEID );
+
+					if ( pSkill && pSkill->m_sBASIC.emIMPACT_SIDE != SIDE_ENERMY )
+					{
+						DISABLESKEFF( i );
+						FACTEFF::DeleteSkillFactEffect ( STARGETID(CROW_PC,m_dwGaeaID,m_vPos), m_pSkinChar, m_sSKILLFACT[i].sNATIVEID );
+					}	
+				}
+
+/*
+				// ÇÏÂ÷ ÀÌÆåÆ® Ãß°¡
+				STARGETID sTargetID(CROW_PC, m_dwGaeaID, m_vPos);
+				DxEffGroupPlayer::GetInstance().NewEffGroup
+				(
+					GLCONST_CHAR::strVEHICLE_GEN_EFFECT.c_str(),
+					m_matTrans,
+					&sTargetID
+				);
+*/
+				// Äù¼Ç ¾ÆÀÌÅÛ Á¦°Å
+				m_CharData.sQITEMFACT.RESET ();		
+
+				UpdateSuit();				
+				ReSelectAnimation();				
+				UPDATE_ITEM();
+			}
+
+		}
+		break;
+	case NET_MSG_GCTRL_GET_VEHICLE_BRD:
+		{
+			GLMSG::SNETPC_GET_VEHICLE_BRD* pNetMsg = (GLMSG::SNETPC_GET_VEHICLE_BRD*) nmg;
+			
+			m_sVehicle.m_dwGUID = pNetMsg->dwGUID;
+			m_sVehicle.m_emTYPE = pNetMsg->emTYPE;
+			m_sVehicle.m_sVehicleID = pNetMsg->sVehicleID;
+
+			for ( int i = 0; i < ACCE_TYPE_SIZE; ++i )
+			{
+				m_sVehicle.m_PutOnItems[i] = pNetMsg->PutOnItems[i];
+			}
+			
+			m_sVehicle.SetActiveValue( true );
+			
+			m_sVehicle.ITEM_UPDATE();
+
+			UpdateSuit();				
+			UPDATE_ITEM();
+		}
+		break;
+	case NET_MSG_GCTRL_UNGET_VEHICLE_BRD:
+		{
+			GLMSG::SNETPC_UNGET_VEHICLE_BRD* pNetMsg = (GLMSG::SNETPC_UNGET_VEHICLE_BRD*) nmg;			
+			m_sVehicle.SetActiveValue( false );	
+			m_sVehicle.RESET();
+		}
+		break;
+	case NET_MSG_VEHICLE_ACCESSORY_DELETE_BRD:
+		{
+			GLMSG::SNET_VEHICLE_ACCESSORY_DELETE_BRD* pNetMsg = (GLMSG::SNET_VEHICLE_ACCESSORY_DELETE_BRD*) nmg;
+			
+			if ( m_sVehicle.m_dwGUID == pNetMsg->dwVehicleNum )
+			{
+                m_sVehicle.m_PutOnItems[pNetMsg->accetype] = SITEMCUSTOM ();			
+				m_sVehicle.ITEM_UPDATE();
+				UpdateSuit();
+				UPDATE_ITEM();
+			}
+		}
+		break;
+	case NET_MSG_VEHICLE_REQ_SLOT_EX_HOLD_BRD:
+		{
+			GLMSG::SNET_VEHICLE_REQ_SLOT_EX_HOLD_BRD* pNetMsg = (GLMSG::SNET_VEHICLE_REQ_SLOT_EX_HOLD_BRD*) nmg;
+
+			// ¼Õ¿¡?E¾ÆÀÌÅÛÀ»
+			m_sVehicle.SetSlotItem ( pNetMsg->emSuit, pNetMsg->sItemCustom );
+
+			UpdateSuit();
+			UPDATE_ITEM();
+		}
+		break;
+	case NET_MSG_VEHICLE_REMOVE_SLOTITEM_BRD:
+		{
+			GLMSG::SNET_VEHICLE_REQ_REMOVE_SLOTITEM_BRD* pNetMsg = ( GLMSG::SNET_VEHICLE_REQ_REMOVE_SLOTITEM_BRD* ) nmg;
+	
+			// ½½·Ô¾ÆÀÌÅÛ Á¦°Å
+			m_sVehicle.ReSetSlotItem ( pNetMsg->emSuit );
+
+			UpdateSuit();
+			UPDATE_ITEM();
+		}
+		break;
+	case NET_MSG_GCTRL_ITEMSHOPOPEN_BRD:
+		{
+//#if defined ( JP_PARAM ) || defined ( _RELEASED)	// JAPAN Item Shop
+			
+			GLMSG::SNETPC_OPEN_ITEMSHOP_BRD* pNetMsg = ( GLMSG::SNETPC_OPEN_ITEMSHOP_BRD* ) nmg;
+			m_bItemShopOpen = pNetMsg->bOpen;
+
+			if ( m_bItemShopOpen )	CInnerInterface::GetInstance().GetItemShopIconMan()->ADD_SHOP_ICON( m_dwGaeaID );
+			else	CInnerInterface::GetInstance().GetItemShopIconMan()->DEL_SHOP_ICON( m_dwGaeaID );	
+//#endif
+		}
+		break;
+	case NET_MSG_REQ_GATHERING_BRD:
+		{
+			GLMSG::SNETPC_REQ_GATHERING_BRD *pNetMsg = (GLMSG::SNETPC_REQ_GATHERING_BRD *) nmg;
+
+			//	Note : °ø°Ý ¼ö?E
+			m_dwANISUBGESTURE = pNetMsg->dwAniSel;
+			TurnAction ( GLAT_GATHERING );
+		}
+		break;
+	case NET_MSG_REQ_GATHERING_CANCEL_BRD:
+		{
+			if ( IsACTION(GLAT_GATHERING) )	TurnAction ( GLAT_IDLE );
+		}
+		break;
+	case NET_MSG_REQ_GATHERING_RESULT_BRD:
+		{
+			GLMSG::SNETPC_REQ_GATHERING_RESULT_BRD* pNetMsg = ( GLMSG::SNETPC_REQ_GATHERING_RESULT_BRD* ) nmg;
+			
+			switch ( pNetMsg->emFB )
+			{
+			case EMREQ_GATHER_RESULT_SUCCESS:
+			case EMREQ_GATHER_RESULT_SUCCESS_EX:
+				{
+					m_dwANISUBGESTURE = 0;
+				}
+				break;
+			case EMREQ_GATHER_RESULT_FAIL:
+			case EMREQ_GATHER_RESULT_ITEMFAIL:
+				{
+					m_dwANISUBGESTURE = 1;
+				}
+				break;
+			}
+		}
+		break;
+	};
+}
+
+void GLCharClient::StartAttackProc ()
+{
+	m_nattSTEP = 0;
+	m_fattTIMER = 0.0f;
+}
+
+void GLCharClient::AttackEffect ( const SANIMSTRIKE &sStrikeEff )
+{
+	BOOL bOk = GLGaeaClient::GetInstance().ValidCheckTarget ( m_sTargetID );
+	if ( !bOk )	return;
+
+	GLCOPY* pActor = GLGaeaClient::GetInstance().GetCopyActor ( m_sTargetID );
+	if ( pActor )	pActor->ReceiveSwing ();
+
+	//	Å¸°ÙÀÇ À§Ä¡.
+	D3DXVECTOR3 vTARPOS = GLGaeaClient::GetInstance().GetTargetPos ( m_sTargetID );
+
+	D3DXVECTOR3 vDir = vTARPOS - m_vPos;
+	vDir.y = 0.f;
+	D3DXVec3Normalize ( &vDir, &vDir );
+
+	vTARPOS.y += 15.0f;
+
+	D3DXVECTOR3 vTarDir = vTARPOS - m_vPos;
+	float fLength = D3DXVec3Length ( &vTarDir );
+
+	D3DXVec3Normalize ( &vTarDir, &vTarDir );
+	D3DXVECTOR3 vTARPAR = m_vPos + vTarDir*fLength * 10.0f;
+
+	//	Å¸°Ý À§Ä¡¸¦ ¾Ë¾Æ³¿.
+	STRIKE::SSTRIKE sStrike;
+
+	if ( m_pSkinChar->m_pSkinCharPiece[PIECE_RHAND] ) //fix abl strike
+	{
+		STRIKE::CSELECTOR Selector ( vTARPAR, m_pSkinChar->m_pSkinCharPiece[PIECE_RHAND]->m_PartArray );
+		bOk = Selector.SELECT ( sStrikeEff, sStrike ,true);
+		if ( !bOk )	return;
+	}
+	else
+	{
+		STRIKE::CSELECTOR Selector ( vTARPAR, m_pSkinChar->m_PartArray );
+		bOk = Selector.SELECT ( sStrikeEff, sStrike ,false);
+		if ( !bOk )	return;
+	}
+
+	EMSLOT emSlot = PIECE_2_SLOT(sStrikeEff.m_emPiece);
+	if( emSlot==SLOT_TSIZE )		return;
+	if( emSlot==SLOT_RHAND )		emSlot = GetCurRHand();
+	else if( emSlot==SLOT_LHAND )	emSlot = GetCurLHand();
+
+	D3DXMATRIX matEffect;
+	D3DXMatrixTranslation ( &matEffect, sStrike.vPos.x, sStrike.vPos.y, sStrike.vPos.z );
+
+	STARGETID sTargetID = m_sTargetID;
+	sTargetID.vPos = vTARPOS;
+
+	//	Note : ¹«±âÀÇ ¼Ó¼º ?EE?
+	//
+	EMELEMENT emELEMENT = GET_ITEM_ELMT();
+
+	if ( VALID_SLOT_ITEM(emSlot) )
+	{
+		SITEM *pItem = GLItemMan::GetInstance().GetItem(GET_SLOT_ITEM(emSlot).sNativeID);
+		if ( pItem )
+		{
+			if ( pItem->sSuitOp.emAttack <= ITEMATT_NEAR )
+			{
+				std::string strEFFECT = pItem->GetTargetEffect();
+				if ( strEFFECT.empty() )	strEFFECT = GLCONST_CHAR::GETSTRIKE_EFFECT(emELEMENT);
+
+				DxEffGroupPlayer::GetInstance().NewEffGroup
+				(
+					strEFFECT.c_str(),
+					matEffect,
+					&sTargetID
+				);
+
+				DxEffGroupPlayer::GetInstance().NewEffBody ( GLCONST_CHAR::strAMBIENT_EFFECT.c_str(), &sTargetID, &vDir );
+			}
+			else
+			{
+				if ( pItem->sSuitOp.emAttack == ITEMATT_BOW )
+				{
+					SITEM *pLHAND = NULL;
+					if ( VALID_SLOT_ITEM(SLOT_LHAND) )	pLHAND = GLItemMan::GetInstance().GetItem(GET_SLOT_ITEM(SLOT_LHAND).sNativeID);
+					if ( pLHAND && pLHAND->sBasicOp.emItemType == ITEM_ARROW )
+					{
+						DxEffSingleGroup* pEffSingleG = DxEffGroupPlayer::GetInstance().NewEffGroup
+						(
+							pLHAND->GetTargetEffect(),
+							matEffect,
+							&sTargetID
+						);
+						
+						if ( pEffSingleG )
+						{
+							pEffSingleG->AddEffAfter ( EFFASINGLE, GLCONST_CHAR::GETSTRIKE_EFFECT(emELEMENT)  );
+							pEffSingleG->AddEffAfter ( EFFABODY, std::string(pLHAND->GetTargBodyEffect()) );
+							pEffSingleG->AddEffAfter ( EFFABODY, GLCONST_CHAR::strAMBIENT_EFFECT );
+						}
+					}
+				}
+				//test gun
+				else if ( pItem->sSuitOp.emAttack == ITEMATT_DUAL_GUN || pItem->sSuitOp.emAttack == ITEMATT_RAIL_GUN || pItem->sSuitOp.emAttack == ITEMATT_PORTAL_GUN )
+				{
+					SITEM *pLHAND = NULL;
+					if ( VALID_SLOT_ITEM(SLOT_LHAND) )	pLHAND = GLItemMan::GetInstance().GetItem(GET_SLOT_ITEM(SLOT_LHAND).sNativeID);
+					if ( pLHAND && pLHAND->sBasicOp.emItemType == ITEM_BULLET )
+					{
+						DxEffSingleGroup* pEffSingleG = DxEffGroupPlayer::GetInstance().NewEffGroup
+						(
+							pLHAND->GetTargetEffect(),
+							matEffect,
+							&sTargetID
+						);
+						
+						if ( pEffSingleG )
+						{
+							pEffSingleG->AddEffAfter ( EFFASINGLE, GLCONST_CHAR::GETSTRIKE_EFFECT(emELEMENT)  );
+							pEffSingleG->AddEffAfter ( EFFABODY, std::string(pLHAND->GetTargBodyEffect()) );
+							pEffSingleG->AddEffAfter ( EFFABODY, GLCONST_CHAR::strAMBIENT_EFFECT );
+
+							/*DxEffGroupPlayer::GetInstance().NewEffGroup
+							(
+								GLCONST_CHAR::strBULLET_EFFECT.c_str(),
+								m_matTrans,
+								&sTargetID
+							);*/
+						}
+					}
+				}
+				else 
+				{
+					std::string strEFFECT = pItem->GetTargetEffect();
+					if ( strEFFECT.empty() )	strEFFECT = GLCONST_CHAR::GETSTRIKE_EFFECT(emELEMENT);
+
+					DxEffGroupPlayer::GetInstance().NewEffGroup
+					(
+						strEFFECT.c_str(),
+						matEffect,
+						&sTargetID
+					);
+
+					DxEffGroupPlayer::GetInstance().NewEffBody ( GLCONST_CHAR::strAMBIENT_EFFECT.c_str(), &sTargetID, &vDir );
+				}
+			}
+		}
+	}
+	else
+	{
+		DxEffGroupPlayer::GetInstance().NewEffGroup
+		(
+			GLCONST_CHAR::GETSTRIKE_EFFECT(emELEMENT),
+			matEffect,
+			&sTargetID
+		);
+
+		DxEffGroupPlayer::GetInstance().NewEffBody ( GLCONST_CHAR::strAMBIENT_EFFECT.c_str(), &sTargetID, &vDir );
+	}
+}
+
+BOOL GLCharClient::AttackProc ( float fElapsedTime )
+{
+	m_fattTIMER += fElapsedTime * GETATTVELO();
+	m_fattTIMER += GETATT_ITEM();
+
+	GASSERT(m_pSkinChar->GETCURANIM());
+
+	PSANIMCONTAINER pAnimCont = m_pSkinChar->GETCURANIM();
+
+	if ( pAnimCont->m_wStrikeCount == 0 )	return FALSE;
+
+	DWORD dwThisKey = DWORD(m_fattTIMER*UNITANIKEY_PERSEC);
+
+	DWORD dwStrikeKey = pAnimCont->m_sStrikeEff[m_nattSTEP].m_dwFrame;
+	if ( m_nattSTEP < pAnimCont->m_wStrikeCount )
+	{
+		if ( dwThisKey>=dwStrikeKey )
+		{
+			if ( GLGaeaClient::GetInstance().IsVisibleCV(m_sTargetID) )
+			{
+				//	Note : °ø°Ý½Ã ÀÌÆÑÆ® ¹ßÈÖ..
+				//
+				AttackEffect ( pAnimCont->m_sStrikeEff[m_nattSTEP] );
+			}
+
+			m_nattSTEP++;
+		}
+	}
+
+	return TRUE;
+}
+
+void GLCharClient::StartSkillProc ()
+{
+	m_nattSTEP = 0;
+	m_fattTIMER = 0.0f;
+
+	PGLSKILL pSkill = GLSkillMan::GetInstance().GetData ( m_idACTIVESKILL.wMainID, m_idACTIVESKILL.wSubID );
+	if ( !pSkill )							return;
+
+	//	Note : °ø°Ý ¹æÇâÀ¸·Î È¸?E
+	//
+	m_vDir = UpdateSkillDirection ( m_vPos, m_vDir, m_idACTIVESKILL, m_vTARPOS, m_sTARIDS );
+
+	STARGETID sTARG(GETCROW(),m_dwGaeaID);
+
+	//	Note : ½ºÅ³ ½ÃÀÛ?Eµ¿½Ã¿¡ ³ªÅ¸³ª´Â ÀÌÆÑÆ®. ¹ßµ¿.
+	//
+	EMELEMENT emELMT = ( pSkill->m_sAPPLY.emELEMENT==EMELEMENT_ARM ) ? GET_ITEM_ELMT() : (EMELEMENT_SPIRIT);
+	if ( pSkill->m_sEXT_DATA.emSELFBODY==SKILL::EMTIME_FIRST )
+		DxEffGroupPlayer::GetInstance().NewEffBody ( pSkill->m_sEXT_DATA.GETSELFBODY(emELMT), &sTARG, &m_vDir);
+
+	EMSLOT emRHand = GetCurRHand();
+
+	SANIMSTRIKE sStrike;
+	sStrike.m_emPiece = VALID_SLOT_ITEM(emRHand) ? PIECE_RHAND : PIECE_GLOVE;
+	sStrike.m_emEffect = EMSF_TARGET;
+	sStrike.m_dwFrame = 0;
+
+	if ( pSkill->m_sEXT_DATA.emSELFZONE01==SKILL::EMTIME_FIRST && !RANPARAM::bSkillEffects)
+	{
+		SK_EFF_SELFZONE ( sStrike, pSkill->m_sEXT_DATA.emSELFZONE01_POS, pSkill->m_sEXT_DATA.GETSELFZONE01(emELMT), &sTARG );
+	}
+	else
+	{
+	}
+
+	if ( pSkill->m_sEXT_DATA.emSELFZONE02==SKILL::EMTIME_FIRST && !RANPARAM::bSkillEffects)
+	{
+		SK_EFF_SELFZONE ( sStrike, pSkill->m_sEXT_DATA.emSELFZONE02_POS, pSkill->m_sEXT_DATA.GETSELFZONE02(emELMT), &sTARG );
+	}
+	else
+	{
+	}
+}
+
+void GLCharClient::SKT_EFF_HOLDOUT ( STARGETID sTarget, DWORD dwDamageFlag )
+{
+	for ( int i=0; i<SKILLFACT_SIZE; ++i )
+	{
+		SSKILLFACT &sSKEFF = m_sSKILLFACT[i];
+		if ( sSKEFF.sNATIVEID==NATIVEID_NULL() )	continue;
+
+		PGLSKILL pSkill = GLSkillMan::GetInstance().GetData ( sSKEFF.sNATIVEID.wMainID, sSKEFF.sNATIVEID.wSubID );
+		if ( !pSkill )							continue;		
+
+		if ( !pSkill->m_sEXT_DATA.strHOLDOUT.empty() )
+		{
+			if ( ( pSkill->m_sAPPLY.GetSpec( EMSPECA_PSY_DAMAGE_REDUCE ) && 
+				!( dwDamageFlag & DAMAGE_TYPE_PSY_REDUCE) ) )
+				continue;
+			
+			if ( ( pSkill->m_sAPPLY.GetSpec( EMSPECA_MAGIC_DAMAGE_REDUCE ) && 
+				!( dwDamageFlag & DAMAGE_TYPE_MAGIC_REDUCE) ) )
+				continue;
+
+			if ( ( pSkill->m_sAPPLY.GetSpec( EMSPECA_PSY_DAMAGE_REFLECTION ) && 
+				!( dwDamageFlag & DAMAGE_TYPE_PSY_REFLECTION) ) )
+				continue;
+
+			if ( ( pSkill->m_sAPPLY.GetSpec( EMSPECA_MAGIC_DAMAGE_REFLECTION ) && 
+				!( dwDamageFlag & DAMAGE_TYPE_MAGIC_REFLECTION) ) )
+				continue;
+
+			const char* szZONE_EFF = pSkill->m_sEXT_DATA.strHOLDOUT.c_str();
+
+			D3DXVECTOR3 vDIR = sTarget.vPos - m_vPos;
+
+			D3DXVECTOR3 vDIR_ORG(1,0,0);
+			float fdir_y = DXGetThetaYFromDirection ( vDIR, vDIR_ORG );
+
+			D3DXMATRIX matTrans;
+			D3DXMatrixRotationY ( &matTrans, fdir_y );
+			matTrans._41 = m_vPos.x;
+			matTrans._42 = m_vPos.y;
+			matTrans._43 = m_vPos.z;
+
+			//	Note : ÀÚ?EÀ§Ä¡ ÀÌÆåÆ® ¹ß»ý½ÃÅ´.
+			DxEffGroupPlayer::GetInstance().NewEffGroup ( szZONE_EFF, matTrans, &sTarget );
+		}
+	}
+}
+
+void GLCharClient::SK_EFF_SELFZONE ( const SANIMSTRIKE &sStrikeEff, const SKILL::EMEFFECTPOS emPOS, const char* const szZONE_EFF, STARGETID *pTarget )
+{
+	D3DXMATRIX matTrans;
+
+	//	½ºÆ®¶óÀÌÅ© ÁöÁ¡¿¡¼­.
+	BOOL bTRANS(FALSE);
+	if ( emPOS == SKILL::EMPOS_STRIKE )
+	{
+		//	Å¸°ÙÀÇ À§Ä¡.
+		D3DXVECTOR3 vTARPOS = m_vPos + m_vDir * 60.0f;
+
+		//	Å¸°Ý À§Ä¡¸¦ ¾Ë¾Æ³¿.
+		STRIKE::SSTRIKE sStrike;
+
+		if ( m_pSkinChar->m_pSkinCharPiece[PIECE_RHAND] ) //fix abl strike
+		{
+			STRIKE::CSELECTOR Selector ( vTARPOS, m_pSkinChar->m_pSkinCharPiece[PIECE_RHAND]->m_PartArray );
+			BOOL bOk = Selector.SELECT ( sStrikeEff, sStrike ,true);
+			if ( bOk )
+			{
+				bTRANS = TRUE;
+
+				D3DXMatrixTranslation ( &matTrans, sStrike.vPos.x, sStrike.vPos.y, sStrike.vPos.z );
+			}
+		}
+		else
+		{
+			STRIKE::CSELECTOR Selector ( vTARPOS, m_pSkinChar->m_PartArray );
+			BOOL bOk = Selector.SELECT ( sStrikeEff, sStrike ,false);
+			if ( bOk )
+			{
+				bTRANS = TRUE;
+
+				D3DXMatrixTranslation ( &matTrans, sStrike.vPos.x, sStrike.vPos.y, sStrike.vPos.z );
+			}
+		}
+	}
+
+	//	Áö¸é±âÁØ ¸ñÇ¥Á¡¿¡ È¸?E¼Ó¼º ³Ö¾ûØ­.
+	if ( !bTRANS )
+	{
+		bTRANS = TRUE;
+
+		D3DXMATRIX matYRot;
+		D3DXMatrixRotationY ( &matYRot, D3DX_PI/2.0f );
+		matTrans = matYRot * m_matTrans;
+	}
+
+	//	Note : ÀÚ?EÀ§Ä¡ ÀÌÆåÆ® ¹ß»ý½ÃÅ´.
+	DxEffGroupPlayer::GetInstance().NewEffGroup ( szZONE_EFF, matTrans, pTarget );
+}
+
+void GLCharClient::SK_EFF_TARZONE ( const STARGETID &_sTarget, const SKILL::EMEFFECTPOS emPOS, const char* const szZONE_EFF )
+{
+	D3DXMATRIX matTrans;
+	STARGETID sTarget = _sTarget;
+
+	//	½ºÆ®¶óÀÌÅ© ÁöÁ¡¿¡¼­.
+	BOOL bTRANS(FALSE);
+	if ( emPOS == SKILL::EMPOS_STRIKE )
+	{
+		DxSkinChar* pSkin = GLGaeaClient::GetInstance().GetSkinChar ( sTarget );
+
+		//	Å¸°ÙÀÇ À§Ä¡.
+		D3DXVECTOR3 vTARPOS ( m_vPos.x, m_vPos.y+15, m_vPos.z );;
+
+		//	Å¸°Ý À§Ä¡¸¦ ¾Ë¾Æ³¿.
+		IMPACT_ARROW::SSTRIKE sStrike;
+		IMPACT_ARROW::CSELECTOR Selector ( vTARPOS, pSkin->m_PartArray );
+		BOOL bOk = Selector.SELECT ( sStrike );
+		if ( bOk )
+		{
+			bTRANS = TRUE;
+
+			D3DXMatrixTranslation ( &matTrans, sStrike.vPos.x, sStrike.vPos.y, sStrike.vPos.z );
+			sTarget.vPos = vTARPOS;
+		}
+	}
+
+	//	Áö¸é±âÁØ ¸ñÇ¥Á¡.
+	if ( !bTRANS )
+	{
+		bTRANS = TRUE;
+		D3DXMatrixTranslation ( &matTrans, sTarget.vPos.x, sTarget.vPos.y, sTarget.vPos.z );
+	}
+
+	//	Note : ¸ñÇ¥ À§Ä¡ ÀÌÆåÆ® ¹ß»ý½ÃÅ´.
+	DxEffGroupPlayer::GetInstance().NewEffGroup ( szZONE_EFF, matTrans, &sTarget );
+}
+
+void GLCharClient::SK_EFF_TARG ( const PGLSKILL pSkill, const SANIMSTRIKE &sStrikeEff, const STARGETID &_sTarget )
+{
+	D3DXMATRIX matTrans;
+	STARGETID sTarget = _sTarget;
+
+	//	½ºÆ®¶óÀÌÅ© ÁöÁ¡¿¡¼­.
+	BOOL bTRANS(FALSE);
+	if ( pSkill->m_sEXT_DATA.emTARG_POSA == SKILL::EMPOS_STRIKE )
+	{
+		//	Å¸°ÙÀÇ À§Ä¡.
+		D3DXVECTOR3 vSTRPOS ( sTarget.vPos.x, sTarget.vPos.y+15, sTarget.vPos.z );;
+
+		D3DXVECTOR3 vDir = vSTRPOS - m_vPos;
+		float fLength = D3DXVec3Length ( &vDir );
+
+		D3DXVec3Normalize ( &vDir, &vDir );
+		D3DXVECTOR3 vSTRPAR = m_vPos + vDir*fLength * 10.0f;
+
+		//	½ºÆ®¶óÀÌÅ© À§Ä¡¸¦ ¾Ë¾Æ³¿.
+		STRIKE::SSTRIKE sStrike;
+
+		if ( m_pSkinChar->m_pSkinCharPiece[PIECE_RHAND] ) //fix abl strike
+		{
+			STRIKE::CSELECTOR Selector ( vSTRPAR, m_pSkinChar->m_pSkinCharPiece[PIECE_RHAND]->m_PartArray );
+			BOOL bOk = Selector.SELECT ( sStrikeEff, sStrike ,true);
+			if ( bOk )
+			{
+				bTRANS = TRUE;
+				D3DXMatrixTranslation ( &matTrans, sStrike.vPos.x, sStrike.vPos.y, sStrike.vPos.z );
+			}
+		}
+		else
+		{
+			STRIKE::CSELECTOR Selector ( vSTRPAR, m_pSkinChar->m_PartArray );
+			BOOL bOk = Selector.SELECT ( sStrikeEff, sStrike ,false);
+			if ( bOk )
+			{
+				bTRANS = TRUE;
+				D3DXMatrixTranslation ( &matTrans, sStrike.vPos.x, sStrike.vPos.y, sStrike.vPos.z );
+			}
+		}
+	}
+	
+	//	Áö¸é±âÁØ È¸?E¼Ó¼º ³Ö¾ûØ­.
+	if ( !bTRANS )
+	{
+		bTRANS = TRUE;
+
+		D3DXMATRIX matYRot;
+		D3DXMatrixRotationY ( &matYRot, D3DX_PI/2.0f );
+		matTrans = matYRot * m_matTrans;
+	}
+
+	//	¸ñÇ¥ ÁöÁ¡ ¼±ÅÃ
+	BOOL bIMPACT(FALSE);
+	if ( pSkill->m_sEXT_DATA.emTARG_POSB == SKILL::EMPOS_STRIKE )
+	{
+		DxSkinChar* pSkin = GLGaeaClient::GetInstance().GetSkinChar ( sTarget );
+		if ( !pSkin )	return;
+
+		//	Å¸°ÙÀÇ À§Ä¡.
+		D3DXVECTOR3 vTARPOS ( m_vPos.x, m_vPos.y+15, m_vPos.z );;
+
+		//	Å¸°Ý À§Ä¡¸¦ ¾Ë¾Æ³¿.
+		IMPACT_ARROW::SSTRIKE sImpact;
+		IMPACT_ARROW::CSELECTOR Selmpact ( vTARPOS, pSkin->m_PartArray );
+		BOOL bOk = Selmpact.SELECT ( sImpact );
+		if ( bOk )
+		{
+			bIMPACT = TRUE;
+			sTarget.vPos = sImpact.vPos;
+		}
+	}
+
+	if ( !bIMPACT )
+	{
+		sTarget.vPos;
+	}
+
+	if (!RANPARAM::bSkillEffects)
+	{
+	EMELEMENT emELMT = ( pSkill->m_sAPPLY.emELEMENT==EMELEMENT_ARM ) ? GET_ITEM_ELMT() : (EMELEMENT_SPIRIT);
+	DxEffSingleGroup* pEffSingleG = DxEffGroupPlayer::GetInstance().NewEffGroup ( pSkill->m_sEXT_DATA.GETTARG(emELMT), matTrans, &sTarget );
+	if ( !pEffSingleG )		return;
+
+	//	Note : ¸ñÇ¥ À§Ä¡ ÀÌÆåÆ®.
+	if ( pSkill->m_sEXT_DATA.emTARGZONE01==SKILL::EMTIME_TARG_OVR )
+		pEffSingleG->AddEffAfter ( EFFASINGLE, pSkill->m_sEXT_DATA.GETTARGZONE01(emELMT) );
+
+	if ( pSkill->m_sEXT_DATA.emTARGZONE02==SKILL::EMTIME_TARG_OVR )
+		pEffSingleG->AddEffAfter ( EFFASINGLE, pSkill->m_sEXT_DATA.GETTARGZONE02(emELMT) );
+
+	//	Note : ¸ñÇ¥ ¸ö ÀÌÆåÆ®.
+	if ( pSkill->m_sEXT_DATA.emTARGBODY01==SKILL::EMTIME_TARG_OVR )
+		pEffSingleG->AddEffAfter ( EFFABODY, pSkill->m_sEXT_DATA.GETTARGBODY01(emELMT) );
+
+	if ( pSkill->m_sEXT_DATA.emTARGBODY02==SKILL::EMTIME_TARG_OVR )
+		pEffSingleG->AddEffAfter ( EFFABODY, pSkill->m_sEXT_DATA.GETTARGBODY02(emELMT) );
+	}
+	else
+	{
+		EMELEMENT emELMT = ( pSkill->m_sAPPLY.emELEMENT==EMELEMENT_ARM ) ? GET_ITEM_ELMT() : (EMELEMENT_SPIRIT);
+		DxEffSingleGroup* pEffSingleG = NULL;
+		if ( !pEffSingleG )		return;
+
+		//	Note : ¸ñÇ¥ À§Ä¡ ÀÌÆåÆ®.
+		if ( pSkill->m_sEXT_DATA.emTARGZONE01==SKILL::EMTIME_TARG_OVR )
+		{}//pEffSingleG->AddEffAfter ( EFFASINGLE, pSkill->m_sEXT_DATA.GETTARGZONE01(emELMT) );
+
+		if ( pSkill->m_sEXT_DATA.emTARGZONE02==SKILL::EMTIME_TARG_OVR )
+		{}//pEffSingleG->AddEffAfter ( EFFASINGLE, pSkill->m_sEXT_DATA.GETTARGZONE02(emELMT) );
+
+		//	Note : ¸ñÇ¥ ¸ö ÀÌÆåÆ®.
+		if ( pSkill->m_sEXT_DATA.emTARGBODY01==SKILL::EMTIME_TARG_OVR )
+		{}//pEffSingleG->AddEffAfter ( EFFABODY, pSkill->m_sEXT_DATA.GETTARGBODY01(emELMT) );
+
+		if ( pSkill->m_sEXT_DATA.emTARGBODY02==SKILL::EMTIME_TARG_OVR )
+		{}//pEffSingleG->AddEffAfter ( EFFABODY, pSkill->m_sEXT_DATA.GETTARGBODY02(emELMT) );
+	}
+}
+
+void GLCharClient::SkillEffect ( const SANIMSTRIKE &sStrikeEff )
+{
+	PGLSKILL pSkill = GLSkillMan::GetInstance().GetData ( m_idACTIVESKILL.wMainID, m_idACTIVESKILL.wSubID );
+	if ( !pSkill )							return;
+
+	D3DXMATRIX matTrans;
+	using namespace SKILL;
+
+	//	Note : Å¸°Ù ÀÌÆåÆ®°¡ Áö¸éÀ» ÇâÇØ ¹ß»çµÇ´Â °æ?E
+	//
+	EMELEMENT emELMT = ( pSkill->m_sAPPLY.emELEMENT==EMELEMENT_ARM ) ? GET_ITEM_ELMT() : (EMELEMENT_SPIRIT);
+	if ( pSkill->m_sBASIC.emIMPACT_TAR == TAR_ZONE_SPEC )
+	{
+		if ( pSkill->m_sEXT_DATA.emTARG == EMTIME_IMPACT )
+		{
+			if (!RANPARAM::bSkillEffects)
+			{
+			D3DXMatrixTranslation ( &matTrans, m_vTARPOS.x, m_vTARPOS.y, m_vTARPOS.z );
+			DxEffSingleGroup* pEffSingleG = DxEffGroupPlayer::GetInstance().NewEffGroup ( pSkill->m_sEXT_DATA.GETSELFZONE01(emELMT), matTrans );
+			if ( pEffSingleG )
+			{
+				if ( pSkill->m_sEXT_DATA.emTARGZONE01==EMTIME_TARG_OVR )
+					pEffSingleG->AddEffAfter ( EFFASINGLE, pSkill->m_sEXT_DATA.GETTARGZONE01(emELMT) );
+
+				if ( pSkill->m_sEXT_DATA.emTARGZONE02==EMTIME_TARG_OVR )
+					pEffSingleG->AddEffAfter ( EFFASINGLE, pSkill->m_sEXT_DATA.GETTARGZONE02(emELMT) );
+
+				//if ( pSkill->m_sEXT_DATA.emTARGZONE03==EMTIME_TARG_OVR )
+				//	pEffSingleG->AddEffAfter ( EFFASINGLE, pSkill->m_sEXT_DATA.GETTARGZONE03(emELMT) );
+			}
+			else
+			{
+				D3DXMatrixTranslation ( &matTrans, m_vTARPOS.x, m_vTARPOS.y, m_vTARPOS.z );
+				DxEffSingleGroup* pEffSingleG = NULL;
+			if ( pEffSingleG )
+			{
+				if ( pSkill->m_sEXT_DATA.emTARGZONE01==EMTIME_TARG_OVR )
+				{}//pEffSingleG->AddEffAfter ( EFFASINGLE, pSkill->m_sEXT_DATA.GETTARGZONE01(emELMT) );
+
+				if ( pSkill->m_sEXT_DATA.emTARGZONE02==EMTIME_TARG_OVR )
+				{}//pEffSingleG->AddEffAfter ( EFFASINGLE, pSkill->m_sEXT_DATA.GETTARGZONE02(emELMT) );
+
+				//if ( pSkill->m_sEXT_DATA.emTARGZONE03==EMTIME_TARG_OVR )
+				//	pEffSingleG->AddEffAfter ( EFFASINGLE, pSkill->m_sEXT_DATA.GETTARGZONE03(emELMT) );
+			}
+			}
+			}
+		}
+
+			if ( pSkill->m_sEXT_DATA.emTARGZONE01==EMTIME_IMPACT && !RANPARAM::bSkillEffects)
+			{
+			DxEffGroupPlayer::GetInstance().NewEffGroup ( pSkill->m_sEXT_DATA.GETTARGZONE01(emELMT), matTrans );
+			}
+			else{}
+
+		if ( pSkill->m_sEXT_DATA.emTARGZONE02==EMTIME_IMPACT && !RANPARAM::bSkillEffects)
+		{
+			DxEffGroupPlayer::GetInstance().NewEffGroup ( pSkill->m_sEXT_DATA.GETTARGZONE02(emELMT), matTrans );
+		}
+		else{}
+
+		//if ( pSkill->m_sEXT_DATA.emTARGZONE03==EMTIME_IMPACT )
+		//	DxEffGroupPlayer::GetInstance().NewEffGroup ( pSkill->m_sEXT_DATA.GETTARGZONE03(emELMT), matTrans );
+	}
+	else if ( pSkill->m_sBASIC.emIMPACT_TAR == TAR_ZONE )
+	{
+		if ( pSkill->m_sEXT_DATA.emTARG == EMTIME_IMPACT )
+		{
+			if (!RANPARAM::bSkillEffects )
+			{
+			D3DXMatrixTranslation ( &matTrans, m_vTARPOS.x, m_vTARPOS.y, m_vTARPOS.z );
+			DxEffSingleGroup* pEffSingleG = DxEffGroupPlayer::GetInstance().NewEffGroup ( pSkill->m_sEXT_DATA.GETSELFZONE01(emELMT), matTrans );
+			if ( pEffSingleG )
+			{
+				if ( pSkill->m_sEXT_DATA.emTARGZONE01==EMTIME_TARG_OVR )
+					pEffSingleG->AddEffAfter ( EFFASINGLE, pSkill->m_sEXT_DATA.GETTARGZONE01(emELMT) );
+
+				if ( pSkill->m_sEXT_DATA.emTARGZONE02==EMTIME_TARG_OVR )
+					pEffSingleG->AddEffAfter ( EFFASINGLE, pSkill->m_sEXT_DATA.GETTARGZONE02(emELMT) );
+
+			//	if ( pSkill->m_sEXT_DATA.emTARGZONE03==EMTIME_TARG_OVR )
+			//		pEffSingleG->AddEffAfter ( EFFASINGLE, pSkill->m_sEXT_DATA.GETTARGZONE03(emELMT) );
+			}
+			}
+			else
+			{
+				D3DXMatrixTranslation ( &matTrans, m_vTARPOS.x, m_vTARPOS.y, m_vTARPOS.z );
+			DxEffSingleGroup* pEffSingleG = NULL;
+			if ( pEffSingleG )
+			{
+				if ( pSkill->m_sEXT_DATA.emTARGZONE01==EMTIME_TARG_OVR )
+				{}//pEffSingleG->AddEffAfter ( EFFASINGLE, pSkill->m_sEXT_DATA.GETTARGZONE01(emELMT) );
+
+				if ( pSkill->m_sEXT_DATA.emTARGZONE02==EMTIME_TARG_OVR )
+				{}//pEffSingleG->AddEffAfter ( EFFASINGLE, pSkill->m_sEXT_DATA.GETTARGZONE02(emELMT) );
+
+			//	if ( pSkill->m_sEXT_DATA.emTARGZONE03==EMTIME_TARG_OVR )
+			//		pEffSingleG->AddEffAfter ( EFFASINGLE, pSkill->m_sEXT_DATA.GETTARGZONE03(emELMT) );
+			}
+			}
+		}
+
+		if ( pSkill->m_sEXT_DATA.emTARGZONE01==EMTIME_IMPACT && !RANPARAM::bSkillEffects)
+		{
+			DxEffGroupPlayer::GetInstance().NewEffGroup ( pSkill->m_sEXT_DATA.GETTARGZONE01(emELMT), matTrans );
+		}
+		else{}
+
+		if ( pSkill->m_sEXT_DATA.emTARGZONE02==EMTIME_IMPACT && !RANPARAM::bSkillEffects)
+		{
+			DxEffGroupPlayer::GetInstance().NewEffGroup ( pSkill->m_sEXT_DATA.GETTARGZONE02(emELMT), matTrans );
+		}
+		else{}
+	}
+	//	Note : Å¸°Ù ÀÌÆåÆ®°¡ Áö¸éÀ» ÇâÇØ ¹ß»çµÇ´Â °æ?E
+	//		ÀÚ?EÀ§Ä¡¿¡¼­ ?EEÀ§Ä¡±û?E ( È­?E?EE)
+	else if ( pSkill->m_sBASIC.emIMPACT_TAR == TAR_SELF_TOSPEC )
+	{
+		if ( m_wTARNUM == 0 )	return;
+
+		STARGETID sTarget(static_cast<EMCROW>(m_sTARIDS[m_wTARNUM-1].wCrow),static_cast<DWORD>(m_sTARIDS[m_wTARNUM-1].wID));
+		if ( !GLGaeaClient::GetInstance().IsVisibleCV(sTarget) )		return;
+		sTarget.vPos = GLGaeaClient::GetInstance().GetTargetPos(sTarget);
+
+		D3DXVECTOR3 vDir = sTarget.vPos - m_vPos;
+		vDir.y = 0.f;
+		D3DXVec3Normalize ( &vDir, &vDir );
+
+		//	Note : ¸ñÇ¥ Áö?EÀÌÆåÆ®¿¡ ½Ç?Eº¸³»´Â ÀÌÆåÆ®.
+		//		( ½Ç?Eº¸³¾¶§´Â ¸ñÇ¥ À§Ä¡ ÀÌÆåÆ®ÀÇ À§Ä¡´Â ÀÚµ¿À¸·Î Áö?EÀÌÆÑÆ®ÀÇ Á¾?EÁöÁ¡À¸·Î °úÝ¤. )
+		if ( pSkill->m_sEXT_DATA.VALIDTARG(emELMT) )
+		{
+			SK_EFF_TARG ( pSkill, sStrikeEff, sTarget );
+		}
+		//	´Üµ¶À¸·Î ¸ñÇ¥ ÁöÁ¡¿¡ ¹ß»ý.
+		else
+		{
+			//	Note : ¸ñÇ¥ À§Ä¡ ÀÌÆåÆ®.
+			if ( pSkill->m_sEXT_DATA.emTARGZONE01==EMTIME_IMPACT && !RANPARAM::bSkillEffects)
+			{
+				SK_EFF_TARZONE ( sTarget, pSkill->m_sEXT_DATA.emTARGZONE01_POS, pSkill->m_sEXT_DATA.GETTARGZONE01(emELMT) );
+			}
+			else{}
+
+			if ( pSkill->m_sEXT_DATA.emTARGZONE02==EMTIME_IMPACT && !RANPARAM::bSkillEffects)
+			{
+				SK_EFF_TARZONE ( sTarget, pSkill->m_sEXT_DATA.emTARGZONE02_POS, pSkill->m_sEXT_DATA.GETTARGZONE02(emELMT) );
+			}
+			else{}
+
+			//	Note : ¸ñÇ¥ ¸ö ÀÌÆåÆ®.
+			if ( pSkill->m_sEXT_DATA.emTARGBODY01==EMTIME_IMPACT && !RANPARAM::bSkillEffects)
+			{
+				DxEffGroupPlayer::GetInstance().NewEffBody ( pSkill->m_sEXT_DATA.GETTARGBODY01(emELMT), &sTarget, &vDir );
+			}
+			else{}
+			if ( pSkill->m_sEXT_DATA.emTARGBODY02==EMTIME_IMPACT && !RANPARAM::bSkillEffects)
+			{
+				DxEffGroupPlayer::GetInstance().NewEffBody ( pSkill->m_sEXT_DATA.GETTARGBODY02(emELMT), &sTarget, &vDir );
+			}
+			else{}
+		}
+	}
+	//	Note : Å¸°Ù ÀÌÆåÆ®°¡ À¯´ÖÀ» ÇâÇØ ¹ß»çµÇ´Â °æ?E
+	//
+	else
+	{
+		//	Note : ¸ñÇ¥ À¯´ÖÀÌ ÀÖ´Â °æ?E
+		//
+		if ( m_wTARNUM )
+		{
+			for ( WORD i=0; i<m_wTARNUM; ++i )
+			{
+				STARGETID sTarget(static_cast<EMCROW>(m_sTARIDS[i].wCrow),static_cast<DWORD>(m_sTARIDS[i].wID));
+				if ( !GLGaeaClient::GetInstance().IsVisibleCV(sTarget) )	continue;
+				sTarget.vPos = GLGaeaClient::GetInstance().GetTargetPos(sTarget);
+
+				D3DXVECTOR3 vDir = sTarget.vPos - m_vPos;
+				vDir.y = 0.f;
+				D3DXVec3Normalize ( &vDir, &vDir );
+
+				//	Note : ¸ñÇ¥ Áö?EÀÌÆåÆ®¿¡ ½Ç?Eº¸³»´Â ÀÌÆåÆ®.
+				//		( ½Ç?Eº¸³¾¶§´Â ¸ñÇ¥ À§Ä¡ ÀÌÆåÆ®ÀÇ À§Ä¡´Â ÀÚµ¿À¸·Î Áö?EÀÌÆÑÆ®ÀÇ Á¾?EÁöÁ¡À¸·Î °úÝ¤. )
+				if ( pSkill->m_sEXT_DATA.VALIDTARG(emELMT) )
+				{
+					SK_EFF_TARG ( pSkill, sStrikeEff, sTarget );
+				}
+				//	´Üµ¶À¸·Î ¸ñÇ¥ ÁöÁ¡¿¡ ¹ß»ý.
+				else
+				{
+					//	Note : ¸ñÇ¥ À§Ä¡ ÀÌÆåÆ®.
+					if ( pSkill->m_sEXT_DATA.emTARGZONE01==EMTIME_IMPACT && !RANPARAM::bSkillEffects)
+					{
+						SK_EFF_TARZONE ( sTarget, pSkill->m_sEXT_DATA.emTARGZONE01_POS, pSkill->m_sEXT_DATA.GETTARGZONE01(emELMT) );
+					}
+					else{}
+
+					if ( pSkill->m_sEXT_DATA.emTARGZONE02==EMTIME_IMPACT && !RANPARAM::bSkillEffects)
+					{
+						SK_EFF_TARZONE ( sTarget, pSkill->m_sEXT_DATA.emTARGZONE02_POS, pSkill->m_sEXT_DATA.GETTARGZONE02(emELMT) );
+					}
+					else{}
+
+					//	Note : ¸ñÇ¥ ¸ö ÀÌÆåÆ®.
+					if ( pSkill->m_sEXT_DATA.emTARGBODY01==EMTIME_IMPACT && !RANPARAM::bSkillEffects)
+					{
+						DxEffGroupPlayer::GetInstance().NewEffBody ( pSkill->m_sEXT_DATA.GETTARGBODY01(emELMT), &sTarget, &vDir );
+					}
+					else{}
+					if ( pSkill->m_sEXT_DATA.emTARGBODY02==EMTIME_IMPACT && !RANPARAM::bSkillEffects)
+					{
+						DxEffGroupPlayer::GetInstance().NewEffBody ( pSkill->m_sEXT_DATA.GETTARGBODY02(emELMT), &sTarget, &vDir );
+					}
+					else{}
+				}
+
+				if ( pSkill->m_sEXT_DATA.bTARG_ONE )	break;
+			}
+		}
+	}
+
+
+	STARGETID sTARG(GETCROW(),m_dwGaeaID);
+
+	if ( pSkill->m_sEXT_DATA.emSELFZONE01 == EMTIME_IMPACT && !RANPARAM::bSkillEffects)
+	{
+		SK_EFF_SELFZONE ( sStrikeEff, pSkill->m_sEXT_DATA.emSELFZONE01_POS, pSkill->m_sEXT_DATA.GETSELFZONE01(emELMT), &sTARG );
+	}
+	else{}
+
+	if ( pSkill->m_sEXT_DATA.emSELFZONE02 == EMTIME_IMPACT && !RANPARAM::bSkillEffects)
+	{
+		SK_EFF_SELFZONE ( sStrikeEff, pSkill->m_sEXT_DATA.emSELFZONE02_POS, pSkill->m_sEXT_DATA.GETSELFZONE02(emELMT), &sTARG );
+	}
+	else{}
+
+	if ( pSkill->m_sEXT_DATA.emSELFBODY == EMTIME_IMPACT && !RANPARAM::bSkillEffects)
+	{
+		DxEffGroupPlayer::GetInstance().NewEffBody ( pSkill->m_sEXT_DATA.GETSELFBODY(emELMT), &sTARG, &m_vDir );
+	}
+	else{}
+}
+
+BOOL GLCharClient::SkillProc ( float fElapsedTime )
+{
+	m_fattTIMER += fElapsedTime * GETATTVELO();
+	m_fattTIMER += GETATT_ITEM();
+	GASSERT(m_pSkinChar->GETCURANIMNODE());
+
+	PANIMCONTNODE pAnicontNode = m_pSkinChar->GETCURANIMNODE();
+	GASSERT(pAnicontNode);
+	PSANIMCONTAINER pAnimCont = pAnicontNode->pAnimCont;
+
+	if ( pAnimCont->m_wStrikeCount == 0 )	return FALSE;
+
+	DWORD dwThisKey = pAnimCont->m_dwSTime + DWORD(m_fattTIMER*UNITANIKEY_PERSEC);
+
+	DWORD dwStrikeKey = pAnimCont->m_sStrikeEff[m_nattSTEP].m_dwFrame;
+	if ( m_nattSTEP < pAnimCont->m_wStrikeCount )
+	{
+		if ( dwThisKey>=dwStrikeKey )
+		{
+			//	Note : ½ºÅ³ ÀÌÆåÆ® ¹ßµ¿.
+			//
+			SkillEffect ( pAnimCont->m_sStrikeEff[m_nattSTEP] );
+		
+			m_nattSTEP++;
+		}
+	}
+
+	return TRUE;
+}
+
+void GLCharClient::UPDATE_ITEM ( )
+{
+	m_fITEM_MOVE_R = 0.0f;
+	m_fITEMATTVELO_R = 0.0f;
+	m_fITEM_MOVE = 0.0f;
+	m_fITEMATTVELO = 0.0f;
+
+	for ( int i=0; i<SLOT_NSIZE_S_2; i++ )
+	{
+		EMSLOT emSLOT = static_cast<EMSLOT>(i);
+		if ( !VALID_SLOT_ITEM(emSLOT) )					continue;
+
+		SITEMCUSTOM sItemCustom;
+		const SITEMCLIENT& sItemClient = m_CharData.m_PutOnItems[i];
+		sItemCustom.Assign( sItemClient );
+		
+		SITEM* sItem = GET_SLOT_ITEMDATA( emSLOT );
+		if ( !sItem ) continue;
+
+		//	Note : º¯È­À² È¿?E
+		switch ( sItem->sSuitOp.sVARIATE.emTYPE )
+		{
+		case EMVAR_HP:
+		case EMVAR_MP:
+		case EMVAR_SP:
+		case EMVAR_AP:
+			break;
+		case EMVAR_MOVE_SPEED:
+			if ( emSLOT != SLOT_VEHICLE )	m_fITEM_MOVE_R += sItemCustom.GETMOVESPEEDR();
+			else if ( m_bVehicle )	m_fITEM_MOVE_R += m_sVehicle.GetSpeedRate() + sItemCustom.GETMOVESPEEDR();;
+			break;
+		case EMVAR_ATTACK_SPEED:
+			m_fITEMATTVELO_R	+= sItem->sSuitOp.sVARIATE.fVariate;
+			break;
+		case EMVAR_CRITICAL_RATE:
+			break;
+		case EMVAR_CRUSHING_BLOW:
+			break;
+		};
+
+		// º¯È­·® È¿?E
+		switch ( sItem->sSuitOp.sVOLUME.emTYPE )
+		{
+		case EMVAR_HP:
+		case EMVAR_MP:
+		case EMVAR_SP:
+		case EMVAR_AP:
+			break;
+		case EMVAR_MOVE_SPEED:
+			if ( emSLOT != SLOT_VEHICLE )	m_fITEM_MOVE += sItemCustom.GETMOVESPEED();
+			else if ( m_bVehicle ) m_fITEM_MOVE += m_sVehicle.GetSpeedVol() + sItemCustom.GETMOVESPEED();
+			break;
+		case EMVAR_ATTACK_SPEED:
+			m_fITEMATTVELO += sItem->sSuitOp.sVOLUME.fVolume;
+			break;
+		case EMVAR_CRITICAL_RATE:
+			break;
+		case EMVAR_CRUSHING_BLOW:
+			break;
+		};
+
+
+		// ÀÌµ¿¼Óµµ ·£´ý¿É¼Ç Àû?E ÆÄÃ÷´Â À§¿¡¼­ Àû?Em_sVehicle.GetSpeedRate(); ) 
+//		if ( emSLOT != SLOT_VEHICLE )	m_fITEM_MOVE += sItemCustom.GETOptVALUE( EMR_OPT_MOVE_SPEED );
+//		else if ( m_bVehicle ) m_fITEM_MOVE += sItemCustom.GETOptVALUE( EMR_OPT_MOVE_SPEED );
+
+	}
+}
+
+void GLCharClient::UpdateLandEffect()
+{
+	PLANDMANCLIENT pLand = GLGaeaClient::GetInstance().GetActiveMap();
+	if( !pLand ) return;
+
+	SLEVEL_ETC_FUNC *pLevelEtcFunc = pLand->GetLevelEtcFunc();
+	if( !pLevelEtcFunc ) return;
+	if( !pLevelEtcFunc->m_bUseFunction[EMETCFUNC_LANDEFFECT] ) return;
+
+	// ¸ð?E¹öÇÁ¸¦ ?EÒÇØ¾ßÇ?°æ?E?Ã³¸®
+	for( int i = 0; i < EMLANDEFFECT_MULTI; i++ )
+	{
+		SLANDEFFECT landEffect = m_sLandEffect[i];
+		if( !landEffect.IsUse() ) continue;
+		if( landEffect.emLandEffectType == EMLANDEFFECT_CANCEL_ALLBUFF )
+		{
+			if( m_dwTransfromSkill != SNATIVEID::ID_NULL )
+			{
+				m_dwTransfromSkill = SNATIVEID::ID_NULL;
+				UpdateSuit();
+			}
+			if( RANPARAM::bCHARACTER_SIMPLIFY == 1 )
+			{
+				UpdateSuit();
+			}
+			if ( m_bTRANSFORM_EFF ) UpdateSuit(); //Transform Function 
+			for ( int i=0; i<SKILLFACT_SIZE; ++i )
+			{
+				FACTEFF::DeleteSkillFactEffect ( STARGETID(CROW_PC,m_dwGaeaID,m_vPos), m_pSkinChar, m_sSKILLFACT[i].sNATIVEID );
+				DISABLESKEFF(i);
+			}			
+			return;
+		}
+	}
+
+	DISABLEALLLANDEFF();
+}
+
+void GLCharClient::UPDATE_DATA ( float fTime, float fElapsedTime, BOOL bClient )
+{
+	m_fSTATE_MOVE = 1.0f;
+	m_fSTATE_DELAY = 1.0f;
+
+	m_fSKILL_MOVE = 0.0f;
+	m_fATTVELO = 0.0f;
+
+	m_bSTATE_PANT = false;
+	m_bSTATE_STUN = false;
+
+	m_bTRANSFORM_EFF = false; //Transform Function 
+	m_bINVISIBLE = false;
+	m_bSafeZone = false;
+
+	for ( int i=0; i<SKILLFACT_SIZE; ++i )
+	{
+		SSKILLFACT &sSKEFF = m_sSKILLFACT[i];
+		if ( sSKEFF.sNATIVEID==NATIVEID_NULL() )	continue;
+
+		PGLSKILL pSkill = GLSkillMan::GetInstance().GetData ( sSKEFF.sNATIVEID.wMainID, sSKEFF.sNATIVEID.wSubID );
+		if ( !pSkill )								return;
+
+		EMSLOT emRHand = GetCurRHand();	
+		SITEM* pRightItem = GET_SLOT_ITEMDATA(emRHand);	
+		sSKEFF.fAGE -= fElapsedTime;
+
+		if ( GLCONST_CHAR::strTRANSFORM_SKIN[pSkill->m_sBASIC.sNATIVEID.wMainID][pSkill->m_sBASIC.sNATIVEID.wSubID] != "" ) m_bTRANSFORM_EFF = true; //Transform Function 
+
+		for( unsigned s=0;s<SKILL::SAPPLY::MAX_DESCRIPTOR;++s)
+		{
+			const SSKILLFACT::SPEC_DESCRIPTOR &desc = sSKEFF.spec[s];
+			if( sSKEFF.GetSpec( desc.emSPEC ) != &desc )	continue;
+			switch ( desc.emSPEC )
+			{
+			case EMSPECA_MOVEVELO:
+				m_fSKILL_MOVE += desc.fSPECVAR1;
+				break;
+
+			case EMSPECA_STUN:
+					{
+						m_fATTVELO = 0.0f;
+						m_bSTATE_STUN = true;
+					}
+					break;
+
+			case EMSPECA_INVISIBLE:
+				m_bINVISIBLE = true;
+				break;
+
+			case EMSPECA_ATTACKVELO:
+				//	°ø°Ý ¼Óµµ °è³äÀÌ¹Ç·Î ( °ø°Ý ½Ã°£À» -0.1 (-10%) °¨¼Ò ½ÃÅ°?EÀ§ÇØ¼­´Â ºÎÈ£ ¹Ý?E?ÇÏ¿©¾ßÇÔ. )
+				m_fATTVELO -= desc.fSPECVAR1;
+				break;
+
+			case EMSPECA_SKILLDELAY:
+			case EMSPECA_DURATION:
+				break;
+			};
+		}
+		
+		//	Å¬¶óÀÌ¾ðÆ®°¡ ¾Æ´Ò °æ¿ì ¿©±â¼­ ½ºÅ³ ÀÌÆåÆ®¸¦ ºñÈ°¼ºÈ­, Å¬¶óÀÌ¾ðÆ®´Â UpdateSkillEffect()¿¡¼­ ÇÔ.
+		if ( !bClient && sSKEFF.fAGE <= 0.0f )		DISABLESKEFF(i);
+	}
+
+	for ( int i=0; i<EMBLOW_MULTI; ++i )
+	{
+		SSTATEBLOW &sSTATEBLOW = m_sSTATEBLOWS[i];
+		if ( sSTATEBLOW.emBLOW == EMBLOW_NONE )		continue;
+
+		sSTATEBLOW.fAGE -= fElapsedTime;
+
+		switch ( sSTATEBLOW.emBLOW )
+		{
+		case EMBLOW_NUMB:
+			m_fSTATE_MOVE += sSTATEBLOW.fSTATE_VAR1;			//	ÀÌµ¿¼Óµµ °¨¼Ò.
+			m_fSTATE_DELAY = 1.0f + sSTATEBLOW.fSTATE_VAR2;		//	µô·¡ÀÌ Áõ°¡.
+			break;
+
+		case EMBLOW_STUN:
+			m_fSTATE_MOVE = 0.0f;								//	±âÀý.
+			m_bSTATE_PANT = true;
+			m_bSTATE_STUN = true;
+			break;
+
+		case EMBLOW_STONE:
+			m_fSTATE_MOVE += sSTATEBLOW.fSTATE_VAR1;			//	ÀÌµ¿¼Óµµ °¨¼Ò.
+			break;
+
+		case EMBLOW_BURN:
+			break;
+
+		case EMBLOW_FROZEN:
+			m_fSTATE_MOVE += sSTATEBLOW.fSTATE_VAR1;			//	ÀÌµ¿¼Óµµ °¨¼Ò.
+			break;
+
+		case EMBLOW_MAD:
+			m_bSTATE_PANT = true;
+			break;
+
+		case EMBLOW_POISON:
+			break;
+
+		case EMBLOW_CURSE:
+			break;
+		};
+	}
+	
+	switch ( m_CharData.sQITEMFACT.emType )
+	{
+	case QUESTION_SPEED_UP:
+		m_fSKILL_MOVE += (m_CharData.sQITEMFACT.wParam1/100.0f);
+		break;
+
+	case QUESTION_CRAZY:
+		m_fSKILL_MOVE += (m_CharData.sQITEMFACT.wParam1/100.0f);
+		m_fATTVELO += (m_CharData.sQITEMFACT.wParam2/100.0f);
+		break;
+
+	case QUESTION_ATTACK_UP:
+		break;
+
+	case QUESTION_EXP_UP:
+		break;
+
+	case QUESTION_LUCKY:
+		break;
+
+	case QUESTION_SPEED_UP_M:
+		m_fSKILL_MOVE += (m_CharData.sQITEMFACT.wParam1/100.0f);
+		break;
+
+	case QUESTION_MADNESS:
+		m_fSKILL_MOVE += (m_CharData.sQITEMFACT.wParam1/100.0f);
+		m_fATTVELO += (m_CharData.sQITEMFACT.wParam2/100.0f);
+		break;
+
+	case QUESTION_ATTACK_UP_M:
+		break;
+	};
+
+
+	// Áö?EÈ¿?EÃ³¸®
+	for( int i = 0; i < EMLANDEFFECT_MULTI; i++ )
+	{
+		SLANDEFFECT landEffect = m_sLandEffect[i];
+		if( !landEffect.IsUse() ) continue;
+
+		switch( landEffect.emLandEffectType ) 
+		{
+		case EMLANDEFFECT_ATK_SPEED: // °ø°Ý¼Óµµ
+			m_fATTVELO	  += landEffect.fValue;
+			break;
+		case EMLANDEFFECT_MOVE_SPEED: // ÀÌµ¿¼Óµµ
+			m_fSKILL_MOVE += landEffect.fValue;
+			break;
+		case EMLANDEFFECT_MP_RATE:	  // HP º¯È­À²
+		case EMLANDEFFECT_HP_RATE:    // MP º¯È­À²
+		case EMLANDEFFECT_RECOVER_RATE: // È¸º¹À²
+		case EMLANDEFFECT_DAMAGE_RATE:	// °ø°ÝÄ¡ º¯È­À²
+		case EMLANDEFFECT_DEFENSE_RATE:	// ¹æ¾ûà¡ º¯È­À²
+		case EMLANDEFFECT_RESIST_RATE:	// ÀúÇ× ¼öÄ¡			
+		case EMLANDEFFECT_CANCEL_ALLBUFF: // ¸ð?E¹öÇÁ ?E?
+			break;
+		case EMLANDEFFECT_SAFE_ZONE:
+			m_bSafeZone = true;
+			break;
+		}
+	}
+
+
+	//	Memo :	? ¾ÆÀÌÅÛ ÀÌº¥Æ® Àû?E
+	if( m_CharData.sEVENTFACT.IsACTIVE( EMGM_EVENT_SPEED ) )	m_fSKILL_MOVE += (m_CharData.sEVENTFACT.wSpeed/100.0f);
+	if( m_CharData.sEVENTFACT.IsACTIVE( EMGM_EVENT_ASPEED) )	m_fATTVELO += (m_CharData.sEVENTFACT.wASpeed/100.0f);
+
+	//	°ø°Ý/ÀÌµ¿ ¼Óµµ. ( Áö¼Ó skill ¼Ó¼º °¡?E?ºÎºÐ¿¡ state, passive skill ¼Ó¼º °¡?E )
+	m_fATTVELO += m_fSTATE_MOVE + m_CharData.sPASSIVE_SKILL.m_fATTVELO;
+	m_fSKILL_MOVE += m_CharData.sPASSIVE_SKILL.m_fMOVEVELO;
+}
+
+BOOL GLCharClient::RECEIVE_SKILLFACT ( const SNATIVEID skill_id, const WORD wlevel, const DWORD dwSELECT, float fAge )
+{
+	//	½ºÅ³ Á¤º¸ °¡Á®¿È.
+	PGLSKILL pSkill = GLSkillMan::GetInstance().GetData ( skill_id.wMainID, skill_id.wSubID );
+	if ( !pSkill )				return FALSE;
+	SKILL::CDATA_LVL &sSKILL_DATA = pSkill->m_sAPPLY.sDATA_LVL[wlevel];
+
+	BOOL bHOLD = FALSE;
+	SSKILLFACT sSKILLEF;
+	switch ( pSkill->m_sAPPLY.emBASIC_TYPE )
+	{
+	case SKILL::EMFOR_VARHP:
+	case SKILL::EMFOR_VARMP:
+	case SKILL::EMFOR_VARSP:
+	case SKILL::EMFOR_DEFENSE:
+	case SKILL::EMFOR_HITRATE:
+	case SKILL::EMFOR_AVOIDRATE:
+	case SKILL::EMFOR_VARAP:
+	case SKILL::EMFOR_VARDAMAGE:
+	case SKILL::EMFOR_VARDEFENSE:
+	case SKILL::EMFOR_PA:
+	case SKILL::EMFOR_SA:
+	case SKILL::EMFOR_MA:
+	case SKILL::EMFOR_RESIST:
+	case SKILL::EMFOR_CP_RATE: //add cp
+	case SKILL::EMFOR_CP_GAIN: //add cp
+		bHOLD = TRUE;
+		sSKILLEF.emTYPE = pSkill->m_sAPPLY.emBASIC_TYPE;
+		sSKILLEF.fMVAR = sSKILL_DATA.fBASIC_VAR;
+		break;
+	};
+
+	for( unsigned s=0;s<SKILL::SAPPLY::MAX_DESCRIPTOR;++s)
+	{
+		const SKILL::SIMPACT_DESCRIPTOR &desc = pSkill->m_sAPPLY.sadon[s];
+		if ( desc.emADDON != EMIMPACTA_NONE )
+		{
+			bHOLD = TRUE;
+			sSKILLEF.adon[ s ].Assign( desc, wlevel );
+		}
+	}
+	
+
+	for( unsigned s=0;s<SKILL::SAPPLY::MAX_DESCRIPTOR;++s)
+	{
+		const SKILL::SSPEC_DESCRIPTOR &desc = pSkill->m_sAPPLY.spec[s];
+		switch ( desc.emSPEC )
+		{
+		case EMSPECA_REFDAMAGE:
+		case EMSPECA_NONBLOW:
+		case EMSPECA_IMMUNE:		//add new spec
+		case EMSPECA_PIERCE:
+		case EMSPECA_TARRANGE:
+		case EMSPECA_ATTACKRANGE:		//add new spec
+		case EMSPECA_MOVEVELO:
+		case EMSPECA_ATTACKVELO:
+		case EMSPECA_SKILLDELAY:
+		case EMSPECA_DURATION:		//add new spec
+		case EMSPECA_PSY_DAMAGE_REDUCE:
+		case EMSPECA_MAGIC_DAMAGE_REDUCE:
+		case EMSPECA_PSY_DAMAGE_REFLECTION:
+		case EMSPECA_MAGIC_DAMAGE_REFLECTION:
+		case EMSPECA_DAMAGEABSORB:
+		case EMSPECA_DEFENSE_SKILL_ACTIVE:
+		case EMSPECA_INVISIBLE: //add invi-anti
+		case EMSPECA_RECVISIBLE: //add invi-anti
+		case EMSPECA_NOPOTION: //add antipot
+		case EMSPECA_NOSKILL: //add antiskill
+		case EMSPECA_CONTINUEDAMAGE:
+		//case EMSPECA_BLOW_DMG: //add blowdmgskill
+		//case EMSPECA_CRIT_RATE: //add critrateskill
+		//case EMSPECA_CRIT_DMG: //add critdmgskill
+		case EMSPECA_BLOW_RATE: //add blowrateskill
+		case EMSPECA_STUN:
+			bHOLD = TRUE;
+			sSKILLEF.spec[ s ].Assign( desc, wlevel );
+			break;
+		};
+	}
+	
+
+	//	Note : Áö¼Ó?E½ºÅ³ÀÏ °æ?EÃÖ?E½½·ÔÀ» Ã£¾Æ¼­ ½ºÅ³ È¿°ú¸¦ ³Ö¾ûÝÜ.
+	//
+	if ( bHOLD )
+	{
+		sSKILLEF.sNATIVEID	= skill_id;
+		sSKILLEF.wLEVEL		= wlevel;
+
+		if ( fAge == _SKILLFACT_DEFAULTTIME )	sSKILLEF.fAGE = sSKILL_DATA.fLIFE;
+		else									sSKILLEF.fAGE = fAge;
+
+		m_sSKILLFACT[dwSELECT] = sSKILLEF;
+
+		DoTransform(pSkill); //Transform Function by NaJ
+
+		return TRUE;
+	}
+
+	GASSERT ( 0 && "Áö¼Ó ½ºÅ³Á¤º¸°¡ À¯È¿ÇÏ?E¾ÊÀ½." );
+	return FALSE;
+}
+
+EMSLOT GLCharClient::GetCurRHand()
+{
+	if( IsUseArmSub() ) return SLOT_RHAND_S;
+	else				return SLOT_RHAND;
+//	return SLOT_RHAND;
+}
+
+EMSLOT GLCharClient::GetCurLHand()
+{
+	if( IsUseArmSub() ) return SLOT_LHAND_S;
+	else				return SLOT_LHAND;
+//	return SLOT_LHAND;
+}
+
+BOOL GLCharClient::VALID_SLOT_ITEM ( EMSLOT _slot )							
+{ 
+	if( m_CharData.m_PutOnItems[_slot].sNativeID==NATIVEID_NULL() ) return FALSE;
+
+	if( IsUseArmSub() )
+	{
+		if( _slot == SLOT_RHAND || _slot == SLOT_LHAND ) return FALSE;
+	}
+	else
+	{
+		if( _slot == SLOT_RHAND_S || _slot == SLOT_LHAND_S ) return FALSE;
+	}
+
+	return TRUE;
+}
+
+BOOL GLCharClient::IsCurUseArm( EMSLOT emSlot )
+{
+	if( IsUseArmSub() )
+	{
+		if( emSlot == SLOT_RHAND || emSlot == SLOT_LHAND ) return FALSE;
+	}
+	else
+	{
+		if( emSlot == SLOT_RHAND_S || emSlot == SLOT_LHAND_S ) return FALSE;
+	}
+
+	return TRUE;
+}
+
+D3DXVECTOR3 GLCharClient::GetPosBodyHeight ()
+{ 
+	if ( m_bVehicle ) return D3DXVECTOR3( m_vPos.x, m_vPos.y+m_fHeight+10.0f, m_vPos.z ); 
+	else return D3DXVECTOR3( m_vPos.x, m_vPos.y+m_fHeight, m_vPos.z ); 
+}
+
+
+void GLCharClient::DISABLEALLLANDEFF()
+{
+	for( int i = 0; i < EMLANDEFFECT_MULTI; i++ )
+	{
+		m_sLandEffect[i].Init();
+	}
+}
+void GLCharClient::ADDLANDEFF( SLANDEFFECT landEffect, int iNum )
+{
+	if( iNum >= EMLANDEFFECT_MULTI ) return;
+	m_sLandEffect[iNum] = landEffect;
+}
+//Extreme Reboot 
+void GLCharClient::ItemPreviewUpdate( SNATIVEID PrevID )
+{
+	EMCHARCLASS emClass = m_CharData.emClass;
+	EMCHARINDEX emIndex = CharClassToIndex(m_CharData.emClass);
+	DxSkinCharData* pSkinChar = DxSkinCharDataContainer::GetInstance().FindData ( GLCONST_CHAR::szCharSkin[emIndex] );
+	if ( !pSkinChar )	return;
+
+	EMCHARCLASS emSex = CharClassGetSex( emIndex );
+	EMCPSINDEX	emLeft = CPSIND_NULL;
+	EMCPSINDEX	emRight = CPSIND_NULL;
+	if ( emSex == GLCC_MAN )
+	{
+		emLeft = CPSIND_M_LEFT;
+		emRight = CPSIND_M_RIGHT;
+	}
+	else
+	{
+		emLeft = CPSIND_W_LEFT;
+		emRight = CPSIND_W_RIGHT;
+	}
+
+	SITEM* PrevItem = GLItemMan::GetInstance().GetItem ( PrevID );
+	if ( PrevItem )
+	{
+		if ( PrevItem->sSuitOp.emSuit == SUIT_HANDHELD ) //preview in weapon slot
+		{
+			{
+				DxSkinPieceRootData* pPieceDataRoot; //try to preview r hand
+				pPieceDataRoot = DxSkinPieceRootDataContainer::GetInstance().LoadData( PrevItem->GetCpsFile(emRight) , m_pd3dDevice , TRUE );
+				if ( pPieceDataRoot )
+				{
+					if ( pPieceDataRoot->GetUseCPS() )
+					{
+						m_pSkinChar->SetPiece( pPieceDataRoot->GetCpsName().c_str(), m_pd3dDevice, NULL, 0, TRUE );
+					}
+					else
+					{
+						m_pSkinChar->ResetCPS (  PIECE_RFINGER );//remove existing cps when the abl data dont have cps
+					}
+
+					m_pSkinChar->SetCharPieceData( pPieceDataRoot->GetData()
+													, m_pd3dDevice
+													, pPieceDataRoot->GetBoneLink()
+													, pPieceDataRoot->GetWeaponSlot()
+													, (DWORD) PIECE_RHAND
+													, NULL
+													, 0
+													, TRUE );
+					//m_pSkinChar->Clear( PIECE_LHAND );
+				}
+				else
+				{
+					m_pSkinChar->SetPiece ( PrevItem->GetCpsFile(emRight), m_pd3dDevice, NULL, 0, TRUE );
+				}
+			}
+			{
+				DxSkinPieceRootData* pPieceDataRoot;//try to preview l hand
+				pPieceDataRoot = DxSkinPieceRootDataContainer::GetInstance().LoadData( PrevItem->GetCpsFile(emLeft) , m_pd3dDevice , TRUE );
+				if ( pPieceDataRoot )
+				{
+					if ( pPieceDataRoot->GetUseCPS() )
+					{
+						m_pSkinChar->SetPiece( pPieceDataRoot->GetCpsName().c_str(), m_pd3dDevice, NULL, 0, TRUE );
+					}
+					else
+					{
+						m_pSkinChar->ResetCPS (  PIECE_LFINGER );//remove existing cps when the abl data dont have cps
+					}
+					m_pSkinChar->SetCharPieceData( pPieceDataRoot->GetData()
+													, m_pd3dDevice
+													, pPieceDataRoot->GetBoneLink()
+													, pPieceDataRoot->GetWeaponSlot()
+													, (DWORD) PIECE_LHAND
+													, NULL
+													, 0
+													, TRUE );
+				//	m_pSkinChar->Clear( PIECE_RHAND );
+					}
+				else
+				{
+					m_pSkinChar->SetPiece ( PrevItem->GetCpsFile(emLeft), m_pd3dDevice, NULL, 0, TRUE );	
+				}
+			}
+			{//for not abl preview
+				m_pSkinChar->SetPiece ( PrevItem->GetWearingFile(emIndex), m_pd3dDevice, NULL, 0, TRUE );	
+			}
+			{//for not abl preview
+				m_pSkinChar->SetPiece ( PrevItem->GetWearingFile2(emIndex), m_pd3dDevice, NULL, 0, TRUE );	
+			}
+		}
+		else
+		{
+			if ( PrevItem->sBasicOp.emItemType != ITEM_VEHICLE )
+			{
+				{
+				DxSkinPieceRootData* pPieceDataRoot; //preview items that are not vehicle and not from weapon slot
+				pPieceDataRoot = DxSkinPieceRootDataContainer::GetInstance().LoadData( PrevItem->GetWearingFile(emIndex) , m_pd3dDevice , TRUE );
+				if ( pPieceDataRoot )
+				{
+					if ( pPieceDataRoot->GetUseCPS() )
+					{
+						m_pSkinChar->SetPiece( pPieceDataRoot->GetCpsName().c_str(), m_pd3dDevice, NULL, 0, TRUE );
+					}
+					else
+					{
+						EMPIECECHAR emPiece_a = SUIT_2_PIECE(PrevItem->sSuitOp.emSuit);
+						PDXSKINPIECE pSkinPiece_a  = NULL;	
+						if ( emPiece_a!=PIECE_SIZE )
+						{
+							pSkinPiece_a  = pSkinChar->GetPiece(emPiece_a );	//
+						}
+						m_pSkinChar->SetPiece ( pSkinPiece_a->m_szFileName, m_pd3dDevice, 0X0, 0, TRUE );
+					}
+					m_pSkinChar->SetCharPieceData( pPieceDataRoot->GetData()
+													, m_pd3dDevice
+													, pPieceDataRoot->GetBoneLink()
+													, pPieceDataRoot->GetWeaponSlot()
+													, pPieceDataRoot->GetType()
+													, NULL
+													, 0
+													, TRUE );
+				}else
+				{
+					m_pSkinChar->SetPiece ( PrevItem->GetWearingFile(emIndex), m_pd3dDevice, NULL, 0, TRUE );
+				}
+				}
+				//LEFT HAND
+				{
+				DxSkinPieceRootData* pPieceDataRoot; //preview items that are not vehicle and not from weapon slot
+				pPieceDataRoot = DxSkinPieceRootDataContainer::GetInstance().LoadData( PrevItem->GetWearingFile2(emIndex) , m_pd3dDevice , TRUE );
+				if ( pPieceDataRoot )
+				{
+					if ( pPieceDataRoot->GetUseCPS() )
+					{
+						m_pSkinChar->SetPiece( pPieceDataRoot->GetCpsName().c_str(), m_pd3dDevice, NULL, 0, TRUE );
+					}
+					else
+					{
+						EMPIECECHAR emPiece_a = SUIT_2_PIECE(PrevItem->sSuitOp.emSuit);
+						PDXSKINPIECE pSkinPiece_a  = NULL;	
+						if ( emPiece_a!=PIECE_SIZE )
+						{
+							pSkinPiece_a  = pSkinChar->GetPiece(emPiece_a );	//
+						}
+						m_pSkinChar->SetPiece ( pSkinPiece_a->m_szFileName, m_pd3dDevice, 0X0, 0, TRUE );
+					}
+					m_pSkinChar->SetCharPieceData( pPieceDataRoot->GetData()
+													, m_pd3dDevice
+													, pPieceDataRoot->GetBoneLink()
+													, pPieceDataRoot->GetWeaponSlot()
+													, pPieceDataRoot->GetType()
+													, NULL
+													, 0
+													, TRUE );
+				}else
+				{
+					m_pSkinChar->SetPiece ( PrevItem->GetWearingFile2(emIndex), m_pd3dDevice, NULL, 0, TRUE );
+				}
+				}
+			}
+		}
+	}
+}
+//Extreme Reboot 
+void GLCharClient::ItemPreviewUpdate_End()
+{
+	EMCHARINDEX emIndex = CharClassToIndex(m_CharData.emClass);
+	DxSkinCharData* pSkinChar = DxSkinCharDataContainer::GetInstance().FindData ( GLCONST_CHAR::szCharSkin[emIndex] );
+	if ( !pSkinChar )	return;
+	
+	//m_pSkinChar->ResetPiece(PIECE_RFINGER);// | 8-25-2015 | Remove ExtremeReboot after Skill 
+	//m_pSkinChar->ResetPiece(PIECE_LFINGER);// | 8-25-2015 | Remove ExtremeReboot after Skill
+
+	UpdateSuit();
+}
+D3DXVECTOR3  GLCharClient::CollisionForward( D3DXVECTOR3 vPOSITION, D3DXVECTOR3 vDIRECTION )
+{
+	D3DXVECTOR3 vFROM = vPOSITION;
+	D3DXVECTOR3 vTO = vPOSITION + vDIRECTION * 2.0f;
+	D3DXVECTOR3 vDir = ( vTO - vFROM );
+	vDir.y = 0.0f;
+	D3DXVec3Normalize (  &vDir, &vDir );
+
+	NavigationMesh* pNavi = GLGaeaClient::GetInstance().GetActiveMap()->GetNaviMesh();
+	if ( pNavi )
+	{
+		D3DXVECTOR3 vPosA = vTO;
+		D3DXVECTOR3 vPosB = vTO + vDir * 2.0f;
+
+		BOOL bCoA(FALSE);
+		DWORD dwCoA(0);
+		D3DXVECTOR3 vCoA(0,0,0);
+
+		pNavi->IsCollision ( D3DXVECTOR3(vPosA.x,vPosA.y+5.0f,vPosA.z), D3DXVECTOR3(vPosA.x,vPosA.y-5.0f,vPosA.z), vCoA, dwCoA, bCoA );
+		if ( bCoA )
+		{
+			BOOL bCoB(FALSE);
+			DWORD dwCoB(0);
+			D3DXVECTOR3 vCoB(0,0,0);
+
+			pNavi->IsCollision ( D3DXVECTOR3(vPosB.x,vPosB.y+5.0f,vPosB.z), D3DXVECTOR3(vPosB.x,vPosB.y-5.0f,vPosB.z), vCoB, dwCoB, bCoB );
+			if ( !bCoB )
+			{
+				float fdxLength = 1.0f;
+				float fNewPushPull = 1.0f - fdxLength;
+				while ( 0.0f < fNewPushPull )
+				{
+					vPosB = vTO + vDir * fNewPushPull;
+					pNavi->IsCollision ( D3DXVECTOR3(vPosB.x,vPosB.y+5.0f,vPosB.z), D3DXVECTOR3(vPosB.x,vPosB.y-5.0f,vPosB.z), vCoB, dwCoB, bCoB );
+					if ( bCoB )		break;
+					fNewPushPull -= fdxLength;
+				};
+			}
+
+			if ( bCoB )
+			{
+				if ( pNavi->LineOfSightTest ( dwCoA, vCoA, dwCoB, vCoB ) )
+				{
+					return vCoB;
+				}
+			}
+		}
+	}
+
+	return D3DXVECTOR3 ( 0.0f, 0.0f, 0.0f );
+}
+
+D3DXVECTOR3  GLCharClient::CollisionBackward( D3DXVECTOR3 vPOSITION, D3DXVECTOR3 vDIRECTION )
+{
+	D3DXVECTOR3 vFROM = vPOSITION;
+	D3DXVECTOR3 vTO = vPOSITION - vDIRECTION * 2.0f;
+	D3DXVECTOR3 vDir = ( vTO - vFROM );
+	vDir.y = 0.0f;
+	D3DXVec3Normalize (  &vDir, &vDir );
+
+	NavigationMesh* pNavi = GLGaeaClient::GetInstance().GetActiveMap()->GetNaviMesh();
+	if ( pNavi )
+	{
+		D3DXVECTOR3 vPosA = vTO;
+		D3DXVECTOR3 vPosB = vTO + vDir * 2.0f;
+
+		BOOL bCoA(FALSE);
+		DWORD dwCoA(0);
+		D3DXVECTOR3 vCoA(0,0,0);
+
+		pNavi->IsCollision ( D3DXVECTOR3(vPosA.x,vPosA.y+5.0f,vPosA.z), D3DXVECTOR3(vPosA.x,vPosA.y-5.0f,vPosA.z), vCoA, dwCoA, bCoA );
+		if ( bCoA )
+		{
+			BOOL bCoB(FALSE);
+			DWORD dwCoB(0);
+			D3DXVECTOR3 vCoB(0,0,0);
+
+			pNavi->IsCollision ( D3DXVECTOR3(vPosB.x,vPosB.y+5.0f,vPosB.z), D3DXVECTOR3(vPosB.x,vPosB.y-5.0f,vPosB.z), vCoB, dwCoB, bCoB );
+			if ( !bCoB )
+			{
+				float fdxLength = 1.0f;
+				float fNewPushPull = 1.0f - fdxLength;
+				while ( 0.0f < fNewPushPull )
+				{
+					vPosB = vTO + vDir * fNewPushPull;
+					pNavi->IsCollision ( D3DXVECTOR3(vPosB.x,vPosB.y+5.0f,vPosB.z), D3DXVECTOR3(vPosB.x,vPosB.y-5.0f,vPosB.z), vCoB, dwCoB, bCoB );
+					if ( bCoB )		break;
+					fNewPushPull -= fdxLength;
+				};
+			}
+
+			if ( bCoB )
+			{
+				if ( pNavi->LineOfSightTest ( dwCoA, vCoA, dwCoB, vCoB ) )
+				{
+					return vCoB;
+				}
+			}
+		}
+	}
+
+	return D3DXVECTOR3 ( 0.0f, 0.0f, 0.0f );
+}
+void GLCharClient::DISABLESKEFF(int i)
+{
+	m_sSKILLFACT[i].RESET();
+}

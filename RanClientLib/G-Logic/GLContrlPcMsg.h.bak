@@ -1,0 +1,3556 @@
+#pragma once
+
+#include "GLContrlBaseMsg.h"
+#include "GLVEHICLE.h"
+
+enum EMBUS_TAKE
+{
+	EMBUS_TAKE_FAIL			= 0,	//	¿œπ›ø¿∑ÅE
+	EMBUS_TAKE_OK			= 1,	//	≈æΩ¬ º∫∞ÅE
+	EMBUS_TAKE_TICKET		= 2,	//	∆ºƒœ ∫Œ¡∑.
+	EMBUS_TAKE_CONDITION	= 3,	//	≈æΩ¬ ø©∞«¿Ã æ»µ .
+	EMBUS_TAKE_PK_LEVEL		= 4,	//	pk º∫«‚¿Ã ≥∑æ∆º≠ ≈æΩ¬ ∫“∞°¥….
+};
+
+enum EMTAXI_TAKE
+{
+	EMTAXI_TAKE_FAIL		= 0,	//	¿œπ›ø¿∑ÅE
+	EMTAXI_TAKE_OK			= 1,	//	≈æΩ¬ º∫∞ÅE
+	EMTAXI_TAKE_TICKET		= 2,	//	∆ºƒœ ∫Œ¡∑.
+	EMTAXI_TAKE_MONEY		= 3,	//	±›æ◊ ∫Œ¡∑.
+	EMTAXI_TAKE_CONDITION	= 4,	//	≈æΩ¬ ø©∞«¿Ã æ»µ .
+	EMTAXI_TAKE_MAPFAIL		= 5,	//  ∏  ø¿∑ÅE
+	EMTAXI_TAKE_STATIONFAIL	= 6,	//  ¡§∑˘¿ÅEø¿∑ÅE
+	EMTAXI_TAKE_NPCFAIL		= 7,	//	NPC º≥¡§ ø¿∑ÅE
+};
+
+enum EMREQ_FIRECRACKER_FB
+{
+	EMREQ_FIRECRACKER_FB_FAIL	= 0,	//	¿œπ› ø¿∑ÅE
+	EMREQ_FIRECRACKER_FB_OK		= 1,	//	ªÁøÅEº∫∞ÅE
+	EMREQ_FIRECRACKER_FB_NOITEM	= 2,	//	æ∆¿Ã≈€ ø¿∑ÅE
+};
+
+enum EMREQ_REVIVE_FB
+{
+	EMREQ_REVIVE_FB_FAIL		= 0,	//	¿œπ›ø¿∑ÅE
+	EMREQ_REVIVE_FB_OK			= 1,	//	ªÁøÅE∫∞ÅE
+	EMREQ_REVIVE_FB_NOITEM		= 2,	//	æ∆¿Ã≈€¿Ã æ¯¿Ω.
+	EMREQ_REVIVE_FB_NOTUSE		= 3,	//	ªÁøÅE∫“∞°¥…«— ¡ˆø™.
+	EMREQ_REVIVE_FB_COOLTIME	= 4,	//	æ∆¿Ã≈€ ƒ≈∏¿”
+};
+
+enum EMREQ_RECOVERY_FB
+{
+	EMREQ_RECOVERY_FB_FAIL		= 0,	//	¿œπ›ø¿∑ÅE
+	EMREQ_RECOVERY_FB_OK		= 1,	//	ªÁøÅE∫∞ÅE
+	EMREQ_RECOVERY_FB_NOMONEY	= 2,	//	µ∑¿Ã ∫Œ¡∑
+	EMREQ_RECOVERY_FB_NOREEXP	= 3,	//	»∏∫π«“ ∞Ê«Ëƒ°∞° æ¯¿Ω
+	EMREQ_RECOVERY_FB_NOTUSE	= 4,	//	ªÁøÅE∫“∞°¥…«— ¡ˆø™.
+};
+
+enum EMREQ_RECOVERY_NPC_FB
+{
+	EMREQ_RECOVERY_NPC_FB_FAIL		= 0,	//	¿œπ›ø¿∑ÅE
+	EMREQ_RECOVERY_NPC_FB_OK		= 1,	//	ªÁøÅE∫∞ÅE
+	EMREQ_RECOVERY_NPC_FB_NOMONEY	= 2,	//	µ∑¿Ã ∫Œ¡∑
+	EMREQ_RECOVERY_NPC_FB_NOREEXP	= 3,	//	»∏∫π«“ ∞Ê«Ëƒ°∞° æ¯¿Ω
+	EMREQ_RECOVERY_NPC_FB_NOTUSE	= 4,	//	ªÁøÅE∫“∞°¥…«— ¡ˆø™.
+};
+
+enum EMINVEN_HAIR_CHANGE_FB
+{
+	EMINVEN_HAIR_CHANGE_FB_FAIL		= 0,	//	¿œπ›ø¿∑ÅE
+	EMINVEN_HAIR_CHANGE_FB_OK		= 1,	//	º∫∞ÅE
+	EMINVEN_HAIR_CHANGE_FB_NOITEM	= 2,	//	æ∆¿Ã≈€¿Ã æ¯¿Ω.
+	EMINVEN_HAIR_CHANGE_FB_BADITEM	= 3,	//	ªÁøÅE∫“∞°¥… æ∆¿Ã≈€.
+	EMINVEN_HAIR_CHANGE_FB_BADCLASS	= 4,	//	ƒ…∏Ø≈Õ ¡˜æ˜¿Ã ∆≤∑¡º≠ ªÁøÅE∫“∞°¥… æ∆¿Ã≈€.
+	EMINVEN_HAIR_CHANGE_FB_COOLTIME = 5,	//	ƒ≈∏¿” Ω«∆–~
+};
+
+enum EMINVEN_BIKE_CHANGE_FB //add bike color
+{
+	EMINVEN_BIKE_CHANGE_FB_FAIL		= 0,	//	¿œπ›ø¿∑˘.
+	EMINVEN_BIKE_CHANGE_FB_OK		= 1,	//	º∫∞¯.
+	EMINVEN_BIKE_CHANGE_FB_NOITEM	= 2,	//	æ∆¿Ã≈€¿Ã æ¯¿Ω.
+	EMINVEN_BIKE_CHANGE_FB_BADITEM	= 3,	//	ªÁøÎ ∫“∞°¥… æ∆¿Ã≈€.
+	EMINVEN_BIKE_CHANGE_FB_BADCLASS	= 4,	//	ƒ…∏Ø≈Õ ¡˜æ˜¿Ã ∆≤∑¡º≠ ªÁøÎ ∫“∞°¥… æ∆¿Ã≈€.
+	EMINVEN_BIKE_CHANGE_FB_COOLTIME = 5,	//	ƒ≈∏¿” Ω«∆–~
+};
+
+
+enum EMINVEN_FACE_CHANGE_FB
+{
+	EMINVEN_FACE_CHANGE_FB_FAIL		= 0,	//	¿œπ›ø¿∑ÅE
+	EMINVEN_FACE_CHANGE_FB_OK		= 1,	//	º∫∞ÅE
+	EMINVEN_FACE_CHANGE_FB_NOITEM	= 2,	//	æ∆¿Ã≈€¿Ã æ¯¿Ω.
+	EMINVEN_FACE_CHANGE_FB_BADITEM	= 3,	//	ªÁøÅE∫“∞°¥… æ∆¿Ã≈€.
+	EMINVEN_FACE_CHANGE_FB_BADCLASS	= 4,	//	ƒ…∏Ø≈Õ ¡˜æ˜¿Ã ∆≤∑¡º≠ ªÁøÅE∫“∞°¥… æ∆¿Ã≈€.
+	EMINVEN_FACE_CHANGE_FB_COOLTIME	= 5,	//	ƒ≈∏¿” Ω«∆–
+};
+
+enum EMINVEN_GENDER_CHANGE_FB
+{
+	EMINVEN_GENDER_CHANGE_FB_FAIL		= 0,	//	¿œπ›ø¿∑ÅE
+	EMINVEN_GENDER_CHANGE_FB_OK			= 1,	//	º∫∞ÅE
+	EMINVEN_GENDER_CHANGE_FB_NOITEM		= 2,	//	æ∆¿Ã≈€¿Ã æ¯¿Ω.
+	EMINVEN_GENDER_CHANGE_FB_ITEMTYPE	= 3,	//	ªÁøÅE∫“∞°¥… æ∆¿Ã≈€.
+	EMINVEN_GENDER_CHANGE_FB_BADCLASS	= 4,	//	ƒ…∏Ø≈Õ ¡˜æ˜¿Ã ∆≤∑¡º≠ ªÁøÅE∫“∞°¥… æ∆¿Ã≈€.
+	EMINVEN_GENDER_CHANGE_FB_NOTVALUE	= 5,	//  ¿ﬂ∏¯µ» µ•¿Ã≈Õ 
+};
+
+enum EMINVEN_RENAME_FB
+{
+	EMINVEN_RENAME_FB_FAIL		= 0,	//	¿œπ›ø¿∑ÅE
+	EMINVEN_RENAME_FB_OK		= 1,	//	º∫∞ÅE
+	EMINVEN_RENAME_FB_NOITEM	= 2,	//	æ∆¿Ã≈€¿Ã æ¯¿Ω.
+	EMINVEN_RENAME_FB_BADITEM	= 3,	//	ªÁøÅE∫“∞°¥… æ∆¿Ã≈€.
+	EMINVEN_RENAME_FB_LENGTH	= 4,	//	¿Ã∏ß¿« ±Ê¿Ã∞° 4¿⁄ πÃ∏∏
+	EMINVEN_RENAME_FROM_DB_OK	= 5,	//	º∫∞ÅE
+	EMINVEN_RENAME_FROM_DB_FAIL	= 6,	//	Ω«∆–.(¿Ã∏ß ¡ﬂ∫π)
+	EMINVEN_RENAME_FROM_DB_BAD	= 7,	//	Ω«∆–.(¿Ã∏ß ∫“∞°)
+	EMINVEN_RENAME_FB_THAICHAR_ERROR = 8,	// ≈¬±πæÅEπÆ¿⁄ ¡∂«’ ø°∑Ø
+	EMINVEN_RENAME_FB_VNCHAR_ERROR = 9,  // ∫£∆Æ≥≤ πÆ¿⁄ ¡∂«’ ø°∑Ø
+};
+
+enum EMSMS_PHONE_NUMBER_FB
+{
+	EMSMS_PHONE_NUMBER_FB_FAIL		= 0,	//	¿œπ›ø¿∑ÅE
+	EMSMS_PHONE_NUMBER_FB_OK		= 1,	//	º∫∞ÅE
+	EMSMS_PHONE_NUMBER_FROM_DB_OK	= 2,	//	º∫∞ÅE
+	EMSMS_PHONE_NUMBER_FROM_DB_FAIL	= 3,	//	Ω«∆–.(¿Ã∏ß ¡ﬂ∫π)
+};
+
+enum EMSMS_SEND_FB
+{
+	EMSMS_SEND_FB_FAIL		= 0,	//	¿œπ›ø¿∑ÅE
+	EMSMS_SEND_FB_OK		= 1,	//	º∫∞ÅE
+	EMSMS_SEND_FB_NOITEM	= 2,	//	æ∆¿Ã≈€¿Ã æ¯¿Ω.
+	EMSMS_SEND_FB_BADITEM	= 3,	//	ªÁøÅE∫“∞°¥… æ∆¿Ã≈€.
+	EMSMS_SEND_FROM_DB_OK	= 4,	//	º∫∞ÅE
+	EMSMS_SEND_FROM_DB_FAIL	= 5,	//	Ω«∆–.
+};
+
+enum EMMGAME_ODDEVEN
+{
+	EMMGAME_ODDEVEN_OK			= 0,	// πË∆√ »Æ¿Œ
+	EMMGAME_ODDEVEN_CANCEL		= 1,	// √ÅE“
+	EMMGAME_ODDEVEN_SELECT		= 2,	// »¶,¬¶
+	EMMGAME_ODDEVEN_AGAIN_OK	= 3,	// π›∫π »Æ¿Œ
+	EMMGAME_ODDEVEN_SHUFFLE		= 4,
+	EMMGAME_ODDEVEN_FINISH		= 5,
+};
+
+enum EMMGAME_ODDEVEN_FB
+{
+	EMMGAME_ODDEVEN_FB_OK			= 0,	// πË∆√ øœ∑ÅE∞‘¿” Ω√¿€
+	EMMGAME_ODDEVEN_FB_FAIL			= 1,	// ∞‘¿” √ÅE“
+	EMMGAME_ODDEVEN_FB_MONEY_FAIL	= 2,	// º“¿Ø±›æ◊ ∫Œ¡∑
+	EMMGAME_ODDEVEN_FB_MAXBATTING	= 3,	// √÷¥ÅEπË∆√∞°¥… ±›æ◊ √ ∞ÅE
+	EMMGAME_ODDEVEN_FB_MAXROUND		= 4,	// √÷¥ÅEπ›∫π »ΩºÅEµµ¥ﬁ
+	EMMGAME_ODDEVEN_FB_WIN			= 5,	// 
+	EMMGAME_ODDEVEN_FB_LOSE			= 6,	// 
+	EMMGAME_ODDEVEN_FB_AGAIN_OK		= 7,	// π›∫π «„∂ÅE
+	EMMGAME_ODDEVEN_FB_FINISH_OK	= 8,
+};
+
+enum EMMGAME_ODDEVEN_CASE
+{
+	EMMGAME_ODDEVEN_EVEN			= 0,	// ¬¶
+	EMMGAME_ODDEVEN_ODD				= 1,	// »¶
+};
+
+enum EM2FRIEND_FB
+{
+	EM2FRIEND_FB_FAIL				= 0,	//	¿œπ› ø¿∑ÅE
+	EM2FRIEND_FB_OK					= 1,	//	º∫∞ÅE
+	EM2FRIEND_FB_NO_ITEM			= 2,	//	æ∆¿Ã≈€¿Ã æ¯¿Ω.
+	EM2FRIEND_FB_FRIEND_CONDITION	= 3,	//	ƒ£±∏¿« ªÛ≈¬ ¿ÃªÅE
+	EM2FRIEND_FB_MY_CONDITION		= 4,	//	¿⁄Ω≈¿« ªÛ≈¬ ¿ÃªÅE
+	EM2FRIEND_FB_PK_CONDITION		= 5,	//	¿⁄Ω≈¿« ªÛ≈¬ ¿ÃªÅE
+	EM2FRIEND_FB_MAP_CONDITION		= 6,	//	∏  ¡¯¿‘ ¡∂∞«.
+	EM2FRIEND_FB_FRIEND_CHANNEL		= 7,	//	ƒ£±∏øÕ √§≥Œ¿Ã ∆≤∏≤.
+	EM2FRIEND_FB_IMMOVABLE			= 8,	//  ¡¯¿‘∫“∞° ( ¿Ã∫•∆Æ ¡ˆø™ )
+	EM2FRIEND_FB_FRIEND_BLOCK		= 9,	//	ƒ£±∏∞° ≥™∏¶ ¬˜¥‹.
+	EM2FRIEND_FB_FRIEND_OFF			= 10,	//	ƒ£±∏∞° ≥™∏¶ ªË¡¶.
+};
+
+enum EMGM_MOVE2CHAR_FB
+{
+	EMGM_MOVE2CHAR_FB_FAIL				= 0,	//	¿œπ› ø¿∑ÅE
+	EMGM_MOVE2CHAR_FB_OK				= 1,	//	º∫∞ÅE
+	EMGM_MOVE2CHAR_FB_TO_CONDITION		= 2,	//	ªÛ¥ÅE« ªÛ≈¬ ¿ÃªÅE
+	EMGM_MOVE2CHAR_FB_MY_CONDITION		= 3,	//	¿⁄Ω≈¿« ªÛ≈¬ ¿ÃªÅE
+	EMGM_MOVE2CHAR_FB_CHANNEL			= 4,	//	√§≥Œ¿Ã ∆≤∏≤.
+};
+
+enum EMVEHICLE_SET_FB
+{
+
+	EMVEHICLE_SET_FB_FAIL			= 0,	// ¿œπ›ø¿∑ÅE
+	EMVEHICLE_SET_FB_OK				= 1,	// º∫∞ÅE
+	EMVEHICLE_SET_FB_NOTENOUGH_OIL	= 2,	// ±‚∏ßæ¯¿Ω
+	EMVEHICLE_SET_FB_MAP_FAIL		= 3,	// ∫Ò»∞º∫»≠ ∏ 
+	EMVEHICLE_SET_FB_NO_ITEM		= 4,	// ≈ª∞Õ æ∆¿Ã≈€ √£¿ªºÅEæ¯¿Ω
+	EMVEHICLE_SET_FB_RESET			= 5,	// ¿ÃπÃ ≈∏∞≈≥™ ≥ª∑»¿ª∂ß...
+};
+
+enum EMVEHICLE_GET_FB
+{
+	EMVEHICLE_GET_FB_OK			   = 0,		// º∫∞ÅE
+	EMVEHICLE_GET_FB_FAIL		   = 1,		// ¿œπ›¿˚¿Œ ø¿∑ÅE
+	EMVEHICLE_GET_FB_INVALIDITEM   = 2,		// æ∆¿Ã≈€¿Ã ¡§∫∏∞° ¥Ÿ∏ß
+	EMVEHICLE_GET_FB_NOITEM		   = 3,		// æ∆¿Ã≈€¿Ã æ¯¿Ω
+	EMVEHICLE_GET_FB_NODATA		   = 4,		// DBø° ¡§∫∏ æ¯¿Ω
+};
+
+enum EMVEHICLE_REQ_SLOT_EX_HOLD_FB
+{
+	EMVEHICLE_REQ_SLOT_EX_HOLD_FB_FAIL		  = 0,		// ¿œπ›ø¿∑ÅE
+	EMVEHICLE_REQ_SLOT_EX_HOLD_FB_OK		  = 1,		// æ∆¿Ã≈€ ±≥√º º∫∞ÅE
+	EMVEHICLE_REQ_SLOT_EX_HOLD_FB_NOMATCH	  = 2,		// ≈∏¿‘¿Ã ∏¬¡ÅEæ ¥¬ æ∆¿Ã≈€
+	EMVEHICLE_REQ_SLOT_EX_HOLD_FB_INVALIDITEM = 3,		// ≈ª∞ÕøÅEÃ æ∆¥œ¥Ÿ.
+};
+
+
+enum EMVEHICLE_REQ_GIVE_BATTERY_FB
+{
+	EMVEHICLE_REQ_GIVE_BATTERY_FB_OK				= 0,	// º∫∞ÅE
+	EMVEHICLE_REQ_GIVE_BATTERY_FB_FAIL				= 1,	// ¿œπ›ø¿∑ÅE
+	EMVEHICLE_REQ_GIVE_BATTERY_FB_INVALIDBATTERY	= 2,	// πË≈Õ∏Æ æ∆¥‘
+	EMVEHICLE_REQ_GIVE_BATTERY_FB_INVALIDITEM		= 3,	// ≈ª∞Õ æ∆¥‘
+	EMVEHICLE_REQ_GET_BATTERY_FROMDB_OK				= 4,	// µ∫Òø°º≠ ¿˙¿ÅE
+	EMVEHICLE_REQ_GET_BATTERY_FROMDB_FAIL			= 5,	// Ω«∆–
+
+	EMVEHICLE_REQ_GET_COLOR_FROMDB_OK			= 6,	//add bike color
+	EMVEHICLE_REQ_GET_COLOR_FROMDB_FAIL			= 7,	//add bike color
+};
+
+enum EMREQ_ATTEND_FB
+{
+	EMREQ_ATTEND_FB_OK			= 0, // º∫∞ÅE
+	EMREQ_ATTEND_FB_FAIL		= 1, // Ω«∆–
+	EMREQ_ATTEND_FB_ALREADY		= 2, // Ω«∆–( ¿ÃπÃ «ﬂ¿Ω ) 
+	EMREQ_ATTEND_FB_ATTENTIME	= 3, //	¡¢º”Ω√∞£ √º≈©
+};
+
+enum EMREQ_GATHER_FB
+{
+	EMREQ_GATHER_FB_OK			= 0,	//	√§¡˝ø‰√ª º∫∞ÅE
+	EMREQ_GATHER_FB_FAIL		= 1,	//	√§¡˝ø‰√ª Ω«∆–
+	EMREQ_GATHER_FB_DISTANCE	= 2,	//	√§¡˝ ∞≈∏Æ 
+	EMREQ_GATHER_FB_NOTTYPE		= 3,	//	Crow Type
+	EMREQ_GATHER_FB_NOCROW		= 4,	//	Crow æ¯¿Ω
+	EMREQ_GATHER_FB_USE			= 5,	//	¥Ÿ∏•ªÁ∂˜¿Ã ªÁøÅEﬂ
+	EMREQ_GATHER_FB_GATHERING	= 6,	//	¿ÃπÃ √§¡˝¡ﬂ¿”
+};
+
+enum EMREQ_GATHER_RESULT
+{
+	EMREQ_GATHER_RESULT_SUCCESS		= 0,	// √§¡˝ º∫∞ÅE
+	EMREQ_GATHER_RESULT_SUCCESS_EX	= 1,	// º∫∞¯¿Ã≥™ æ∆¿Ã≈€ ∑Á∆√ Ω«∆–
+	EMREQ_GATHER_RESULT_FAIL		= 2,	// √§¡˝ Ω«∆–
+	EMREQ_GATHER_RESULT_ITEMFAIL	= 3,	// æ∆¿Ã≈€ »πµÅEΩ«∆–
+};
+
+namespace GLMSG
+{
+	#pragma pack(1)
+
+	
+	struct SNETPC_REQ_TYRANNY_GETREWARD
+	{
+		NET_MSG_GENERIC		nmg;
+		LONGLONG			lnValue;
+
+		SNETPC_REQ_TYRANNY_GETREWARD ()
+			: lnValue(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_REQ_TYRANNY_GETREWARD;
+		}
+	};
+
+	struct SNETPC_REQ_TYRANNY_GETREWARD_FB 
+	{
+		NET_MSG_GENERIC		nmg;
+		LONGLONG			lnValue;
+
+		SNETPC_REQ_TYRANNY_GETREWARD_FB ()
+			: lnValue(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_REQ_TYRANNY_GETREWARD_FB;
+		}
+	};
+	//--------------------------
+
+	//Update Any money type
+	struct SNETPC_UPDATE_MONEYTYPE
+	{
+		NET_MSG_GENERIC		nmg;
+		LONGLONG			lnGold;
+		LONGLONG			lnPremP;
+		LONGLONG			lnVoteP;
+		LONGLONG			lnContribP; //add contributionpoint by CNDev
+
+		SNETPC_UPDATE_MONEYTYPE () :
+			lnGold(0),
+			lnPremP(0),
+			lnVoteP(0),
+			lnContribP(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_UPDATE_MONEYTYPE;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+	////add charinfoview
+	struct SNET_VIEW_PROPERTIES
+	{
+		NET_MSG_GENERIC		nmg;
+
+		DWORD				dwTargetID;
+
+		SNET_VIEW_PROPERTIES () :
+		dwTargetID(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_VIEW_PROPERTIES;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	struct SNET_VIEW_PROPERTIES_TAR
+	{
+		NET_MSG_GENERIC		nmg;
+
+		DWORD				dwMasterID;
+
+		SNET_VIEW_PROPERTIES_TAR () :
+		dwMasterID(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_TRADE_TAR;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	struct SNET_VIEW_PROPERTIES_FB
+	{
+		NET_MSG_GENERIC		nmg;
+		DWORD				dwMasterID;
+		DWORD				dwTargetID;
+		SDROP_CHAR			Data;
+		int					nSlot;
+		SITEMCUSTOM			PutOnItem;
+		DWORD               Viewpropertise;
+		char			szName[CHAR_SZNAME];
+		DWORD           WeizhiTo;
+
+
+		SNET_VIEW_PROPERTIES_FB () 
+			: dwMasterID(0)
+			, Viewpropertise(0)
+			, dwTargetID(0)
+			, nSlot(0)
+
+			//, dwMasterID(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_VIEW_PROPERTIES_FB;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+
+			memset(szName, 0, sizeof(char) * CHAR_SZNAME);
+
+		}
+
+	};
+
+	struct SNET_VIEWCHARITEM_SLOT_TAR
+	{
+		NET_MSG_GENERIC		nmg;
+
+		int					nSlot;
+		SITEMCUSTOM			PutOnItem;
+
+		SNET_VIEWCHARITEM_SLOT_TAR ()
+			: nSlot ( 0 )
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_VIEWCHAROTEM_SLOT_TAR;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+
+	//---------------------------------------------------------------------------NET
+	struct SNETPC_GOTO
+	{
+		NET_MSG_GENERIC		nmg;
+
+		DWORD				dwActState;
+		D3DXVECTOR3			vCurPos;
+		D3DXVECTOR3			vTarPos;
+
+		SNETPC_GOTO () :
+			dwActState(NULL),
+			vCurPos(0,0,0),
+			vTarPos(0,0,0)
+		{
+			nmg.dwSize = (DWORD) sizeof(SNETPC_GOTO);
+			nmg.nType = NET_MSG_GCTRL_GOTO;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	//---------------------------------------------------------------------------NET
+	struct SNETPC_GOTO_BRD : public SNETPC_BROAD
+	{
+		DWORD				dwActState;
+		D3DXVECTOR3			vCurPos;
+		D3DXVECTOR3			vTarPos;
+
+		float				fDelay;
+
+		SNETPC_GOTO_BRD () :
+			dwActState(NULL),
+			vCurPos(0,0,0),
+			vTarPos(0,0,0),
+
+			fDelay(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_GOTO_BRD;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+
+	//---------------------------------------------------------------------------NET
+	struct SNETPC_ACTSTATE
+	{
+		NET_MSG_GENERIC		nmg;
+
+		DWORD				dwActState;
+
+		SNETPC_ACTSTATE () :
+			dwActState(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_ACTSTATE;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	//---------------------------------------------------------------------------NET
+	struct SNETPC_MOVESTATE
+	{
+		NET_MSG_GENERIC		nmg;
+
+		DWORD				dwActState;
+
+		SNETPC_MOVESTATE () :
+			dwActState(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_MOVESTATE;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	//---------------------------------------------------------------------------NET
+
+	struct SNETPC_MOVESTATE_BRD : public SNETPC_BROAD
+	{
+		DWORD				dwActState;
+
+		SNETPC_MOVESTATE_BRD () :
+			dwActState(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_MOVESTATE_BRD;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	struct SNETPC_UPDATE_FLAGS_BRD : public SNETPC_BROAD
+	{
+		DWORD				dwFLAGS;
+
+		SNETPC_UPDATE_FLAGS_BRD () :
+			dwFLAGS(NULL)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_UPDATE_FLAGS;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	struct SNETPC_JUMP_POS_BRD : public SNETPC_BROAD
+	{
+		D3DXVECTOR3			vPOS;
+
+		SNETPC_JUMP_POS_BRD () :
+			vPOS(0,0,0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_JUMP_POS_BRD;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	//---------------------------------------------------------------------------NET
+	struct SNETPC_ATTACK
+	{
+		NET_MSG_GENERIC		nmg;
+
+		EMCROW				emTarCrow;
+		DWORD				dwTarID;
+		DWORD				dwAniSel;
+		DWORD				dwFlags;
+
+		SNETPC_ATTACK () :
+			emTarCrow(CROW_MOB),
+			dwTarID(0),
+			dwAniSel(0),
+			dwFlags(NULL)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_ATTACK;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	//---------------------------------------------------------------------------NET
+	struct SNETPC_ATTACK_BRD : public SNETPC_BROAD
+	{
+		EMCROW				emTarCrow;
+		DWORD				dwTarID;
+		DWORD				dwAniSel;
+
+		SNETPC_ATTACK_BRD () :
+			emTarCrow(CROW_MOB),
+			dwTarID(0),
+			dwAniSel(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_ATTACK_BRD;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	//---------------------------------------------------------------------------NET
+	struct SNETPC_ATTACK_CANCEL
+	{
+		NET_MSG_GENERIC		nmg;
+
+		SNETPC_ATTACK_CANCEL ()
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_ATTACK_CANCEL;
+		}
+	};
+
+	//---------------------------------------------------------------------------NET
+	struct SNETPC_ATTACK_CANCEL_BRD : public SNETPC_BROAD
+	{
+		SNETPC_ATTACK_CANCEL_BRD ()
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_ATTACK_CANCEL_BRD;
+		}
+	};
+
+	//---------------------------------------------------------------------------NET
+	struct SNETPC_ATTACK_AVOID
+	{
+		NET_MSG_GENERIC		nmg;
+
+		EMCROW				emTarCrow;
+		DWORD				dwTarID;
+
+		SNETPC_ATTACK_AVOID () :
+			emTarCrow(CROW_MOB),
+			dwTarID(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_ATTACK_AVOID;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	//---------------------------------------------------------------------------NET
+	struct SNETPC_ATTACK_AVOID_BRD : public SNETPC_BROAD
+	{
+		EMCROW				emTarCrow;
+		DWORD				dwTarID;
+
+		SNETPC_ATTACK_AVOID_BRD () :
+			emTarCrow(CROW_MOB),
+			dwTarID(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_ATTACK_AVOID_BRD;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	//---------------------------------------------------------------------------NET
+	struct SNETPC_ATTACK_DAMAGE
+	{
+		NET_MSG_GENERIC		nmg;
+
+		EMCROW				emTarCrow;
+		DWORD				dwTarID;
+		int					nDamage;
+		DWORD				dwDamageFlag;
+
+		SNETPC_ATTACK_DAMAGE () :
+			emTarCrow(CROW_MOB),
+			dwTarID(0),
+			nDamage(0),
+			dwDamageFlag( DAMAGE_TYPE_NONE )
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_ATTACK_DAMAGE;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	struct SNETPC_DEFENSE_SKILL_ACTIVE
+	{
+		NET_MSG_GENERIC		nmg;
+
+		EMCROW				emTarCrow;
+		DWORD				dwTarID;
+		SNATIVEID			sNativeID;
+		WORD				wLevel;
+
+		SNETPC_DEFENSE_SKILL_ACTIVE () :
+			emTarCrow(CROW_MOB),
+			dwTarID(0),
+			sNativeID(NATIVEID_NULL()),
+			wLevel(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_DEFENSE_SKILL_ACTIVE;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+	
+
+	//---------------------------------------------------------------------------NET
+	struct SNETPC_ATTACK_DAMAGE_BRD : public SNETPC_BROAD
+	{
+		EMCROW				emTarCrow;
+		DWORD				dwTarID;
+		int					nDamage;
+		DWORD			dwDamageFlag;
+
+		SNETPC_ATTACK_DAMAGE_BRD () :
+			emTarCrow(CROW_MOB),
+			dwTarID(0),
+			nDamage(0),
+			dwDamageFlag(DAMAGE_TYPE_NONE)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_ATTACK_DAMAGE_BRD;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	struct SNET_POSITIONCHK_BRD : public SNETCROW_BROAD
+	{
+		D3DXVECTOR3 vPOS;
+
+		SNET_POSITIONCHK_BRD () :
+			vPOS(0,0,0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_POSITIONCHK_BRD;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	//---------------------------------------------------------------------------NET
+	struct SNET_ACTION_BRD : public SNETCROW_BROAD
+	{
+		EMACTIONTYPE		emAction;
+		DWORD				dwFLAG;
+
+		SNET_ACTION_BRD () :
+			emAction(GLAT_IDLE),
+			dwFLAG(NULL)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_ACTION_BRD;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	//---------------------------------------------------------------------------NET
+	struct SNETPC_UPDATE_STATE
+	{
+		NET_MSG_GENERIC		nmg;
+		
+		GLPADATA			sHP;
+		GLPADATA			sMP;
+		GLPADATA			sSP;
+		GLPADATA			sCP;  //add cp
+
+		void ENCODE ( DWORD dwKEY );
+		void DECODE ( DWORD dwKEY );
+
+		SNETPC_UPDATE_STATE ()
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_UPDATE_STATE;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	//---------------------------------------------------------------------------NET
+	struct SNETPC_UPDATE_STATE_BRD : public SNETPC_BROAD
+	{
+		GLPADATA			sHP;
+
+		SNETPC_UPDATE_STATE_BRD ()
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_UPDATE_STATE_BRD;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	struct SNETPC_UPDATE_PASSIVE_BRD : public SNETPC_BROAD
+	{
+		SPASSIVE_SKILL_DATA	sSKILL_DATA;
+
+		SNETPC_UPDATE_PASSIVE_BRD ()
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_UPDATE_PASSIVE_BRD;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	//---------------------------------------------------------------------------NET
+	struct SNETPC_UPDATE_EXP
+	{
+		NET_MSG_GENERIC		nmg;
+		LONGLONG			lnNowExp;
+
+		SNETPC_UPDATE_EXP() :
+			lnNowExp(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_UPDATE_EXP;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	//---------------------------------------------------------------------------NET
+	struct SNETPC_UPDATE_MONEY
+	{
+		NET_MSG_GENERIC		nmg;
+		LONGLONG			lnMoney;
+		//add money 2
+		LONGLONG			lnVoteP;
+		//add money 3
+		LONGLONG			lnPremP;
+		//add contributionpoints by CNDev
+		LONGLONG			lnContribP;
+
+		SNETPC_UPDATE_MONEY () :
+			lnMoney(0),
+			//add money 2
+			lnVoteP(0),
+			//add money 3
+			lnPremP(0),
+			//add contributionpoints by CNDev
+			lnContribP(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_UPDATE_MONEY;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	//---------------------------------------------------------------------------NET
+	struct SNETPC_UPDATE_SP
+	{
+		NET_MSG_GENERIC		nmg;
+		DWORD				wNowSP;
+
+		SNETPC_UPDATE_SP () :
+			wNowSP(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_UPDATE_SP;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	//---------------------------------------------------------------------------NET
+	struct SNETPC_UPDATE_LP
+	{
+		NET_MSG_GENERIC		nmg;
+		int					nLP;
+
+		SNETPC_UPDATE_LP () :
+			nLP(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_UPDATE_LP;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	//add pk
+	struct SNETPC_UPDATE_PKWIN
+	{
+		NET_MSG_GENERIC		nmg;
+		DWORD				dwPkWin;
+		char				szName[CHAR_SZNAME];
+
+		SNETPC_UPDATE_PKWIN () :
+			dwPkWin(0)
+		{
+			memset (szName, 0, sizeof(char) * CHAR_SZNAME);
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_UPDATE_PKWIN;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	struct SNETPC_UPDATE_PKLOSS
+	{
+		NET_MSG_GENERIC		nmg;
+		DWORD				dwPkLoss;
+		char				szName[CHAR_SZNAME];
+
+		SNETPC_UPDATE_PKLOSS () :
+			dwPkLoss(0)
+		{
+			memset (szName, 0, sizeof(char) * CHAR_SZNAME);
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_UPDATE_PKLOSS;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	struct SNETPC_UPDATE_CP //add cp
+	{
+		NET_MSG_GENERIC		nmg;
+		DWORD			dwRCLvl;
+		WORD			wRCNum;
+
+		SNETPC_UPDATE_CP() :
+			dwRCLvl(0)
+			,wRCNum(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_UPDATE_CP;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	struct SNETPC_UPDATE_PKWIN_BRD : public SNETPC_BROAD //add pk
+	{
+		SNETPC_UPDATE_PKWIN_BRD ()
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_UPDATE_PKWIN_BRD;
+		}
+	};
+
+	struct SNETPC_UPDATE_PKLOSS_BRD : public SNETPC_BROAD //add pk
+	{
+		SNETPC_UPDATE_PKLOSS_BRD ()
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_UPDATE_PKLOSS_BRD;
+		}
+	};
+
+	struct SNETPC_UPDATE_PKSTREAK_BRD : public SNETPC_BROAD //add pk streak
+	{
+		SNETPC_UPDATE_PKSTREAK_BRD ()
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_UPDATE_PKSTREAK_BRD;
+		}
+	};
+
+	/*struct SNETPC_UPDATE_DUELWIN //add duel bet
+	{
+		NET_MSG_GENERIC		nmg;
+		LONGLONG			llWin;
+		DWORD				wType;
+
+		SNETPC_UPDATE_DUELWIN () :
+			llWin(0)
+			,wType(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_UPDATE_DUELWIN;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	struct SNETPC_UPDATE_DUELLOSS //add duel bet
+	{
+		NET_MSG_GENERIC		nmg;
+		LONGLONG			llLoss;
+		DWORD				wType;
+
+		SNETPC_UPDATE_DUELLOSS () :
+			llLoss(0)
+			,wType(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_UPDATE_DUELLOSS;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};*/
+
+
+	//---------------------------------------------------------------------------NET
+	struct SNETPC_UPDATE_SKP
+	{
+		NET_MSG_GENERIC		nmg;
+		DWORD				dwSkillPoint;
+
+		SNETPC_UPDATE_SKP () :
+			dwSkillPoint(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_UPDATE_SKP;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	//---------------------------------------------------------------------------NET
+	struct SNETPC_UPDATE_BRIGHT
+	{
+		NET_MSG_GENERIC		nmg;
+		int					nBright;
+
+		SNETPC_UPDATE_BRIGHT () :
+			nBright(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_UPDATE_BRIGHT;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	//---------------------------------------------------------------------------NET
+	struct SNETPC_UPDATE_BRIGHT_BRD : public SNETPC_BROAD
+	{
+		int					nBright;
+
+		SNETPC_UPDATE_BRIGHT_BRD () :
+			nBright(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_UPDATE_BRIGHT_BRD;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	//---------------------------------------------------------------------------NET
+	struct SNETPC_UPDATE_STATS
+	{
+		NET_MSG_GENERIC		nmg;
+		DWORD				wStatsPoint;
+
+		SNETPC_UPDATE_STATS () :
+			wStatsPoint(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_UPDATE_STATS;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	//---------------------------------------------------------------------------NET
+	struct SNET_PUSHPULL_BRD : public SNETCROW_BROAD
+	{
+		D3DXVECTOR3			vMovePos;
+		BOOL				bTeleport; //add teleport
+		float				fSpeed;
+
+		SNET_PUSHPULL_BRD () :
+			vMovePos(0,0,0),
+			bTeleport(false),
+			fSpeed(0.0f)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_PUSHPULL_BRD;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	//---------------------------------------------------------------------------NET
+
+	struct SNETPC_REQ_LEVELUP
+	{
+		NET_MSG_GENERIC		nmg;
+
+		SNETPC_REQ_LEVELUP ()
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_REQ_LEVELUP;
+		}
+	};
+	//---------------------------------------------------------------------------NET
+	struct SNETPC_REQ_LEVELUP_FB
+	{
+		NET_MSG_GENERIC		nmg;
+		WORD				wLevel;
+		DWORD				wStatsPoint;
+		DWORD				dwSkillPoint;
+		bool				bInitNowLevel;
+		SNATIVEID			sMapID;
+
+		SNETPC_REQ_LEVELUP_FB () :
+			wLevel(0),
+			wStatsPoint(0),
+			dwSkillPoint(0),
+			bInitNowLevel(TRUE),
+			sMapID(NATIVEID_NULL())
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_REQ_LEVELUP_FB;
+		}
+	};
+
+	struct SNETPC_REQ_LEVELUP_BRD : public SNETPC_BROAD
+	{
+		SNETPC_REQ_LEVELUP_BRD ()
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_REQ_LEVELUP_BRD;
+		}
+	};
+
+	struct SNETPC_REQ_STATSUP
+	{
+		NET_MSG_GENERIC		nmg;
+		//EMSTATS				emStats;
+		SCHARSTATS			sStats;
+
+		SNETPC_REQ_STATSUP ()/* :*/
+			//emStats(EMPOW)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_REQ_STATSUP;
+		}
+	};
+
+	struct SNETPC_REQ_STATSUPCMD
+	{
+		NET_MSG_GENERIC		nmg;
+		EMSTATS				emStats;
+		DWORD				dwValue;
+
+		SNETPC_REQ_STATSUPCMD () :
+			emStats(EMPOW),
+			dwValue(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_REQ_STATSUPCMD;
+		}
+	};
+
+	struct SNETPC_REQ_STATSUP_FB
+	{
+		NET_MSG_GENERIC		nmg;
+
+		//EMSTATS				emStats;
+		SCHARSTATS			sStats;
+		DWORD				wStatsPoint;
+
+		SNETPC_REQ_STATSUP_FB () :
+			/*emStats(EMPOW),*/
+			wStatsPoint(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_REQ_STATSUP_FB;
+		}
+	};
+
+	struct SNETPC_REQ_STATSUPCMD_FB
+	{
+		NET_MSG_GENERIC		nmg;
+
+		EMSTATS				emStats;
+		DWORD				wStatsPoint;
+		DWORD				dwValue;
+
+		SNETPC_REQ_STATSUPCMD_FB () :
+			emStats(EMPOW),
+			wStatsPoint(0),
+			dwValue(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_REQ_STATSUPCMD_FB;
+		}
+	};
+
+	/*struct SNETPC_REQ_ALLOW_BET // add duel bet
+	{
+		NET_MSG_GENERIC		nmg;
+		BOOL				bAllowBet;
+
+		SNETPC_REQ_ALLOW_BET () :
+			bAllowBet(FALSE)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_REQ_ALLOW_BET;
+		}
+	};
+
+	struct SNETPC_REQ_ALLOW_BET_FB // add duel bet
+	{
+		NET_MSG_GENERIC		nmg;
+		BOOL				bAllowBet;
+
+		SNETPC_REQ_ALLOW_BET_FB () :
+			bAllowBet(FALSE)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_REQ_ALLOW_BET_FB;
+		}
+	};*/
+
+	struct SNETPC_REQ_BUS
+	{
+		NET_MSG_GENERIC		nmg;
+
+		WORD				wPosX;
+		WORD				wPosY;
+
+		DWORD				dwNPC_ID;
+		DWORD				dwSTATION_ID;
+
+		SNETPC_REQ_BUS () :
+			wPosX(0),
+			wPosY(0),
+			dwNPC_ID(0),
+			dwSTATION_ID(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_REQ_BUS;
+		}
+	};
+
+	struct SNETPC_REQ_BUS_FB
+	{
+		NET_MSG_GENERIC		nmg;
+
+		EMBUS_TAKE			emFB;
+
+		SNETPC_REQ_BUS_FB () :
+			emFB(EMBUS_TAKE_OK)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_REQ_BUS_FB;
+		}
+	};
+
+	struct SNETPC_REQ_TAXI
+	{
+		NET_MSG_GENERIC		nmg;
+
+		WORD				wPosX;
+		WORD				wPosY;
+
+		DWORD				dwSelectMap;
+		DWORD				dwSelectStop;
+		DWORD				dwGaeaID;
+		D3DXVECTOR3			vPos;		
+
+		SNETPC_REQ_TAXI () :
+			wPosX(0),
+			wPosY(0),
+			dwSelectMap(0),
+			dwSelectStop(0),
+			dwGaeaID(0),
+			vPos(0,0,0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_REQ_TAXI;
+		}
+	};
+
+	struct SNETPC_REQ_TAXI_NPCPOS
+	{
+		NET_MSG_GENERIC		nmg;
+
+		WORD				wPosX;
+		WORD				wPosY;
+
+		DWORD				dwSelectMap;
+		DWORD				dwSelectStop;
+		DWORD				dwGaeaID;
+		D3DXVECTOR3			vPos;		
+
+		SNETPC_REQ_TAXI_NPCPOS () :
+			wPosX(0),
+			wPosY(0),
+			dwSelectMap(0),
+			dwSelectStop(0),
+			dwGaeaID(0),
+			vPos(0,0,0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_REQ_TAXI_NPCPOS;
+		}
+	};
+
+	struct SNETPC_REQ_TAXI_NPCPOS_FB
+	{
+		NET_MSG_GENERIC		nmg;
+
+		WORD				wPosX;
+		WORD				wPosY;
+
+		DWORD				dwSelectMap;
+		DWORD				dwSelectStop;
+		DWORD				dwGaeaID;
+		D3DXVECTOR3			vPos;		
+
+		SNETPC_REQ_TAXI_NPCPOS_FB () :
+			wPosX(0),
+			wPosY(0),
+			dwSelectMap(0),
+			dwSelectStop(0),
+			dwGaeaID(0),
+			vPos(0,0,0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_REQ_TAXI_NPCPOS_FB;
+		}
+	};
+
+	struct SNETPC_REQ_TAXI_FB
+	{
+		NET_MSG_GENERIC		nmg;
+
+		EMTAXI_TAKE			emFB;
+
+		SNETPC_REQ_TAXI_FB () :
+			emFB(EMTAXI_TAKE_FAIL)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_REQ_TAXI_FB;
+		}
+	};
+
+	struct SNETPC_STORAGE_STATE
+	{
+		NET_MSG_GENERIC		nmg;
+		bool				bVALID[EMSTORAGE_CHANNEL_SPAN_SIZE];
+
+		SNETPC_STORAGE_STATE ()
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_STORAGE_STATE;
+
+			for ( int i=0; i<EMSTORAGE_CHANNEL_SPAN_SIZE; ++i  )
+				bVALID[i] = false;
+		}
+	};
+
+	struct SNETPC_PREMIUM_STATE
+	{
+		NET_MSG_GENERIC		nmg;
+		bool				bPREMIUM;
+
+		SNETPC_PREMIUM_STATE () :
+			bPREMIUM(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_PREMIUM_STATE;
+		}
+	};
+
+	struct SNETPC_REQ_FIRECRACKER
+	{
+		NET_MSG_GENERIC		nmg;
+		D3DXVECTOR3			vPOS;
+
+		SNETPC_REQ_FIRECRACKER () :
+			vPOS(0,0,0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_FIRECRACKER;
+		}
+	};
+	
+	struct SNETPC_REQ_FIRECRACKER_FB
+	{
+		NET_MSG_GENERIC			nmg;
+		EMREQ_FIRECRACKER_FB	emFB;
+
+		SNETPC_REQ_FIRECRACKER_FB () :
+			emFB(EMREQ_FIRECRACKER_FB_FAIL)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_FIRECRACKER_FB;
+		}
+	};
+
+	struct SNETPC_REQ_FIRECRACKER_BRD
+	{
+		NET_MSG_GENERIC			nmg;
+
+		D3DXVECTOR3				vPOS;
+		SNATIVEID				nidITEM;
+
+		SNETPC_REQ_FIRECRACKER_BRD () :
+			vPOS(0,0,0),
+			nidITEM(false)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_FIRECRACKER_BRD;
+		}
+	};
+
+	struct SNETPC_REQ_REVIVE
+	{
+		NET_MSG_GENERIC			nmg;
+		
+		SNETPC_REQ_REVIVE ()
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_REVIVE;
+		}
+	};
+
+	struct SNETPC_REQ_REVIVE_FB
+	{
+		NET_MSG_GENERIC			nmg;
+
+		EMREQ_REVIVE_FB			emFB;
+		
+		SNETPC_REQ_REVIVE_FB () :
+			emFB(EMREQ_REVIVE_FB_FAIL)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_REVIVE_FB;
+		}
+	};
+
+
+	struct SNETPC_REQ_GETEXP_RECOVERY
+	{
+		NET_MSG_GENERIC			nmg;
+
+		SNETPC_REQ_GETEXP_RECOVERY ()
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_GETEXP_RECOVERY;
+		}
+	};
+
+	struct SNETPC_REQ_GETEXP_RECOVERY_FB
+	{
+		NET_MSG_GENERIC			nmg;
+
+		LONGLONG				nDecExp;
+		LONGLONG				nReExp;
+		LONGLONG				nDecMoney;
+
+		SNETPC_REQ_GETEXP_RECOVERY_FB ()
+			: nDecExp ( 0 )
+			, nReExp ( 0 )
+			, nDecMoney ( 0 ) 
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_GETEXP_RECOVERY_FB;
+		}
+	};
+
+	struct SNETPC_REQ_GETEXP_RECOVERY_NPC
+	{
+		NET_MSG_GENERIC			nmg;
+		DWORD					dwNPCID;
+
+		SNETPC_REQ_GETEXP_RECOVERY_NPC ()
+			: dwNPCID( 0 )
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_GETEXP_RECOVERY_NPC;
+		}
+	};
+
+	struct SNETPC_REQ_GETEXP_RECOVERY_NPC_FB
+	{
+		NET_MSG_GENERIC			nmg;
+
+		LONGLONG				nReExp;
+		LONGLONG				nDecMoney;
+		DWORD					dwNPCID;
+
+		SNETPC_REQ_GETEXP_RECOVERY_NPC_FB ()
+			: nReExp ( 0 )
+			, nDecMoney ( 0 ) 
+			, dwNPCID( 0 )
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_GETEXP_RECOVERY_NPC_FB;
+		}
+	};
+
+	struct SNETPC_REQ_RECOVERY
+	{
+		NET_MSG_GENERIC			nmg;
+
+		SNETPC_REQ_RECOVERY ()
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_RECOVERY;
+		}
+	};
+
+	struct SNETPC_REQ_RECOVERY_FB
+	{
+		NET_MSG_GENERIC			nmg;
+
+		EMREQ_RECOVERY_FB		emFB;
+		LONGLONG				nReExp;
+		
+
+		SNETPC_REQ_RECOVERY_FB ()
+			: emFB(EMREQ_RECOVERY_FB_FAIL)
+			, nReExp( 0 )		
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_RECOVERY_FB;
+		}
+	};
+
+	struct SNETPC_REQ_RECOVERY_NPC
+	{
+		NET_MSG_GENERIC			nmg;
+		DWORD					dwNPCID;
+
+		SNETPC_REQ_RECOVERY_NPC ()
+			: dwNPCID ( 0 )
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_RECOVERY_NPC;
+		}
+	};
+
+	struct SNETPC_REQ_RECOVERY_NPC_FB
+	{
+		NET_MSG_GENERIC			nmg;
+
+		EMREQ_RECOVERY_NPC_FB	emFB;
+		LONGLONG				nReExp;
+
+		SNETPC_REQ_RECOVERY_NPC_FB ()
+			: emFB(EMREQ_RECOVERY_NPC_FB_FAIL)
+			, nReExp( 0 )
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_RECOVERY_NPC_FB;
+		}
+	};
+
+	struct SNETPC_PLAYERKILLING_ADD
+	{
+		NET_MSG_GENERIC			nmg;
+		
+		DWORD					dwCharID;
+		WORD					wSchoolID;
+		BOOL					bBAD;
+		BOOL					bClubBattle;
+		float					fTime;
+
+		char					szName[CHAR_SZNAME];
+
+		SNETPC_PLAYERKILLING_ADD () 
+			: dwCharID(0)
+			, wSchoolID(0)
+			, bBAD(FALSE)
+			, fTime(0)
+			, bClubBattle(0)
+		{
+			nmg.dwSize = (DWORD) sizeof(SNETPC_PLAYERKILLING_ADD);
+			nmg.nType = NET_MSG_GCTRL_PLAYERKILLING_ADD;
+			memset (szName, 0, sizeof(char) * CHAR_SZNAME);
+		}
+	};
+
+	struct SNETPC_PLAYERKILLING_DEL
+	{
+		NET_MSG_GENERIC			nmg;
+
+		DWORD					dwCharID;
+
+		SNETPC_PLAYERKILLING_DEL () 
+			: dwCharID(0)
+		{
+			nmg.dwSize = (DWORD) sizeof(SNETPC_PLAYERKILLING_DEL);
+			nmg.nType = NET_MSG_GCTRL_PLAYERKILLING_DEL;
+		}
+	};
+
+	struct SNETPC_INVEN_HAIR_CHANGE
+	{
+		NET_MSG_GENERIC			nmg;
+		
+		WORD					wPosX;
+		WORD					wPosY;
+
+		SNETPC_INVEN_HAIR_CHANGE () 
+			: wPosX(0)
+			, wPosY(0)
+		{
+			nmg.dwSize = (DWORD) sizeof(SNETPC_INVEN_HAIR_CHANGE);
+			nmg.nType = NET_MSG_GCTRL_INVEN_HAIR_CHANGE;
+		}
+	};
+
+	struct SNETPC_INVEN_HAIR_CHANGE_FB
+	{
+		NET_MSG_GENERIC			nmg;
+		
+		EMINVEN_HAIR_CHANGE_FB	emFB;
+		DWORD					dwID;
+
+		SNETPC_INVEN_HAIR_CHANGE_FB () :
+			emFB(EMINVEN_HAIR_CHANGE_FB_FAIL),
+			dwID(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_INVEN_HAIR_CHANGE_FB;
+		}
+	};
+
+	struct SNETPC_INVEN_HAIR_CHANGE_BRD : public SNETPC_BROAD
+	{
+		DWORD					dwID;
+
+		SNETPC_INVEN_HAIR_CHANGE_BRD () :
+			dwID(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_INVEN_HAIR_CHANGE_BRD;
+		}
+	};
+
+	struct SNETPC_INVEN_HAIRSTYLE_CHANGE
+	{
+		NET_MSG_GENERIC			nmg;
+		
+		WORD					wPosX;
+		WORD					wPosY;
+		WORD					wHairStyle;
+
+		SNETPC_INVEN_HAIRSTYLE_CHANGE () 
+			: wPosX(0)
+			, wPosY(0)
+			, wHairStyle(0)
+		{
+			nmg.dwSize = (DWORD) sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_INVEN_HAIRSTYLE_CHANGE;
+		}
+	};
+
+	struct SNETPC_INVEN_HAIRSTYLE_CHANGE_FB
+	{
+		NET_MSG_GENERIC			nmg;
+		
+		EMINVEN_HAIR_CHANGE_FB	emFB;
+		DWORD					dwID;
+
+		SNETPC_INVEN_HAIRSTYLE_CHANGE_FB () :
+			emFB(EMINVEN_HAIR_CHANGE_FB_FAIL),
+			dwID(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_INVEN_HAIRSTYLE_CHANGE_FB;
+		}
+	};
+
+	struct SNETPC_INVEN_HAIRSTYLE_CHANGE_BRD : public SNETPC_BROAD
+	{
+		DWORD					dwID;
+
+		SNETPC_INVEN_HAIRSTYLE_CHANGE_BRD () :
+			dwID(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_INVEN_HAIRSTYLE_CHANGE_BRD;
+		}
+	};
+
+	struct SNETPC_INVEN_HAIRCOLOR_CHANGE
+	{
+		NET_MSG_GENERIC			nmg;
+		
+		WORD					wPosX;
+		WORD					wPosY;
+		WORD					wHairColor;
+
+		SNETPC_INVEN_HAIRCOLOR_CHANGE () 
+			: wPosX(0)
+			, wPosY(0)
+			, wHairColor(0)
+		{
+			nmg.dwSize = (DWORD) sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_INVEN_HAIRCOLOR_CHANGE;
+		}
+	};
+
+	struct SNETPC_INVEN_BIKECOLOR_CHANGE //add bike color
+	{
+		NET_MSG_GENERIC			nmg;
+		
+		WORD					wPosX;
+		WORD					wPosY;
+		WORD					wBikeColor;
+
+		SNETPC_INVEN_BIKECOLOR_CHANGE () 
+			: wPosX(0)
+			, wPosY(0)
+			, wBikeColor(0)
+		{
+			nmg.dwSize = (DWORD) sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_INVEN_BIKECOLOR_CHANGE;
+		}
+	};
+
+	struct SNETPC_INVEN_BIKECOLOR_CHANGE_FB //add bike color
+	{
+		NET_MSG_GENERIC			nmg;
+		
+		EMINVEN_BIKE_CHANGE_FB	emFB;
+		WORD					wBikeColor;
+
+		SNETPC_INVEN_BIKECOLOR_CHANGE_FB () :
+			emFB(EMINVEN_BIKE_CHANGE_FB_FAIL),
+			wBikeColor(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_INVEN_BIKECOLOR_CHANGE_FB;
+		}
+	};
+
+	struct SNETPC_INVEN_BIKECOLOR_CHANGE_BRD : public SNETPC_BROAD //add bike color
+	{
+		WORD					wBikeColor;
+
+		SNETPC_INVEN_BIKECOLOR_CHANGE_BRD () :
+			wBikeColor(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_INVEN_BIKECOLOR_CHANGE_BRD;
+		}
+	};
+
+	struct SNETPC_INVEN_HAIRCOLOR_CHANGE_FB
+	{
+		NET_MSG_GENERIC			nmg;
+		
+		EMINVEN_HAIR_CHANGE_FB	emFB;
+		WORD					wHairColor;
+
+		SNETPC_INVEN_HAIRCOLOR_CHANGE_FB () :
+			emFB(EMINVEN_HAIR_CHANGE_FB_FAIL),
+			wHairColor(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_INVEN_HAIRCOLOR_CHANGE_FB;
+		}
+	};
+
+	struct SNETPC_INVEN_HAIRCOLOR_CHANGE_BRD : public SNETPC_BROAD
+	{
+		WORD					wHairColor;
+
+		SNETPC_INVEN_HAIRCOLOR_CHANGE_BRD () :
+			wHairColor(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_INVEN_HAIRCOLOR_CHANGE_BRD;
+		}
+	};
+
+	struct SNETPC_INVEN_FACE_CHANGE
+	{
+		NET_MSG_GENERIC			nmg;
+		
+		WORD					wPosX;
+		WORD					wPosY;
+
+		SNETPC_INVEN_FACE_CHANGE () :
+			wPosX(0),
+			wPosY(0)			
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_INVEN_FACE_CHANGE;
+		}
+	};
+
+	struct SNETPC_INVEN_FACE_CHANGE_FB
+	{
+		NET_MSG_GENERIC			nmg;
+		
+		EMINVEN_FACE_CHANGE_FB	emFB;
+		DWORD					dwID;
+
+		SNETPC_INVEN_FACE_CHANGE_FB () :
+			emFB(EMINVEN_FACE_CHANGE_FB_FAIL),
+			dwID(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_INVEN_FACE_CHANGE_FB;
+		}
+	};
+
+	struct SNETPC_INVEN_FACE_CHANGE_BRD : public SNETPC_BROAD
+	{
+		DWORD					dwID;
+
+		SNETPC_INVEN_FACE_CHANGE_BRD () :
+			dwID(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_INVEN_FACE_CHANGE_BRD;
+		}
+	};
+
+	struct SNETPC_INVEN_FACESTYLE_CHANGE
+	{
+		NET_MSG_GENERIC			nmg;
+		
+		WORD					wPosX;
+		WORD					wPosY;
+		WORD					wFaceStyle;
+
+		SNETPC_INVEN_FACESTYLE_CHANGE () 
+			: wPosX(0)
+			, wPosY(0)
+			, wFaceStyle(0)
+		{
+			nmg.dwSize = (DWORD) sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_INVEN_FACESTYLE_CHANGE;
+		}
+	};
+
+	struct SNETPC_INVEN_FACESTYLE_CHANGE_FB
+	{
+		NET_MSG_GENERIC			nmg;
+		
+		EMINVEN_HAIR_CHANGE_FB	emFB;
+		DWORD					dwID;
+
+		SNETPC_INVEN_FACESTYLE_CHANGE_FB () :
+			emFB(EMINVEN_HAIR_CHANGE_FB_FAIL),
+			dwID(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_INVEN_FACESTYLE_CHANGE_FB;
+		}
+	};
+
+	struct SNETPC_INVEN_FACESTYLE_CHANGE_BRD : public SNETPC_BROAD
+	{
+		DWORD					dwID;
+
+		SNETPC_INVEN_FACESTYLE_CHANGE_BRD () :
+			dwID(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_INVEN_FACESTYLE_CHANGE_BRD;
+		}
+	};
+
+	struct SNETPC_INVEN_GENDER_CHANGE
+	{
+		NET_MSG_GENERIC			nmg;
+		
+		WORD					wPosX;
+		WORD					wPosY;
+		WORD					wFace;
+		WORD					wHair;
+
+		SNETPC_INVEN_GENDER_CHANGE () 
+			: wPosX(0)
+			, wPosY(0)
+			, wFace(0)
+			, wHair(0)
+		{
+			nmg.dwSize = (DWORD) sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_INVEN_GENDER_CHANGE;
+		}
+	};
+
+	struct SNETPC_INVEN_GENDER_CHANGE_FB
+	{
+		NET_MSG_GENERIC			nmg;
+		
+		EMINVEN_GENDER_CHANGE_FB	emFB;
+		WORD						wFace;
+		WORD						wHair;
+		WORD						wHairColor;
+		EMCHARCLASS					emClass;
+		WORD						wSex;
+
+		SNETPC_INVEN_GENDER_CHANGE_FB () :
+			emFB(EMINVEN_GENDER_CHANGE_FB_FAIL),
+			wFace(0),
+			wHair(0),
+			wHairColor(0),
+			emClass ( GLCC_NONE ),
+			wSex ( 0 )
+
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_INVEN_GENDER_CHANGE_FB;
+		}
+	};
+
+
+	struct SNETPC_INVEN_RENAME
+	{
+		NET_MSG_GENERIC			nmg;
+
+		char					szName[CHAR_SZNAME];
+		WORD					wPosX;
+		WORD					wPosY;
+
+		SNETPC_INVEN_RENAME () :
+			wPosX(0),
+			wPosY(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			memset ( szName, 0, sizeof(char)*CHAR_SZNAME );
+			nmg.nType  = NET_MSG_GCTRL_INVEN_RENAME;
+		}
+	};
+
+	struct SNETPC_INVEN_RENAME_FB
+	{
+		NET_MSG_GENERIC			nmg;
+
+		EMINVEN_RENAME_FB		emFB;
+		char					szName[CHAR_SZNAME];
+
+		SNETPC_INVEN_RENAME_FB () :
+			emFB(EMINVEN_RENAME_FB_FAIL)
+		{
+			nmg.dwSize = sizeof(*this);
+			memset ( szName, 0, sizeof(char)*CHAR_SZNAME );
+			nmg.nType = NET_MSG_GCTRL_INVEN_RENAME_FB;
+		}
+	};
+
+	struct SNETPC_INVEN_RENAME_FROM_DB
+	{
+		NET_MSG_GENERIC				nmg;
+
+		EMINVEN_RENAME_FB			emFB;
+		DWORD						dwCharID;
+		WORD						wPosX;
+		WORD						wPosY;
+		char						szName[CHAR_SZNAME];
+
+		enum { EMMSG_SIZE = sizeof(NET_MSG_GENERIC)+sizeof(DWORD)*3+CHAR_SZNAME };
+		char				m_cBUFFER[NET_DATA_BUFSIZE-EMMSG_SIZE];
+
+		SNETPC_INVEN_RENAME_FROM_DB () :
+			emFB(EMINVEN_RENAME_FROM_DB_FAIL),
+			dwCharID(0),
+			wPosX(0),
+			wPosY(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			memset ( szName, 0, sizeof(char)*CHAR_SZNAME );
+			nmg.nType = NET_MSG_GCTRL_INVEN_RENAME_FROM_DB;
+		}
+	};
+
+	struct SNETPC_INVEN_RENAME_BRD : public SNETPC_BROAD
+	{
+		char 		szName[CHAR_SZNAME];
+
+		SNETPC_INVEN_RENAME_BRD ()
+		{
+			memset ( szName, 0, sizeof(char)*CHAR_SZNAME );
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_INVEN_RENAME_BRD;
+		}
+	};
+
+	struct SNETPC_INVEN_RENAME_AGTBRD
+	{
+		NET_MSG_GENERIC		nmg;
+		
+		DWORD				dwID;
+		char				szOldName[CHAR_SZNAME];
+		char				szNewName[CHAR_SZNAME];
+
+		enum { EMMSG_SIZE = sizeof(NET_MSG_GENERIC)+sizeof(DWORD)+(CHAR_SZNAME)*2 };
+		char				m_cBUFFER[NET_DATA_BUFSIZE-EMMSG_SIZE];
+
+		SNETPC_INVEN_RENAME_AGTBRD () :
+			dwID(0)
+		{
+			memset ( szOldName, 0, sizeof(char)*CHAR_SZNAME );
+			memset ( szNewName, 0, sizeof(char)*CHAR_SZNAME );
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_INVEN_RENAME_AGTBRD;
+		}
+	};
+
+	struct SNETPC_CHANGE_NAMEMAP : public SNETPC_BROAD
+	{
+		char 					szOldName[CHAR_SZNAME];
+		char 					szNewName[CHAR_SZNAME];
+
+		SNETPC_CHANGE_NAMEMAP ()
+		{
+			memset ( szOldName, 0, sizeof(char)*CHAR_SZNAME );
+			memset ( szNewName, 0, sizeof(char)*CHAR_SZNAME );
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_CHANGE_NAMEMAP;
+		}
+	};
+
+
+
+
+	struct SNETPC_REQ_GESTURE
+	{
+		NET_MSG_GENERIC			nmg;
+		
+		DWORD					dwID;
+
+		SNETPC_REQ_GESTURE () :
+			dwID(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_REQ_GESTURE;
+		}
+	};
+
+	struct SNETPC_REQ_GESTURE_BRD : public SNETPC_BROAD
+	{
+		DWORD					dwID;
+
+		SNETPC_REQ_GESTURE_BRD () :
+			dwID(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_REQ_GESTURE_BRD;
+		}
+	};
+
+	struct SNETPC_QITEMFACT_BRD : public SNETPC_BROAD
+	{
+		SQITEM_FACT sFACT;
+
+		SNETPC_QITEMFACT_BRD ()
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_QITEMFACT_BRD;
+		}
+	};
+
+	struct SNETPC_PKITEMFACT_BRD : public SNETPK_BROAD
+	{
+		SQPK_FACT sPKFACT;
+
+		SNETPC_PKITEMFACT_BRD ()
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_UPDATE_PKSTREAK_BRD;
+		}
+	};
+
+	struct SNETPC_QITEMFACT_END_BRD : public SNETPC_BROAD
+	{
+		SNETPC_QITEMFACT_END_BRD ()
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_QITEMFACT_END_BRD;
+		}
+	};
+
+	struct SNETPC_QITEMFACT_TIMEUPDATE_BRD : public SNETPC_BROAD //add qbox
+	{
+		float fQBoxTime;
+
+		SNETPC_QITEMFACT_TIMEUPDATE_BRD ()
+			: fQBoxTime(0.0f)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_QITEMFACT_TIMEUPDATE_BRD;
+		}
+	};
+
+	struct SNETPC_EVENTFACT_BRD : public SNETPC_BROAD
+	{
+		EMGM_EVENT_TYPE		emType;
+		WORD				wValue;
+
+		SNETPC_EVENTFACT_BRD ()
+			: emType(EMGM_EVENT_NONE)
+			, wValue(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_EVENTFACT_BRD;
+		}
+	};
+
+	struct SNETPC_EVENTFACT_END_BRD : public SNETPC_BROAD
+	{
+		EMGM_EVENT_TYPE		emType;
+
+		SNETPC_EVENTFACT_END_BRD ()
+			: emType(EMGM_EVENT_NONE)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_EVENTFACT_END_BRD;
+		}
+	};
+
+	struct SNETPC_EVENTFACT_INFO
+	{
+		NET_MSG_GENERIC			nmg;
+		SEVENT_FACT				sEVENTFACT;
+
+		SNETPC_EVENTFACT_INFO ()
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_EVENTFACT_INFO;
+		}
+	};
+
+	struct SNETPC_2_FRIEND_REQ
+	{
+		NET_MSG_GENERIC			nmg;
+		char					szFRIEND_NAME[CHAR_SZNAME];
+		WORD					wItemPosX;
+		WORD					wItemPosY;
+
+		SNETPC_2_FRIEND_REQ () :
+			wItemPosX(0),
+			wItemPosY(0)
+		{
+			memset(szFRIEND_NAME, 0, sizeof(char) * CHAR_SZNAME);
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_2_FRIEND_REQ;
+		}
+	};
+
+	struct SNETPC_2_FRIEND_CK
+	{
+		NET_MSG_GENERIC			nmg;
+		DWORD					dwCOMMAND_CHARID;
+		DWORD					dwFRIEND_CHARID;
+		WORD					wItemPosX;
+		WORD					wItemPosY;
+
+		SNETPC_2_FRIEND_CK () :
+			dwCOMMAND_CHARID(0),
+			dwFRIEND_CHARID(0),
+			wItemPosX(0),
+			wItemPosY(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_2_FRIEND_CK;
+		}
+	};
+
+	struct SNETPC_2_FRIEND_AG
+	{
+		NET_MSG_GENERIC			nmg;
+		DWORD					dwCOMMAND_CHARID;
+		DWORD					dwFRIEND_CHARID;
+		WORD					wItemPosX;
+		WORD					wItemPosY;
+
+		EM2FRIEND_FB			emFB;
+		SNATIVEID				sFriendMapID;
+		D3DXVECTOR3				vFriendPos;
+
+		SNETPC_2_FRIEND_AG () :
+			dwCOMMAND_CHARID(0),
+			dwFRIEND_CHARID(0),
+			wItemPosX(0),
+			wItemPosY(0),
+
+			emFB(EM2FRIEND_FB_FAIL),
+			sFriendMapID(0,0),
+			vFriendPos(0,0,0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_2_FRIEND_AG;
+		}
+	};
+
+	struct SNETPC_2_FRIEND_FLD
+	{
+		NET_MSG_GENERIC			nmg;
+		WORD					wItemPosX;
+		WORD					wItemPosY;
+
+		SNATIVEID				sFriendMapID;
+		D3DXVECTOR3				vFriendPos;
+
+		SNETPC_2_FRIEND_FLD () :
+			wItemPosX(0),
+			wItemPosY(0),
+
+			sFriendMapID(0,0),
+			vFriendPos(0,0,0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_2_FRIEND_FLD;
+		}
+	};
+
+	struct SNETPC_2_FRIEND_FB
+	{
+		NET_MSG_GENERIC			nmg;
+		EM2FRIEND_FB			emFB;
+
+		SNETPC_2_FRIEND_FB () :
+			emFB(EM2FRIEND_FB_FAIL)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_2_FRIEND_FB;
+		}
+	};
+
+	struct SNETPC_GM_GENCHAR
+	{
+		NET_MSG_GENERIC			nmg;
+		char					szNAME[CHAR_SZNAME];
+		DWORD					dwCHARID;
+
+		SNETPC_GM_GENCHAR ()
+			: dwCHARID(0)
+		{
+			memset(szNAME, 0, sizeof(char) * (CHAR_SZNAME));
+			nmg.dwSize = sizeof(SNETPC_GM_GENCHAR);
+			nmg.nType = NET_MSG_GM_GENCHAR;
+		}
+	};
+
+	struct SNETPC_GM_GENCHAR_FB
+	{
+		NET_MSG_GENERIC			nmg;
+
+		int						nChannel;
+		EMGM_MOVE2CHAR_FB		emFB;
+
+		SNETPC_GM_GENCHAR_FB () :
+			nChannel(0),
+			emFB(EMGM_MOVE2CHAR_FB_FAIL)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GM_GENCHAR_FB;
+		}
+	};
+
+	struct SNETPC_GM_GETWHISPERMSG
+	{
+		NET_MSG_GENERIC			nmg;
+		char					szNAME[CHAR_SZNAME];
+
+		SNETPC_GM_GETWHISPERMSG ()
+		{
+			nmg.dwSize = sizeof(SNETPC_GM_GETWHISPERMSG);
+			nmg.nType = NET_MSG_GM_GETWHISPERMSG;
+			memset(szNAME, 0, sizeof(char) * (CHAR_SZNAME));
+		}
+	};
+
+
+
+	struct SNETPC_GM_MOVE2CHAR
+	{
+		NET_MSG_GENERIC			nmg;
+		char					szNAME[CHAR_SZNAME];
+		DWORD					dwCHARID;
+
+		SNETPC_GM_MOVE2CHAR ()
+			: dwCHARID(0)
+		{
+			nmg.dwSize = sizeof(SNETPC_GM_MOVE2CHAR);
+			nmg.nType = NET_MSG_GM_MOVE2CHAR;
+			memset(szNAME, 0, sizeof(char) * (CHAR_SZNAME));
+		}
+	};
+
+	struct SNETPC_GM_MOVE2CHAR_POS
+	{
+		NET_MSG_GENERIC			nmg;
+		DWORD					dwCOMMAND_CHARID;
+		DWORD					dwTO_CHARID;
+
+		SNETPC_GM_MOVE2CHAR_POS () 
+			: dwCOMMAND_CHARID(0)
+			, dwTO_CHARID(0)
+		{
+			nmg.dwSize = sizeof(SNETPC_GM_MOVE2CHAR_POS);
+			nmg.nType = NET_MSG_GM_MOVE2CHAR_POS;
+		}
+	};
+
+	struct SNETPC_GM_MOVE2CHAR_AG
+	{
+		NET_MSG_GENERIC			nmg;
+		DWORD					dwCOMMAND_CHARID;
+		DWORD					dwTO_CHARID;
+
+		EMGM_MOVE2CHAR_FB		emFB;
+		SNATIVEID				sToMapID;
+		D3DXVECTOR3				vToPos;
+
+		SNETPC_GM_MOVE2CHAR_AG () :
+			dwCOMMAND_CHARID(0),
+			dwTO_CHARID(0),
+
+			emFB(EMGM_MOVE2CHAR_FB_FAIL),
+			sToMapID(0,0),
+			vToPos(0,0,0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GM_MOVE2CHAR_AG;
+		}
+	};
+
+	struct SNETPC_GM_MOVE2CHAR_FLD
+	{
+		NET_MSG_GENERIC			nmg;
+
+		SNATIVEID				sToMapID;
+		D3DXVECTOR3				vToPos;
+
+		SNETPC_GM_MOVE2CHAR_FLD () :
+			sToMapID(0,0),
+			vToPos(0,0,0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GM_MOVE2CHAR_FLD;
+		}
+	};
+
+	struct SNETPC_GM_MOVE2CHAR_FB
+	{
+		NET_MSG_GENERIC			nmg;
+
+		int						nChannel;
+		EMGM_MOVE2CHAR_FB		emFB;
+
+		SNETPC_GM_MOVE2CHAR_FB () :
+			nChannel(0),
+			emFB(EMGM_MOVE2CHAR_FB_FAIL)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GM_MOVE2CHAR_FB;
+		}
+	};
+
+	struct SNETPC_UPDATE_LASTCALL
+	{
+		NET_MSG_GENERIC		nmg;
+		
+		SNATIVEID			sLastCallMapID;		//	¡˜¿ÅEÕ»Ø ∏ .
+		D3DXVECTOR3			vLastCallPos;		//	¡˜¿ÅEÕ»Ø ¿ßƒ°.
+
+		SNETPC_UPDATE_LASTCALL () :
+			vLastCallPos(0,0,0)
+		{
+			nmg.dwSize = sizeof(SNETPC_UPDATE_LASTCALL);
+			nmg.nType = NET_MSG_GCTRL_UPDATE_LASTCALL;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	struct SNETPC_UPDATE_STARTCALL
+	{
+		NET_MSG_GENERIC		nmg;
+		
+		SNATIVEID			sStartMapID;		// ¡˜¿ÅEÕ»Ø ∏ 
+		DWORD				dwStartGateID;		// ¡˜¿ÅEÕ»Ø ∞‘¿Ã∆Æ
+		D3DXVECTOR3			vStartPos;			// ¡˜¿ÅEÕ»Ø ¿ßƒ°
+
+
+		SNETPC_UPDATE_STARTCALL () :
+			dwStartGateID(0),
+			vStartPos(0,0,0)
+		{
+			nmg.dwSize = sizeof(SNETPC_UPDATE_STARTCALL);
+			nmg.nType = NET_MSG_GCTRL_UPDATE_STARTCALL;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	struct SNETPC_MGAME_ODDEVEN
+	{
+		NET_MSG_GENERIC	nmg;
+
+		DWORD					dwNPCID;
+		EMMGAME_ODDEVEN			emEvent;
+		EMMGAME_ODDEVEN_CASE	emCase;
+		UINT					uiBattingMoney;		// πË∆√ ±›æ◊
+
+		SNETPC_MGAME_ODDEVEN () :
+			dwNPCID(0),
+			emEvent(EMMGAME_ODDEVEN_CANCEL),
+			emCase(EMMGAME_ODDEVEN_ODD),
+			uiBattingMoney(0)
+		{
+			nmg.dwSize = sizeof(SNETPC_MGAME_ODDEVEN);
+			nmg.nType = NET_MSG_MGAME_ODDEVEN;
+		}
+	};
+
+	struct SNETPC_MGAME_ODDEVEN_FB
+	{
+		NET_MSG_GENERIC	nmg;
+
+		EMMGAME_ODDEVEN_FB		emResult;
+		EMMGAME_ODDEVEN_CASE	emCase;
+		ULONGLONG				ui64DividendMoney;	// πË¥Á±›
+		ULONGLONG				ui64ActualMoney;	// Ω«ºˆ∑…±›
+		WORD					wRound;				// ∞‘¿” »∏ºÅE
+
+		SNETPC_MGAME_ODDEVEN_FB () :
+			emResult(EMMGAME_ODDEVEN_FB_FAIL),
+			emCase(EMMGAME_ODDEVEN_ODD),
+			ui64DividendMoney(0),
+			ui64ActualMoney(0),
+			wRound(0)
+		{
+			nmg.dwSize = sizeof(SNETPC_MGAME_ODDEVEN_FB);
+			nmg.nType = NET_MSG_MGAME_ODDEVEN_FB;
+		}
+	};
+
+	struct SNETPC_SEND_SMS
+	{
+		NET_MSG_GENERIC	nmg;
+
+		DWORD			dwReceiveChaNum;
+		TCHAR			szPhoneNumber[SMS_RECEIVER];
+		TCHAR			szSmsMsg[SMS_LENGTH];
+
+		WORD			wItemPosX;
+		WORD			wItemPosY;
+
+		SNETPC_SEND_SMS () :
+			wItemPosX(0),
+			wItemPosY(0),
+			dwReceiveChaNum(0)
+		{
+			memset(szPhoneNumber, 0, sizeof(TCHAR) * (SMS_RECEIVER));
+			memset(szSmsMsg, 0, sizeof(TCHAR) * (SMS_LENGTH));
+			nmg.dwSize = sizeof(SNETPC_SEND_SMS);
+			nmg.nType = NET_MSG_SMS_SEND;
+		}
+	};
+
+	struct SNETPC_SEND_SMS_FB
+	{
+		NET_MSG_GENERIC			nmg;
+
+		EMSMS_SEND_FB			emFB;
+
+		SNETPC_SEND_SMS_FB () :
+			emFB(EMSMS_SEND_FB_FAIL)
+		{
+			nmg.dwSize = sizeof(SNETPC_SEND_SMS_FB);
+			nmg.nType = NET_MSG_SMS_SEND_FB;
+		}
+	};
+
+	struct SNETPC_SEND_SMS_FROM_DB
+	{
+		NET_MSG_GENERIC			nmg;
+
+		EMSMS_SEND_FB			emFB;
+
+		WORD					wPosX;
+		WORD					wPosY;
+
+		enum { EMMSG_SIZE = sizeof(NET_MSG_GENERIC)+sizeof(EMSMS_SEND_FB)+(sizeof(WORD)*2) };
+		char				m_cBUFFER[NET_DATA_BUFSIZE-EMMSG_SIZE];
+
+		SNETPC_SEND_SMS_FROM_DB () :
+        	emFB(EMSMS_SEND_FROM_DB_FAIL),
+			wPosX(0),
+			wPosY(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_SMS_SEND_FROM_DB;
+		}
+	};
+
+	struct SNETPC_PHONE_NUMBER
+	{
+		NET_MSG_GENERIC			nmg;
+
+		TCHAR					szPhoneNumber[SMS_RECEIVER];
+
+		SNETPC_PHONE_NUMBER ()
+		{
+			memset(szPhoneNumber, 0, sizeof(TCHAR) * (SMS_RECEIVER));
+			nmg.dwSize = sizeof(SNETPC_PHONE_NUMBER);
+			nmg.nType = NET_MSG_SMS_PHONE_NUMBER;
+		}
+	};
+
+	struct SNETPC_PHONE_NUMBER_FB
+	{
+		NET_MSG_GENERIC			nmg;
+
+		EMSMS_PHONE_NUMBER_FB	emFB;
+		TCHAR					szPhoneNumber[SMS_RECEIVER];
+
+		SNETPC_PHONE_NUMBER_FB () :
+			emFB(EMSMS_PHONE_NUMBER_FB_FAIL)
+		{
+			memset(szPhoneNumber, 0, sizeof(TCHAR) * (SMS_RECEIVER));
+			nmg.dwSize = sizeof(SNETPC_PHONE_NUMBER_FB);
+			nmg.nType = NET_MSG_SMS_PHONE_NUMBER_FB;
+		}
+	};
+
+	struct SNETPC_PHONE_NUMBER_FROM_DB
+	{
+		NET_MSG_GENERIC				nmg;
+
+		EMSMS_PHONE_NUMBER_FB		emFB;
+		DWORD						dwCharID;
+		TCHAR						szPhoneNumber[SMS_RECEIVER];
+
+		enum { EMMSG_SIZE = sizeof(NET_MSG_GENERIC)+sizeof(EMSMS_PHONE_NUMBER_FB)+sizeof(DWORD)+(SMS_RECEIVER) };
+		char				m_cBUFFER[NET_DATA_BUFSIZE-EMMSG_SIZE];
+
+		SNETPC_PHONE_NUMBER_FROM_DB () :
+			emFB(EMSMS_PHONE_NUMBER_FROM_DB_FAIL),
+			dwCharID(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			memset ( szPhoneNumber, 0, sizeof(TCHAR)*SMS_RECEIVER );
+			nmg.nType = NET_MSG_SMS_PHONE_NUMBER_FROM_DB;
+		}
+	};
+
+	struct SNETPC_PHONE_NUMBER_AGTBRD
+	{
+		NET_MSG_GENERIC		nmg;
+
+		DWORD				dwID;
+		TCHAR				szName[CHAR_SZNAME];
+		TCHAR				szNewPhoneNumber[SMS_RECEIVER];
+
+		enum { EMMSG_SIZE = sizeof(NET_MSG_GENERIC)+sizeof(DWORD)+(SMS_RECEIVER)+(CHAR_SZNAME) };
+		char				m_cBUFFER[NET_DATA_BUFSIZE-EMMSG_SIZE];
+
+		SNETPC_PHONE_NUMBER_AGTBRD () :
+			dwID(0)
+		{
+			memset ( szName, 0, sizeof(TCHAR)*CHAR_SZNAME );
+			memset ( szNewPhoneNumber, 0, sizeof(TCHAR)*SMS_RECEIVER );
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_SMS_PHONE_NUMBER_AGTBRD;
+		}
+	};
+
+	struct SNETPC_CHINA_GAINTYPE
+	{
+		NET_MSG_GENERIC		nmg;
+
+		BYTE				dwGainType;
+
+
+		SNETPC_CHINA_GAINTYPE () :
+		dwGainType(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_CHINA_GAINTYPE;
+		}
+	};
+
+	struct SNETPC_VIETNAM_GAINTYPE
+	{
+		NET_MSG_GENERIC		nmg;
+
+		BYTE				dwGainType;
+
+
+		SNETPC_VIETNAM_GAINTYPE () :
+		dwGainType(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_VIETNAM_GAINTYPE;
+		}
+	};
+
+	struct SNETPC_VIETNAM_TIME_REQ
+	{
+		NET_MSG_GENERIC		nmg;
+		DWORD				dwGaeaID;
+
+
+		SNETPC_VIETNAM_TIME_REQ () :
+								dwGaeaID(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_VIETNAM_TIME_REQ;
+		}
+	};
+
+	struct SNETPC_VIETNAM_TIME_REQ_FB
+	{
+		NET_MSG_GENERIC		nmg;		
+		LONGLONG			gameTime;  //	¿˙¿Âµ» ¥©¿ÅEΩ√∞£
+		__time64_t			loginTime; //	∑Œ±◊¿Œ Ω√∞£
+
+
+
+		SNETPC_VIETNAM_TIME_REQ_FB () :
+							gameTime(0),
+							loginTime(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_VIETNAM_TIME_REQ_FB;
+		}
+	};
+
+	struct SNETPC_VIETNAM_GAIN_EXP
+	{
+		NET_MSG_GENERIC		nmg;		
+		LONGLONG			gainExp;   //	¿˙¿Âµ» ¥©¿ÅE∞Ê«Ëƒ°
+
+		SNETPC_VIETNAM_GAIN_EXP () :
+							gainExp(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_VIETNAM_GAIN_EXP;
+		}
+	};
+
+	struct SNETPC_VIETNAM_GAIN_MONEY
+	{
+		NET_MSG_GENERIC		nmg;		
+		LONGLONG			gainMoney;   //	¿˙¿Âµ» ¥©¿ÅEµ∑
+
+		SNETPC_VIETNAM_GAIN_MONEY () :
+							gainMoney(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_VIETNAM_GAIN_MONEY;
+		}
+	};
+
+	struct SNETPC_INVEN_VIETNAM_INVENGET
+	{
+		NET_MSG_GENERIC			nmg;
+
+		WORD					wPosX;
+		WORD					wPosY;
+		bool					bGetExp;
+
+		SNETPC_INVEN_VIETNAM_INVENGET () :
+			wPosX(0),
+			wPosY(0),
+			bGetExp(TRUE)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_INVEN_VIETNAM_INVENGET;
+		}
+	};
+
+	struct SNETPC_INVEN_VIETNAM_EXPGET_FB
+	{
+		NET_MSG_GENERIC			nmg;	
+
+		LONGLONG				lnVnMoney;
+
+		SNETPC_INVEN_VIETNAM_EXPGET_FB () 
+			: lnVnMoney ( 0 )
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_INVEN_VIETNAM_EXPGET_FB;
+		}
+	};
+
+	struct SNETPC_INVEN_VIETNAM_ITEMGETNUM_UPDATE
+	{
+		NET_MSG_GENERIC			nmg;
+
+		DWORD					dwVietnamInvenCount;
+		
+
+		SNETPC_INVEN_VIETNAM_ITEMGETNUM_UPDATE () :
+			dwVietnamInvenCount(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_INVEN_VIETNAM_ITEMGETNUM_UPDATE;
+		}
+	};
+
+	struct SNETPC_INVEN_VIETNAM_ITEMGET_FB
+	{
+		NET_MSG_GENERIC			nmg;	
+		DWORD					dwVietnamInvenCount;
+
+		SNETPC_INVEN_VIETNAM_ITEMGET_FB () :
+			dwVietnamInvenCount(0)
+
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_INVEN_VIETNAM_ITEMGET_FB;
+		}
+	};
+
+
+	struct SNETPC_VIETNAM_ALLINITTIME
+	{
+		NET_MSG_GENERIC nmg;
+		__time64_t		initTime;
+
+		SNETPC_VIETNAM_ALLINITTIME () 
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_VIETNAM_ALLINITTIME;
+		}
+	};
+
+
+//vietnamtest%%% && vietnamtest2
+	struct SNETPC_VIETNAM_TIME_RESET
+	{
+		NET_MSG_GENERIC nmg;
+
+		DWORD			dwGaeaID;
+
+		SNETPC_VIETNAM_TIME_RESET () 
+		: dwGaeaID ( 0 )
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_VIETNAM_TIME_RESET;
+		}
+	};
+
+
+	struct SNETPC_ACTIVE_VEHICLE
+	{
+		NET_MSG_GENERIC		nmg;
+
+		bool				bActive;
+
+		SNETPC_ACTIVE_VEHICLE () :
+		bActive(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_ACTIVE_VEHICLE;
+		}	
+	};
+
+	struct SNETPC_ACTIVE_VEHICLE_FB
+	{
+		NET_MSG_GENERIC		nmg;
+
+		EMVEHICLE_SET_FB	emFB;
+        bool				bActive;
+		bool				bLeaveFieldServer;
+
+		SNETPC_ACTIVE_VEHICLE_FB () :
+		emFB(EMVEHICLE_SET_FB_FAIL),
+		bActive(0),
+		bLeaveFieldServer( false )
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_ACTIVE_VEHICLE_FB;
+		}	
+	};
+
+	struct SNETPC_ACTIVE_VEHICLE_BRD : public SNETPC_BROAD
+	{
+		bool				bActive;		
+		
+
+		SNETPC_ACTIVE_VEHICLE_BRD () :
+		bActive(0)		
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_ACTIVE_VEHICLE_BRD;
+		}	
+	};
+
+	struct SNETPC_GET_VEHICLE
+	{
+		NET_MSG_GENERIC		nmg;
+		SNATIVEID			nItemID;		
+
+		SNETPC_GET_VEHICLE () :
+		nItemID(false)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_GET_VEHICLE;
+		}	
+	};
+
+	struct SNETPC_UNGET_VEHICLE_FB
+	{
+		NET_MSG_GENERIC		nmg;
+
+		SNETPC_UNGET_VEHICLE_FB () 
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_UNGET_VEHICLE_FB;
+		}	
+	};
+
+	struct SNETPC_UNGET_VEHICLE_BRD	 : public SNETPC_BROAD
+	{
+		SNETPC_UNGET_VEHICLE_BRD ()
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_UNGET_VEHICLE_BRD;
+		}	
+	};
+
+	struct SNETPC_GET_VEHICLE_FB
+	{
+		NET_MSG_GENERIC		nmg;
+
+		VEHICLE_TYPE		emTYPE;
+		DWORD				dwGUID;					// ≈ª∞Õ¿« GUID
+		DWORD				dwOwner;					// ¡÷¿Œ GaeaID
+		SNATIVEID			sVehicleID;				// º“»Ø¿ª ø‰√ª«— ≈ª∞Õ æ∆¿Ã≈€¿« Mid/Sid
+		int					nFull;
+		SITEMCUSTOM			PutOnItems[ACCE_TYPE_SIZE];
+		WORD				wColor; //add bike color
+
+		EMVEHICLE_GET_FB	emFB;
+
+		SNETPC_GET_VEHICLE_FB () :
+		emTYPE( VEHICLE_TYPE_NONE ),
+		dwGUID ( UINT_MAX ),
+		dwOwner ( 0 ),
+		sVehicleID ( NATIVEID_NULL() ),
+		nFull ( 0 ),
+		emFB( EMVEHICLE_GET_FB_FAIL ),
+		wColor ( 0 ) //add bike color
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_GET_VEHICLE_FB;
+		}	
+	};
+
+	struct SNETPC_GET_VEHICLE_BRD : public SNETPC_BROAD
+	{
+	
+		DWORD				dwGUID;					// ≈ª∞Õ¿« GUID
+		VEHICLE_TYPE		emTYPE;
+		SNATIVEID			sVehicleID;				// º“»Ø¿ª ø‰√ª«— ≈ª∞Õ æ∆¿Ã≈€¿« Mid/Sid
+		SITEMCUSTOM			PutOnItems[ACCE_TYPE_SIZE];
+
+
+
+		SNETPC_GET_VEHICLE_BRD () :
+		dwGUID ( 0 ),
+		emTYPE ( VEHICLE_TYPE_NONE ),
+		sVehicleID ( NATIVEID_NULL() )
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_GET_VEHICLE_BRD;
+		}
+	};
+
+	struct SNET_VEHICLE_CREATE_FROMDB_FB
+	{
+		NET_MSG_GENERIC		nmg;
+		
+		VEHICLE_TYPE		emTYPE;
+		SNATIVEID			sVehicleID;					// ¡§∫∏ ø‰√ª«— ITEM ID
+		DWORD				dwVehicleID;				// ≈ª∞Õ¿« ∞˙‹ØID
+
+		enum { EMMSG_SIZE = sizeof(NET_MSG_GENERIC)+sizeof(VEHICLE_TYPE)+sizeof(SNATIVEID)+sizeof(DWORD) };
+		char				m_cBUFFER[NET_DATA_BUFSIZE-EMMSG_SIZE];
+
+		SNET_VEHICLE_CREATE_FROMDB_FB () :
+		emTYPE ( VEHICLE_TYPE_NONE ),
+		sVehicleID ( NATIVEID_NULL() ),
+		dwVehicleID ( 0 )
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_VEHICLE_CREATE_FROMDB_FB;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+
+	struct SNET_VEHICLE_GET_FROMDB_FB
+	{
+		NET_MSG_GENERIC		nmg;
+		
+		PGLVEHICLE			pVehicle;
+		DWORD				dwVehicleNum;			// º“»Ø ø‰√ª¿« ≈ª∞Õ¿« ∞˙‹Ø ID
+		bool				bLMTItemCheck;
+		bool				bCardInfo;
+		bool				bTrade;
+
+		enum { EMMSG_SIZE = sizeof(NET_MSG_GENERIC)+sizeof(PGLVEHICLE)+sizeof(DWORD)+sizeof(bool)*3 };
+		char				m_cBUFFER[NET_DATA_BUFSIZE-EMMSG_SIZE];
+
+		SNET_VEHICLE_GET_FROMDB_FB () :
+		pVehicle ( NULL ),
+		dwVehicleNum ( UINT_MAX ),
+		bLMTItemCheck( false ),
+		bCardInfo( false ),
+		bTrade ( false )
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_VEHICLE_GET_FROMDB_FB;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	struct SNET_VEHICLE_GET_FROMDB_ERROR
+	{
+		NET_MSG_GENERIC		nmg;
+		
+		bool				bLMTItemCheck;
+		bool				bCardInfo;
+		bool				bTrade;
+
+		enum { EMMSG_SIZE = sizeof(NET_MSG_GENERIC)+sizeof(bool)*3 };
+		char				m_cBUFFER[NET_DATA_BUFSIZE-EMMSG_SIZE];
+
+		SNET_VEHICLE_GET_FROMDB_ERROR () :
+		bLMTItemCheck( false ),
+		bCardInfo( false ),
+		bTrade ( false )
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_VEHICLE_GET_FROMDB_ERROR;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	struct SNET_VEHICLE_ACCESSORY_DELETE
+	{
+		NET_MSG_GENERIC		nmg;
+		
+		VEHICLE_ACCESSORYTYPE	accetype;
+		DWORD					dwVehicleNum;			// º“»Ø ø‰√ª¿« ≈ª∞Õ¿« ∞˙‹Ø ID
+
+		SNET_VEHICLE_ACCESSORY_DELETE () :
+		accetype ( ACCE_TYPE_SIZE ),
+		dwVehicleNum ( 0 )
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_VEHICLE_ACCESSORY_DELETE;
+		}
+	};
+
+	struct SNET_VEHICLE_ACCESSORY_DELETE_BRD : public SNETPC_BROAD
+	{
+
+		DWORD				dwVehicleNum;
+		VEHICLE_ACCESSORYTYPE		accetype;
+
+		SNET_VEHICLE_ACCESSORY_DELETE_BRD () :
+		dwVehicleNum ( 0 ),
+		accetype ( ACCE_TYPE_SIZE )
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_VEHICLE_ACCESSORY_DELETE_BRD;
+		}
+
+	};
+
+	struct SNET_VEHICLE_REQ_SLOT_EX_HOLD
+	{
+		NET_MSG_GENERIC		nmg;
+
+		EMSUIT				emSuit;
+
+		SNET_VEHICLE_REQ_SLOT_EX_HOLD () 
+			: emSuit(SUIT_NSIZE)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_VEHICLE_REQ_SLOT_EX_HOLD;
+		}
+	};
+
+	struct SNET_VEHICLE_REQ_SLOT_EX_HOLD_FB
+	{
+		NET_MSG_GENERIC			  nmg;
+
+		EMVEHICLE_REQ_SLOT_EX_HOLD_FB emFB;
+		SITEMCUSTOM				  sItemCustom;
+		EMSUIT					  emSuit;
+
+		SNET_VEHICLE_REQ_SLOT_EX_HOLD_FB () 
+			: emSuit(SUIT_NSIZE)
+			, emFB(EMVEHICLE_REQ_SLOT_EX_HOLD_FB_FAIL)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_VEHICLE_REQ_SLOT_EX_HOLD_FB;
+		}
+	};
+
+	struct SNET_VEHICLE_REQ_SLOT_EX_HOLD_BRD : public SNETPC_BROAD
+	{
+		SITEMCUSTOM			sItemCustom;
+		EMSUIT				emSuit;
+
+		SNET_VEHICLE_REQ_SLOT_EX_HOLD_BRD () 
+			: emSuit(SUIT_NSIZE)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_VEHICLE_REQ_SLOT_EX_HOLD_BRD;
+		}
+	};
+
+	struct SNET_VEHICLE_REQ_HOLD_TO_SLOT
+	{
+		NET_MSG_GENERIC		nmg;
+
+		EMSUIT				emSuit;
+
+		SNET_VEHICLE_REQ_HOLD_TO_SLOT () 
+			: emSuit(SUIT_NSIZE)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_VEHICLE_REQ_HOLD_TO_SLOT;
+		}
+	};
+
+	struct SNET_VEHICLE_REQ_HOLD_TO_SLOT_FB
+	{
+		NET_MSG_GENERIC		nmg;
+
+		EMVEHICLE_REQ_SLOT_EX_HOLD_FB emFB;
+		SITEMCUSTOM				  sItemCustom;
+		EMSUIT					  emSuit;
+
+		SNET_VEHICLE_REQ_HOLD_TO_SLOT_FB () 
+			: emSuit(SUIT_NSIZE)
+			, emFB(EMVEHICLE_REQ_SLOT_EX_HOLD_FB_FAIL)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_VEHICLE_REQ_HOLD_TO_SLOT_FB;
+		}
+	};
+
+	struct SNET_VEHICLE_REQ_SLOT_TO_HOLD
+	{
+		NET_MSG_GENERIC		nmg;
+
+		EMSUIT				emSuit;
+
+		SNET_VEHICLE_REQ_SLOT_TO_HOLD () 
+			: emSuit(SUIT_NSIZE)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_VEHICLE_REQ_SLOT_TO_HOLD;
+		}
+	};
+
+	struct SNET_VEHICLE_REQ_SLOT_TO_HOLD_FB
+	{
+		NET_MSG_GENERIC		nmg;
+
+		EMVEHICLE_REQ_SLOT_EX_HOLD_FB emFB;
+		SITEMCUSTOM				  sItemCustom;
+		EMSUIT					  emSuit;
+
+		SNET_VEHICLE_REQ_SLOT_TO_HOLD_FB () 
+			: emSuit(SUIT_NSIZE)
+			, emFB(EMVEHICLE_REQ_SLOT_EX_HOLD_FB_FAIL)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_VEHICLE_REQ_SLOT_TO_HOLD_FB;
+		}
+	};
+
+	struct SNET_VEHICLE_REQ_REMOVE_SLOTITEM
+	{
+		NET_MSG_GENERIC		nmg;
+
+		EMSUIT				emSuit;
+
+		SNET_VEHICLE_REQ_REMOVE_SLOTITEM () 
+			: emSuit(SUIT_NSIZE)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_VEHICLE_REMOVE_SLOTITEM;
+		}
+	};
+
+	struct SNET_VEHICLE_REQ_REMOVE_SLOTITEM_FB
+	{
+		NET_MSG_GENERIC		nmg;
+
+		EMSUIT				emSuit;
+
+		SNET_VEHICLE_REQ_REMOVE_SLOTITEM_FB () 
+			: emSuit(SUIT_NSIZE)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_VEHICLE_REMOVE_SLOTITEM_FB;
+		}
+	};
+
+	struct SNET_VEHICLE_REQ_REMOVE_SLOTITEM_BRD : public SNETPC_BROAD
+	{
+		EMSUIT			emSuit;
+
+		SNET_VEHICLE_REQ_REMOVE_SLOTITEM_BRD ()
+			: emSuit(SUIT_NSIZE)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_VEHICLE_REMOVE_SLOTITEM_BRD;
+		}
+	};
+
+	struct SNET_VEHICLE_UPDATE_CLIENT_BATTERY
+	{
+		NET_MSG_GENERIC		nmg;
+
+		int					nFull;
+
+		SNET_VEHICLE_UPDATE_CLIENT_BATTERY () 
+			: nFull(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_VEHICLE_UPDATE_CLIENT_BATTERY;
+		}
+
+	};
+
+	struct SNET_VEHICLE_REQ_GIVE_BATTERY
+	{
+		NET_MSG_GENERIC		nmg;
+
+		WORD				wPosX;
+		WORD				wPosY;
+
+		SNET_VEHICLE_REQ_GIVE_BATTERY () 
+			: wPosX(0)
+			, wPosY(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_VEHICLE_REQ_GIVE_BATTERY;
+		}
+
+	};
+
+
+	struct SNET_VEHICLE_REQ_GIVE_BATTERY_FB
+	{
+		NET_MSG_GENERIC				nmg;
+
+		DWORD						dwVehicleID;
+		SNATIVEID					sItemID;
+		SNATIVEID					sBatteryID;
+		int							nFull;
+
+		EMVEHICLE_REQ_GIVE_BATTERY_FB		emFB;
+
+		SNET_VEHICLE_REQ_GIVE_BATTERY_FB () :
+			dwVehicleID(0),
+			sItemID(NATIVEID_NULL()),
+			sBatteryID(NATIVEID_NULL()),
+			nFull(0),
+			emFB(EMVEHICLE_REQ_GIVE_BATTERY_FB_FAIL)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_VEHICLE_REQ_GIVE_BATTERY_FB;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	struct SNET_VEHICLE_REQ_GET_BATTERY_FROMDB_FB
+	{
+		NET_MSG_GENERIC					nmg;
+
+		DWORD							dwVehicleID;
+		SNATIVEID						sItemID;
+		int								nFull;
+		WORD							wPosX;
+		WORD							wPosY;
+		WORD							wCureVolume;
+		BOOL							bRatio;
+		SNATIVEID						sBatteryID;
+		EMVEHICLE_REQ_GIVE_BATTERY_FB	emFB;
+		VEHICLE_TYPE					emType;
+
+		enum { EMMSG_SIZE = sizeof(NET_MSG_GENERIC)+sizeof(DWORD)+sizeof(SNATIVEID)+sizeof(int)+sizeof(WORD)*3+sizeof(BOOL)+sizeof(SNATIVEID)+sizeof(EMVEHICLE_REQ_GIVE_BATTERY_FB)+sizeof(VEHICLE_TYPE) };
+		char				m_cBUFFER[NET_DATA_BUFSIZE-EMMSG_SIZE];
+
+		SNET_VEHICLE_REQ_GET_BATTERY_FROMDB_FB () :
+			dwVehicleID(0),
+			sItemID( NATIVEID_NULL() ),
+			nFull(0),
+			wPosX(0),
+			wPosY(0),
+			wCureVolume(0),
+			bRatio(false),
+			sBatteryID(NATIVEID_NULL()),
+			emFB(EMVEHICLE_REQ_GIVE_BATTERY_FB_FAIL),
+			emType( VEHICLE_TYPE_NONE )
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_VEHICLE_REQ_GET_BATTERY_FROMDB_FB;
+		}
+	};
+
+
+	struct SNET_VEHICLE_REQ_ITEM_INFO
+	{
+		NET_MSG_GENERIC		nmg;
+
+		DWORD				dwVehicleID;
+		bool				bTrade;
+
+		SNET_VEHICLE_REQ_ITEM_INFO () :
+			dwVehicleID(0),
+			bTrade(false)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_VEHICLE_REQ_ITEM_INFO;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	struct SNET_VEHICLE_REQ_ITEM_INFO_FB
+	{
+		NET_MSG_GENERIC		nmg;
+
+		VEHICLE_TYPE				emTYPE;
+		int					nFull;
+		SITEMCUSTOM			PutOnItems[ACCE_TYPE_SIZE];
+		DWORD				dwVehicleID;
+		bool				bTrade;
+
+		SNET_VEHICLE_REQ_ITEM_INFO_FB () :
+			emTYPE(VEHICLE_TYPE_NONE),
+			nFull(0),
+			dwVehicleID(0),
+			bTrade(false)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_VEHICLE_REQ_ITEM_INFO_FB;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	struct SNET_NON_REBIRTH_REQ
+	{
+		NET_MSG_GENERIC		nmg;
+
+		BOOL				bNon_Rebirth;
+
+		SNET_NON_REBIRTH_REQ () :
+			bNon_Rebirth(FALSE)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_NON_REBIRTH_REQ;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+
+	struct SNET_QBOX_OPTION_REQ_AG
+	{
+		NET_MSG_GENERIC		nmg;
+
+		BOOL				bQBoxEnable;
+
+		SNET_QBOX_OPTION_REQ_AG () :
+			bQBoxEnable(FALSE)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_QBOX_OPTION_REQ_AG;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	struct SNET_QBOX_OPTION_REQ_FLD
+	{
+		NET_MSG_GENERIC		nmg;
+
+		BOOL				bQBoxEnable;
+		DWORD				dwPartyID;		
+
+		SNET_QBOX_OPTION_REQ_FLD () :
+			bQBoxEnable(FALSE),
+			dwPartyID(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_QBOX_OPTION_REQ_FLD;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	struct SNET_QBOX_OPTION_MEMBER
+	{
+		NET_MSG_GENERIC		nmg;
+
+		BOOL				bQBoxEnable;
+
+		SNET_QBOX_OPTION_MEMBER () :
+		bQBoxEnable(FALSE)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_QBOX_OPTION_MEMBER;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+	};
+
+	struct SNETPC_OPEN_ITEMSHOP
+	{
+		NET_MSG_GENERIC		nmg;
+
+		bool				bOpen;
+
+		SNETPC_OPEN_ITEMSHOP () :
+		bOpen(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_ITEMSHOPOPEN;
+		}	
+	};
+
+	struct SNETPC_OPEN_ITEMSHOP_BRD : public SNETPC_BROAD
+	{
+		bool				bOpen;			
+
+		SNETPC_OPEN_ITEMSHOP_BRD () :
+		bOpen(0)		
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_ITEMSHOPOPEN_BRD;
+		}	
+	};
+
+	struct SNETPC_REQ_ATTENDLIST
+	{
+		NET_MSG_GENERIC		nmg;
+
+		SNETPC_REQ_ATTENDLIST ()
+		{
+			nmg.dwSize = sizeof(SNETPC_REQ_ATTENDLIST);
+			nmg.nType = NET_MSG_REQ_ATTENDLIST;
+		}
+	};
+
+	struct SNETPC_REQ_ATTENDLIST_FB
+	{
+		enum { EMMAXATTEND = 31 };
+
+		NET_MSG_GENERIC		nmg;
+		DWORD				dwAttenNum;
+		DWORD				dwAttendCombo;
+		
+		__time64_t			tLoginTime;
+		DWORD				dwAttendTime;
+
+		USER_ATTEND_INFO 	sAttend[EMMAXATTEND];
+
+		SNETPC_REQ_ATTENDLIST_FB ()
+			: dwAttenNum(0)
+			, dwAttendCombo(0)
+			, tLoginTime(0)
+			, dwAttendTime(0)
+		{
+			nmg.dwSize = sizeof(NET_MSG_GENERIC) + sizeof(DWORD) + sizeof(DWORD) +
+						 sizeof(__time64_t) + sizeof(DWORD);
+			nmg.nType = NET_MSG_REQ_ATTENDLIST_FB;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}		
+
+		void SetSize( int nSize )
+		{
+			dwAttenNum = nSize;
+			nmg.dwSize = sizeof(NET_MSG_GENERIC) + sizeof(DWORD) + sizeof(DWORD) +
+						 sizeof(__time64_t) + sizeof(DWORD) +
+						 sizeof(USER_ATTEND_INFO)*dwAttenNum ;
+			GASSERT(nmg.dwSize<=NET_DATA_BUFSIZE);
+		}
+
+		void RESET ()
+		{
+			dwAttenNum = 0;
+			dwAttendCombo = 0;
+			nmg.dwSize = sizeof(NET_MSG_GENERIC) + sizeof(DWORD) + sizeof(DWORD) +
+						 sizeof(__time64_t) + sizeof(DWORD);
+		}
+	};
+	
+
+	struct SNETPC_REQ_ATTENDANCE
+	{
+		NET_MSG_GENERIC		nmg;
+
+		SNETPC_REQ_ATTENDANCE ()
+		{
+			nmg.dwSize = sizeof(SNETPC_REQ_ATTENDANCE);
+			nmg.nType = NET_MSG_REQ_ATTENDANCE;
+		}
+	};
+
+	struct SNETPC_REQ_ATTENDANCE_FB
+	{
+		NET_MSG_GENERIC		nmg;
+		EMREQ_ATTEND_FB		emFB;
+
+		__time64_t			tAttendTime;
+		DWORD				dwComboAttend;
+		bool				bAttendReward;
+
+		SNETPC_REQ_ATTENDANCE_FB ()
+			: emFB ( EMREQ_ATTEND_FB_FAIL )
+			, tAttendTime ( 0 )
+			, dwComboAttend ( 0 )
+			, bAttendReward (false)
+		{
+			nmg.dwSize = sizeof(SNETPC_REQ_ATTENDANCE_FB);
+			nmg.nType = NET_MSG_REQ_ATTENDANCE_FB;
+		}
+	};
+
+	struct SNETPC_REQ_ATTEND_REWARD_FLD
+	{
+		NET_MSG_GENERIC		nmg;
+		SNATIVEID			idAttendReward;
+
+		SNETPC_REQ_ATTEND_REWARD_FLD ()
+			: idAttendReward ( NATIVEID_NULL() )
+		{
+			nmg.dwSize = sizeof(SNETPC_REQ_ATTEND_REWARD_FLD);
+			nmg.nType = NET_MSG_REQ_ATTEND_REWARD_FLD;
+		}
+	};
+
+	struct SNETPC_REQ_ATTEND_REWARD_CLT
+	{
+		NET_MSG_GENERIC		nmg;
+		SNATIVEID			idAttendReward;
+
+		SNETPC_REQ_ATTEND_REWARD_CLT ()
+			: idAttendReward ( NATIVEID_NULL() )
+		{
+			nmg.dwSize = sizeof(SNETPC_REQ_ATTEND_REWARD_CLT);
+			nmg.nType = NET_MSG_REQ_ATTEND_REWARD_CLT;
+		}
+	};
+
+
+	struct SNETPC_REQ_GATHERING
+	{
+		NET_MSG_GENERIC		nmg;
+		DWORD				dwTargetID;
+
+		SNETPC_REQ_GATHERING ()
+			: dwTargetID(0)
+		{
+			nmg.dwSize = sizeof(SNETPC_REQ_GATHERING);
+			nmg.nType = NET_MSG_REQ_GATHERING;
+		}
+	};
+
+	struct SNETPC_REQ_GATHERING_FB
+	{
+		NET_MSG_GENERIC		nmg;
+		EMREQ_GATHER_FB		emFB;
+		DWORD				dwTime;
+		DWORD				dwAniSel;
+		DWORD				dwGaeaID;
+
+		SNETPC_REQ_GATHERING_FB ()
+			: emFB ( EMREQ_GATHER_FB_FAIL )
+			, dwTime ( 0 )
+			, dwGaeaID ( GAEAID_NULL )
+			, dwAniSel ( 0 )
+		{
+			nmg.dwSize = sizeof(SNETPC_REQ_GATHERING_FB);
+			nmg.nType = NET_MSG_REQ_GATHERING_FB;
+		}
+	};
+
+	struct SNETPC_REQ_GATHERING_BRD : public SNETPC_BROAD
+	{
+		DWORD				dwAniSel;
+		
+		SNETPC_REQ_GATHERING_BRD ()
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_REQ_GATHERING_BRD;
+		}
+	};
+
+	struct SNETPC_REQ_GATHERING_RESULT
+	{
+		NET_MSG_GENERIC		nmg;
+		EMREQ_GATHER_RESULT	emFB;
+
+		SNETPC_REQ_GATHERING_RESULT ()
+			: emFB ( EMREQ_GATHER_RESULT_FAIL )			
+		{
+			nmg.dwSize = sizeof(SNETPC_REQ_GATHERING_RESULT);
+			nmg.nType = NET_MSG_REQ_GATHERING_RESULT;
+		}
+	};
+
+	struct SNETPC_REQ_GATHERING_RESULT_BRD : public SNETPC_BROAD
+	{
+		EMREQ_GATHER_RESULT	emFB;
+
+		SNETPC_REQ_GATHERING_RESULT_BRD ()
+			: emFB ( EMREQ_GATHER_RESULT_FAIL )			
+		{
+			nmg.dwSize = sizeof(SNETPC_REQ_GATHERING_RESULT_BRD);
+			nmg.nType = NET_MSG_REQ_GATHERING_RESULT_BRD;
+		}
+	};
+
+	struct SNETPC_REQ_GATHERING_CANCEL
+	{
+		NET_MSG_GENERIC		nmg;
+
+		SNETPC_REQ_GATHERING_CANCEL ()
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_REQ_GATHERING_CANCEL;
+		}
+	};
+
+	struct SNETPC_REQ_GATHERING_CANCEL_BRD : public SNETPC_BROAD
+	{
+		SNETPC_REQ_GATHERING_CANCEL_BRD ()
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_REQ_GATHERING_CANCEL_BRD;
+		}
+	};
+
+	struct SNETPC_LANDEFFECT : public SNETPC_BROAD
+	{
+		SLANDEFFECT		sLandEffect[EMLANDEFFECT_MULTI];
+
+		SNETPC_LANDEFFECT ()
+		{
+			nmg.dwSize = sizeof(SNETPC_LANDEFFECT);
+			nmg.nType = NET_MSG_GCTRL_LANDEFFECT;
+
+			for( int i = 0; i < EMLANDEFFECT_MULTI; i++ )
+				sLandEffect[i].Init();
+		}
+
+	};
+
+	struct SNETPC_REQ_DISABLESKILLEFF //disable skill effect NaJDeV
+	{
+		NET_MSG_GENERIC		nmg;
+		DWORD				dwSKILL;
+
+		SNETPC_REQ_DISABLESKILLEFF () :
+			dwSKILL(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_REQ_DISABLESKILLEFF;
+		}
+	};
+
+	
+	struct SNETPC_REQ_DISABLESKILLEFF_FB //disable skill effect NaJDeV
+	{
+		NET_MSG_GENERIC		nmg;
+		DWORD				dwSKILL;
+
+		SNETPC_REQ_DISABLESKILLEFF_FB () :
+			dwSKILL(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_REQ_DISABLESKILLEFF_FB;
+		}
+	};
+
+	struct SNETPC_REQ_DISABLESKILLEFF_BRD : public SNETPC_BROAD //disable skill effect NaJDeV
+	{
+		DWORD dwSKILL;
+
+		SNETPC_REQ_DISABLESKILLEFF_BRD ():
+			dwSKILL(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_REQ_DISABLESKILLEFF_BRD;
+		}
+	};
+
+	//link skill
+	struct SNETPC_REQ_LINKSKILLEFF
+	{
+		NET_MSG_GENERIC		nmg;
+		SNATIVEID			sSKILLID;
+		WORD				wSKILLLevel;
+		DWORD				dwSelect;
+
+		SNETPC_REQ_LINKSKILLEFF ():
+			sSKILLID(NATIVEID_NULL()),
+			wSKILLLevel(0),
+			dwSelect(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_REQ_LINKSKILLEFF;
+		}
+	};
+
+	struct SNETPC_REQ_LINKSKILLEFF_FB
+	{
+		NET_MSG_GENERIC		nmg;
+		SNATIVEID			sSKILLID;
+		WORD				wSKILLLevel;
+		DWORD				dwSelect;
+
+		SNETPC_REQ_LINKSKILLEFF_FB ():
+			sSKILLID(NATIVEID_NULL()),
+			wSKILLLevel(0),
+			dwSelect(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_REQ_LINKSKILLEFF_FB;
+		}
+	};
+
+	struct SNETPC_REQ_LINKSKILLEFF_BRD : public SNETPC_BROAD
+	{
+		SNATIVEID			sSKILLID;
+		WORD				wSKILLLevel;
+		DWORD				dwSelect;
+
+		SNETPC_REQ_LINKSKILLEFF_BRD ():
+			sSKILLID(NATIVEID_NULL()),
+			wSKILLLevel(0),
+			dwSelect(0)
+		{
+			nmg.dwSize = sizeof(*this);
+			nmg.nType = NET_MSG_GCTRL_REQ_LINKSKILLEFF_BRD;
+		}
+	};
+	// Revert to default structure packing
+	#pragma pack()
+};

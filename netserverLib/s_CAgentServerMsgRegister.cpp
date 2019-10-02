@@ -1,0 +1,841 @@
+#include "stdafx.h"
+#include "s_CAgentServer.h"
+
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
+void CAgentServer::ChinaMsgRegister( MSG_LIST* pMsg )
+{
+
+	CHINA_NET_REGISTER_DATA* pNml = NULL;
+
+	if (m_pClientManager->IsAccountPassing( pMsg->dwClient ) == true)
+	{
+		return;
+	}
+	else // 인증중으로 세팅
+	{
+		m_pClientManager->SetAccountPassing( pMsg->dwClient, true );
+	}
+
+	pNml = reinterpret_cast<CHINA_NET_REGISTER_DATA *> (pMsg->Buffer);
+
+	if (sizeof(CHINA_NET_REGISTER_DATA) != pNml->nmg.dwSize)
+	{
+		CConsoleMessage::GetInstance()->Write(
+			
+			_T("ERROR:CHINA_NET_REGISTER_DATA Wrong Message Size") );
+		return;
+	}
+CConsoleMessage::GetInstance()->Write(_T("CHINA_NET_REGISTER_DATA begin") );
+	// 복호화
+	m_Tea.decrypt( pNml->szUserid, USR_ID_LENGTH+1 );
+	m_Tea.decrypt( pNml->szPassword, USR_PASS_LENGTH );
+	m_Tea.decrypt( pNml->szPassword2, USR_PASS_LENGTH );
+	m_Tea.decrypt( pNml->szCaptcha, USR_CAPTCHA+1 );
+	m_Tea.decrypt( pNml->szUserEmail, USR_EMAIL+1 );
+
+	TCHAR szCaptcha[USR_CAPTCHA+1] = {0};
+	TCHAR szPassword[USR_PASS_LENGTH] = {0};
+	TCHAR szPassword2[USR_PASS_LENGTH] = {0};
+	TCHAR szUserid[USR_ID_LENGTH+1] = {0};
+	TCHAR szUserEmail[USR_EMAIL+1] = {0};
+	DWORD dwClient;
+
+	
+	dwClient = pMsg->dwClient;
+
+	StringCchCopy( szUserid, USR_ID_LENGTH+1, pNml->szUserid );
+	StringCchCopy( szPassword, USR_PASS_LENGTH, pNml->szPassword );
+	StringCchCopy( szPassword2, USR_PASS_LENGTH, pNml->szPassword2 );
+	StringCchCopy( szCaptcha, USR_CAPTCHA+1, pNml->szCaptcha );
+	StringCchCopy( szUserEmail, USR_EMAIL+1, pNml->szUserEmail );
+	
+	m_pClientManager->SetAccountPass( pMsg->dwClient, false );
+	CAgentUserRegister* pAction = new CAgentUserRegister(
+		szUserid, 
+		szPassword,
+		szPassword2,
+		szUserEmail,
+		szCaptcha,
+		dwClient);
+	if ( pAction )	CConsoleMessage::GetInstance()->Write(_T("CHINA_NET_REGISTER_DATA Init Success") );
+	else	CConsoleMessage::GetInstance()->Write(_T("CHINA_NET_REGISTER_DATA failed") );
+	COdbcManager::GetInstance()->AddUserJob( (CDbAction*) pAction );
+
+}
+
+void CAgentServer::ChinaMsgRegisterBack (NET_REGISTER_FEEDBACK_DATA2* nlfd2)
+{
+	NET_REGISTER_FEEDBACK_DATA2		nlfd;
+
+	nlfd.nmg.nType = CHINA_NET_MSG_REGISTER_FB;
+	
+	DWORD	dwClient   = (DWORD) nlfd2->nClient;
+	DWORD	dwSndBytes = 0;
+	int		nUserNum   = 0;		
+
+	if ( nlfd2->nResult == EM_REGISTER_FB_SUB_OK )
+	{
+		nlfd.nResult   = nlfd2->nResult;
+		if ( m_pClientManager->IsOnline( dwClient ) == true )
+		{
+		
+			SendClient(dwClient, &nlfd);
+			CConsoleMessage::GetInstance()->Write(_T("NET_REGISTER_FEEDBACK_DATA2 EM_REGISTER_FB_SUB_OK") );
+	
+		}
+	}else if ( nlfd2->nResult == EM_REGISTER_FB_SUB_FAIL )
+	{
+		nlfd.nResult   = nlfd2->nResult;
+		if ( m_pClientManager->IsOnline( dwClient ) == true )
+		{
+		
+			SendClient(dwClient, &nlfd);
+			CConsoleMessage::GetInstance()->Write(_T("NET_REGISTER_FEEDBACK_DATA2 EM_REGISTER_FB_SUB_FAIL") );
+	
+		}
+	}
+}
+
+void CAgentServer::MsgChangePass( MSG_LIST* pMsg )
+{
+
+	CHINA_NET_CP_DATA* pNml = NULL;
+
+	pNml = reinterpret_cast<CHINA_NET_CP_DATA *> (pMsg->Buffer);
+
+	if (sizeof(CHINA_NET_CP_DATA) != pNml->nmg.dwSize)
+	{
+		CConsoleMessage::GetInstance()->Write(
+			
+			_T("ERROR:CHINA_NET_CP_DATA Wrong Message Size") );
+		return;
+	}
+CConsoleMessage::GetInstance()->Write(_T("CHINA_NET_CP_DATA begin") );
+	// 복호화
+	m_Tea.decrypt( pNml->szPassword, USR_PASS_LENGTH );
+	m_Tea.decrypt( pNml->szOPassword, USR_PASS_LENGTH );
+	m_Tea.decrypt( pNml->szPassword2, USR_PASS_LENGTH );
+	m_Tea.decrypt( pNml->szCaptcha, USR_CAPTCHA+1 );
+
+	TCHAR szCaptcha[USR_CAPTCHA+1] = {0};
+	TCHAR szPassword[USR_PASS_LENGTH] = {0};
+	TCHAR szOPassword[USR_PASS_LENGTH] = {0};
+	TCHAR szPassword2[USR_PASS_LENGTH] = {0};
+	TCHAR szUserid[USR_ID_LENGTH+1] = {0};
+	DWORD dwClient;
+
+	
+	dwClient = pMsg->dwClient;
+
+	StringCchCopy( szUserid, USR_ID_LENGTH+1, m_pClientManager->GetUserID(pMsg->dwClient) );
+	StringCchCopy( szOPassword, USR_PASS_LENGTH, pNml->szOPassword );
+	StringCchCopy( szPassword, USR_PASS_LENGTH, pNml->szPassword );
+	StringCchCopy( szPassword2, USR_PASS_LENGTH, pNml->szPassword2 );
+	StringCchCopy( szCaptcha, USR_CAPTCHA+1, pNml->szCaptcha );
+	
+	m_pClientManager->SetAccountPass( pMsg->dwClient, false );
+	CAgentUserChangePassword* pAction = new CAgentUserChangePassword(
+		szUserid,
+		szOPassword,
+		szPassword,
+		szPassword2,
+		szCaptcha,
+		dwClient);
+	if ( pAction )	CConsoleMessage::GetInstance()->Write(_T("CHINA_NET_CP_DATA Init Success") );
+	else	CConsoleMessage::GetInstance()->Write(_T("CHINA_NET_CP_DATA failed") );
+	COdbcManager::GetInstance()->AddUserJob( (CDbAction*) pAction );
+
+}
+
+void CAgentServer::MsgChangePassBack (NET_CP_FEEDBACK_DATA2* nlfd2)
+{
+	NET_CP_FEEDBACK_DATA2		nlfd;
+
+	nlfd.nmg.nType = CHINA_NET_MSG_PASS_FB;
+	
+	DWORD	dwClient   = (DWORD) nlfd2->nClient;
+	DWORD	dwSndBytes = 0;
+	int		nUserNum   = 0;		
+
+	if ( nlfd2->nResult == EM_PASS_FB_SUB_OK )
+	{
+		nlfd.nResult   = nlfd2->nResult;
+		if ( m_pClientManager->IsOnline( dwClient ) == true )
+		{
+		
+			SendClient(dwClient, &nlfd);
+			CConsoleMessage::GetInstance()->Write(_T("NET_CP_FEEDBACK_DATA2 EM_PASS_FB_SUB_OK") );
+	
+		}
+	}else if ( nlfd2->nResult == EM_PASS_FB_SUB_FAIL )
+	{
+		nlfd.nResult   = nlfd2->nResult;
+		if ( m_pClientManager->IsOnline( dwClient ) == true )
+		{
+		
+			SendClient(dwClient, &nlfd);
+			CConsoleMessage::GetInstance()->Write(_T("NET_CP_FEEDBACK_DATA2 EM_PASS_FB_SUB_FAIL") );
+	
+		}
+	}
+}
+
+
+
+void CAgentServer::MsgChangePin( MSG_LIST* pMsg )
+{
+
+	CHINA_NET_CPN_DATA* pNml = NULL;
+
+	pNml = reinterpret_cast<CHINA_NET_CPN_DATA *> (pMsg->Buffer);
+
+	if (sizeof(CHINA_NET_CPN_DATA) != pNml->nmg.dwSize)
+	{
+		CConsoleMessage::GetInstance()->Write(
+			
+			_T("ERROR:CHINA_NET_CPN_DATA Wrong Message Size") );
+		return;
+	}
+CConsoleMessage::GetInstance()->Write(_T("CHINA_NET_CPN_DATA begin") );
+	// 복호화
+	m_Tea.decrypt( pNml->szOPassword2, USR_PASS_LENGTH );
+	m_Tea.decrypt( pNml->szPassword, USR_PASS_LENGTH );
+	m_Tea.decrypt( pNml->szPassword2, USR_PASS_LENGTH );
+	m_Tea.decrypt( pNml->szCaptcha, USR_CAPTCHA+1 );
+
+	TCHAR szCaptcha[USR_CAPTCHA+1] = {0};
+	TCHAR szOPassword2[USR_PASS_LENGTH] = {0};
+	TCHAR szPassword[USR_PASS_LENGTH] = {0};
+	TCHAR szPassword2[USR_PASS_LENGTH] = {0};
+	TCHAR szUserid[USR_ID_LENGTH+1] = {0};
+	DWORD dwClient;
+
+	
+	dwClient = pMsg->dwClient;
+
+	StringCchCopy( szUserid, USR_ID_LENGTH+1, m_pClientManager->GetUserID(pMsg->dwClient) );
+	StringCchCopy( szOPassword2, USR_PASS_LENGTH, pNml->szOPassword2 );
+	StringCchCopy( szPassword, USR_PASS_LENGTH, pNml->szPassword );
+	StringCchCopy( szPassword2, USR_PASS_LENGTH, pNml->szPassword2 );
+	StringCchCopy( szCaptcha, USR_CAPTCHA+1, pNml->szCaptcha );
+	
+	m_pClientManager->SetAccountPass( pMsg->dwClient, false );
+	CAgentUserChangePin* pAction = new CAgentUserChangePin(
+		szUserid, 
+		szOPassword2,
+		szPassword,
+		szPassword2,
+		szCaptcha,
+		dwClient);
+	if ( pAction )	CConsoleMessage::GetInstance()->Write(_T("CHINA_NET_CPN_DATA Init Success") );
+	else	CConsoleMessage::GetInstance()->Write(_T("CHINA_NET_CPN_DATA failed") );
+	COdbcManager::GetInstance()->AddUserJob( (CDbAction*) pAction );
+
+}
+
+void CAgentServer::MsgChangePinBack (NET_CPN_FEEDBACK_DATA2* nlfd2)
+{
+	NET_CPN_FEEDBACK_DATA2		nlfd;
+
+	nlfd.nmg.nType = CHINA_NET_MSG_PIN_FB;
+	
+	DWORD	dwClient   = (DWORD) nlfd2->nClient;
+	DWORD	dwSndBytes = 0;
+	int		nUserNum   = 0;		
+
+	if ( nlfd2->nResult == EM_PIN_FB_SUB_OK )
+	{
+		nlfd.nResult   = nlfd2->nResult;
+		if ( m_pClientManager->IsOnline( dwClient ) == true )
+		{
+		
+			SendClient(dwClient, &nlfd);
+			CConsoleMessage::GetInstance()->Write(_T("NET_CPN_FEEDBACK_DATA2 EM_PIN_FB_SUB_OK") );
+	
+		}
+	}else if ( nlfd2->nResult == EM_PIN_FB_SUB_FAIL )
+	{
+		nlfd.nResult   = nlfd2->nResult;
+		if ( m_pClientManager->IsOnline( dwClient ) == true )
+		{
+		
+			SendClient(dwClient, &nlfd);
+			CConsoleMessage::GetInstance()->Write(_T("NET_CPN_FEEDBACK_DATA2 EM_PIN_FB_SUB_FAIL") );
+	
+		}
+	}
+}
+
+
+
+
+void CAgentServer::MsgChangeEmail( MSG_LIST* pMsg )
+{
+
+	CHINA_NET_CE_DATA* pNml = NULL;
+
+	pNml = reinterpret_cast<CHINA_NET_CE_DATA *> (pMsg->Buffer);
+
+	if (sizeof(CHINA_NET_CE_DATA) != pNml->nmg.dwSize)
+	{
+		CConsoleMessage::GetInstance()->Write(
+			
+			_T("ERROR:CHINA_NET_CE_DATA Wrong Message Size") );
+		return;
+	}
+CConsoleMessage::GetInstance()->Write(_T("CHINA_NET_CE_DATA begin") );
+	// 복호화
+	m_Tea.decrypt( pNml->szPassword, USR_PASS_LENGTH );
+	m_Tea.decrypt( pNml->szPassword2, USR_PASS_LENGTH );
+	m_Tea.decrypt( pNml->szCaptcha, USR_CAPTCHA+1 );
+	m_Tea.decrypt( pNml->szUserEmail, USR_EMAIL+1 );
+
+	TCHAR szCaptcha[USR_CAPTCHA+1] = {0};
+	TCHAR szPassword[USR_PASS_LENGTH] = {0};
+	TCHAR szPassword2[USR_PASS_LENGTH] = {0};
+	TCHAR szUserid[USR_ID_LENGTH+1] = {0};
+	TCHAR szUserEmail[USR_EMAIL+1] = {0};
+	DWORD dwClient;
+
+	
+	dwClient = pMsg->dwClient;
+
+	StringCchCopy( szUserid, USR_ID_LENGTH+1, m_pClientManager->GetUserID(pMsg->dwClient) );
+	StringCchCopy( szPassword, USR_PASS_LENGTH, pNml->szPassword );
+	StringCchCopy( szPassword2, USR_PASS_LENGTH, pNml->szPassword2 );
+	StringCchCopy( szCaptcha, USR_CAPTCHA+1, pNml->szCaptcha );
+	StringCchCopy( szUserEmail, USR_EMAIL+1, pNml->szUserEmail );
+	
+	m_pClientManager->SetAccountPass( pMsg->dwClient, false );
+	CAgentUserChangeEmail* pAction = new CAgentUserChangeEmail(
+		szUserid, 
+		szPassword,
+		szPassword2,
+		szUserEmail,
+		szCaptcha,
+		dwClient);
+	if ( pAction )	CConsoleMessage::GetInstance()->Write(_T("CHINA_NET_CP_DATA Init Success") );
+	else	CConsoleMessage::GetInstance()->Write(_T("CHINA_NET_CP_DATA failed") );
+	COdbcManager::GetInstance()->AddUserJob( (CDbAction*) pAction );
+
+}
+
+void CAgentServer::MsgChangeEmailBack (NET_CE_FEEDBACK_DATA2* nlfd2)
+{
+	NET_CE_FEEDBACK_DATA2		nlfd;
+
+	nlfd.nmg.nType = CHINA_NET_MSG_EMAIL_FB;
+	
+	DWORD	dwClient   = (DWORD) nlfd2->nClient;
+	DWORD	dwSndBytes = 0;
+	int		nUserNum   = 0;		
+
+	if ( nlfd2->nResult == EM_EMAIL_FB_SUB_OK )
+	{
+		nlfd.nResult   = nlfd2->nResult;
+		if ( m_pClientManager->IsOnline( dwClient ) == true )
+		{
+		
+			SendClient(dwClient, &nlfd);
+			CConsoleMessage::GetInstance()->Write(_T("NET_CE_FEEDBACK_DATA2 EM_EMAIL_FB_SUB_OK") );
+	
+		}
+	}else if ( nlfd2->nResult == EM_EMAIL_FB_SUB_FAIL )
+	{
+		nlfd.nResult   = nlfd2->nResult;
+		if ( m_pClientManager->IsOnline( dwClient ) == true )
+		{
+		
+			SendClient(dwClient, &nlfd);
+			CConsoleMessage::GetInstance()->Write(_T("NET_CE_FEEDBACK_DATA2 EM_EMAIL_FB_SUB_FAIL") );
+	
+		}
+	}
+}
+
+
+
+void CAgentServer::MsgTopUp( MSG_LIST* pMsg )
+{
+
+	CHINA_NET_TOPUP_DATA* pNml = NULL;
+
+	pNml = reinterpret_cast<CHINA_NET_TOPUP_DATA *> (pMsg->Buffer);
+
+	if (sizeof(CHINA_NET_TOPUP_DATA) != pNml->nmg.dwSize)
+	{
+		CConsoleMessage::GetInstance()->Write(
+			
+			_T("ERROR:CHINA_NET_TOPUP_DATA Wrong Message Size") );
+		return;
+	}
+CConsoleMessage::GetInstance()->Write(_T("CHINA_NET_TOPUP_DATA begin") );
+	// 복호화
+	m_Tea.decrypt( pNml->szCode, USR_PASS_LENGTH );
+	m_Tea.decrypt( pNml->szPin, USR_PASS_LENGTH );
+	m_Tea.decrypt( pNml->szCaptcha, USR_CAPTCHA+1 );
+
+	TCHAR szCaptcha[USR_CAPTCHA+1] = {0};
+	TCHAR szCode[USR_PASS_LENGTH] = {0};
+	TCHAR szPin[USR_PASS_LENGTH] = {0};
+	TCHAR szUserid[USR_ID_LENGTH+1] = {0};
+	DWORD dwClient;
+
+	
+	dwClient = pMsg->dwClient;
+
+	m_pClientManager->SetAccountPass( pMsg->dwClient, false );
+	StringCchCopy( szUserid, USR_ID_LENGTH+1, m_pClientManager->GetUserID(pMsg->dwClient) );
+	StringCchCopy( szCode, USR_PASS_LENGTH, pNml->szCode );
+	StringCchCopy( szPin, USR_PASS_LENGTH, pNml->szPin );
+	StringCchCopy( szCaptcha, USR_CAPTCHA+1, pNml->szCaptcha );
+	
+	CAgentUserTopUp* pAction = new CAgentUserTopUp(
+		szUserid, 
+		szCode,
+		szPin,
+		szCaptcha,
+		dwClient);
+	if ( pAction )	CConsoleMessage::GetInstance()->Write(_T("CHINA_NET_TOPUP_DATA Init Success") );
+	else	CConsoleMessage::GetInstance()->Write(_T("CHINA_NET_TOPUP_DATA failed") );
+	COdbcManager::GetInstance()->AddUserJob( (CDbAction*) pAction );
+
+}
+
+void CAgentServer::MsgTopUpBack (NET_TOPUP_FEEDBACK_DATA2* nlfd2)
+{
+	NET_TOPUP_FEEDBACK_DATA2		nlfd;
+
+	nlfd.nmg.nType = CHINA_NET_MSG_TOPUP_FB;
+	
+	DWORD	dwClient   = (DWORD) nlfd2->nClient;
+	DWORD	dwSndBytes = 0;
+	int		nUserNum   = 0;		
+
+	if ( nlfd2->nResult == EM_TOPUP_FB_SUB_OK )
+	{
+		nlfd.nResult   = nlfd2->nResult;
+		if ( m_pClientManager->IsOnline( dwClient ) == true )
+		{
+		
+			SendClient(dwClient, &nlfd);
+			CConsoleMessage::GetInstance()->Write(_T("NET_TOPUP_FEEDBACK_DATA2 EM_TOPUP_FB_SUB_OK") );
+	
+		}
+	}else if ( nlfd2->nResult == EM_TOPUP_FB_SUB_FAIL )
+	{
+		nlfd.nResult   = nlfd2->nResult;
+		if ( m_pClientManager->IsOnline( dwClient ) == true )
+		{
+		
+			SendClient(dwClient, &nlfd);
+			CConsoleMessage::GetInstance()->Write(_T("NET_TOPUP_FEEDBACK_DATA2 EM_TOPUP_FB_SUB_FAIL") );
+	
+		}
+	}
+}
+
+
+
+void CAgentServer::MsgGameTimeCVT( MSG_LIST* pMsg )
+{
+
+	CHINA_NET_GTCVT_DATA* pNml = NULL;
+
+	pNml = reinterpret_cast<CHINA_NET_GTCVT_DATA *> (pMsg->Buffer);
+
+	if (sizeof(CHINA_NET_GTCVT_DATA) != pNml->nmg.dwSize)
+	{
+		CConsoleMessage::GetInstance()->Write(
+			
+			_T("ERROR:CHINA_NET_GTCVT_DATA Wrong Message Size") );
+		return;
+	}
+	// 복호화
+	
+	CConsoleMessage::GetInstance()->Write(_T("CHINA_NET_GTCVT_DATA begin") );
+	m_Tea.decrypt( pNml->szCaptcha, USR_CAPTCHA+1 );
+
+	TCHAR szCaptcha[USR_CAPTCHA+1] = {0};
+	DWORD dwGameTime;
+	TCHAR szUserid[USR_ID_LENGTH+1] = {0};
+	DWORD dwClient;
+	
+	dwClient = pMsg->dwClient;
+	
+	m_pClientManager->SetAccountPass( pMsg->dwClient, false );
+	dwGameTime = (DWORD)m_pClientManager->GetChinaGameTime(pMsg->dwClient);
+	StringCchCopy( szUserid, USR_ID_LENGTH+1, m_pClientManager->GetUserID(pMsg->dwClient) );
+	StringCchCopy( szCaptcha, USR_CAPTCHA+1, pNml->szCaptcha );
+	
+	CConsoleMessage::GetInstance()->Write(_T("CHINA_NET_GTCVT_DATA Init") );
+	CAgentUserGameTimeCVT* pAction = new CAgentUserGameTimeCVT(
+		szUserid, 
+		szCaptcha,
+		dwGameTime,
+		dwClient);
+	if ( pAction )	CConsoleMessage::GetInstance()->Write(_T("CHINA_NET_GTCVT_DATA Init Success") );
+	else	CConsoleMessage::GetInstance()->Write(_T("CHINA_NET_GTCVT_DATA failed") );
+	COdbcManager::GetInstance()->AddUserJob( (CDbAction*) pAction );
+
+}
+
+void CAgentServer::MsgGameTimeCVTBack (NET_GTCVT_FEEDBACK_DATA2* nlfd2)
+{
+	NET_GTCVT_FEEDBACK_DATA2		nlfd;
+
+	nlfd.nmg.nType = CHINA_NET_MSG_GT2VP_FB;
+	
+	DWORD	dwClient   = (DWORD) nlfd2->nClient;
+	DWORD	dwSndBytes = 0;
+	int		nUserNum   = 0;		
+
+	if ( nlfd2->nResult == EM_GT2VP_FB_SUB_OK )
+	{
+		nlfd.nResult   = nlfd2->nResult;
+		if ( m_pClientManager->IsOnline( dwClient ) == true )
+		{
+		
+			SendClient(dwClient, &nlfd);
+			CConsoleMessage::GetInstance()->Write(_T("NET_GTCVT_FEEDBACK_DATA2 EM_GTCVT_FB_SUB_OK") );
+	
+		}
+	}else if ( nlfd2->nResult == EM_GT2VP_FB_SUB_FAIL )
+	{
+		nlfd.nResult   = nlfd2->nResult;
+		if ( m_pClientManager->IsOnline( dwClient ) == true )
+		{
+		
+			SendClient(dwClient, &nlfd);
+			CConsoleMessage::GetInstance()->Write(_T("NET_GTCVT_FEEDBACK_DATA2 EM_GTCVT_FB_SUB_FAIL") );
+	
+		}
+	}
+}
+//
+void CAgentServer::MsgPremiumPointCVT( MSG_LIST* pMsg )
+{
+
+	CHINA_NET_PPCVT_DATA* pNml = NULL;
+
+	pNml = reinterpret_cast<CHINA_NET_PPCVT_DATA *> (pMsg->Buffer);
+
+	if (sizeof(CHINA_NET_PPCVT_DATA) != pNml->nmg.dwSize)
+	{
+		CConsoleMessage::GetInstance()->Write(
+			
+			_T("ERROR:CHINA_NET_PPCVT_DATA Wrong Message Size") );
+		return;
+	}
+	// 복호화
+	
+	CConsoleMessage::GetInstance()->Write(_T("CHINA_NET_PPCVT_DATA begin") );
+	m_Tea.decrypt( pNml->szCaptcha, USR_CAPTCHA+1 );
+	m_Tea.decrypt( pNml->szValue,  USR_CAPTCHA+1 );
+
+	TCHAR szCaptcha[USR_CAPTCHA+1] = {0};
+	TCHAR szValue[USR_CAPTCHA+1] = {0};
+	TCHAR szUserid[USR_ID_LENGTH+1] = {0};
+	DWORD dwClient;
+	
+	dwClient = pMsg->dwClient;
+	
+	m_pClientManager->SetAccountPass( pMsg->dwClient, false );
+	StringCchCopy( szValue, USR_ID_LENGTH+1,  pNml->szValue );
+	StringCchCopy( szUserid, USR_ID_LENGTH+1, m_pClientManager->GetUserID(pMsg->dwClient) );
+	StringCchCopy( szCaptcha, USR_CAPTCHA+1, pNml->szCaptcha );
+	
+	CConsoleMessage::GetInstance()->Write(_T("CHINA_NET_PPCVT_DATA Init") );
+	CAgentUserPremiumPointCVT* pAction = new CAgentUserPremiumPointCVT(
+		szUserid, 
+		szValue,
+		szCaptcha,
+		dwClient);
+	if ( pAction )	CConsoleMessage::GetInstance()->Write(_T("CHINA_NET_PPCVT_DATA Init Success") );
+	else	CConsoleMessage::GetInstance()->Write(_T("CHINA_NET_PPCVT_DATA failed") );
+	COdbcManager::GetInstance()->AddUserJob( (CDbAction*) pAction );
+
+}
+
+void CAgentServer::MsgPremiumPointCVTBack (NET_PPCVT_FEEDBACK_DATA2* nlfd2)
+{
+	NET_PPCVT_FEEDBACK_DATA2		nlfd;
+
+	nlfd.nmg.nType = CHINA_NET_MSG_PP2VP_FB;
+	
+	DWORD	dwClient   = (DWORD) nlfd2->nClient;
+	DWORD	dwSndBytes = 0;
+	int		nUserNum   = 0;		
+
+	if ( nlfd2->nResult == EM_PP2VP_FB_SUB_OK )
+	{
+		nlfd.nResult   = nlfd2->nResult;
+		if ( m_pClientManager->IsOnline( dwClient ) == true )
+		{
+		
+			SendClient(dwClient, &nlfd);
+			CConsoleMessage::GetInstance()->Write(_T("NET_PPCVT_FEEDBACK_DATA2 EM_PPCVT_FB_SUB_OK") );
+	
+		}
+	}else if ( nlfd2->nResult == EM_PP2VP_FB_SUB_FAIL )
+	{
+		nlfd.nResult   = nlfd2->nResult;
+		if ( m_pClientManager->IsOnline( dwClient ) == true )
+		{
+		
+			SendClient(dwClient, &nlfd);
+			CConsoleMessage::GetInstance()->Write(_T("NET_PPCVT_FEEDBACK_DATA2 EM_PPCVT_FB_SUB_FAIL") );
+	
+		}
+	}
+}
+void CAgentServer::MsgResetPin ( MSG_LIST* pMsg )
+{
+
+	CHINA_NET_RPN_DATA* pNml = NULL;
+	
+	pNml = reinterpret_cast<CHINA_NET_RPN_DATA *> (pMsg->Buffer);
+
+	if (sizeof(CHINA_NET_RPN_DATA) != pNml->nmg.dwSize)
+	{
+		CConsoleMessage::GetInstance()->Write(
+			
+			_T("ERROR:CHINA_NET_RPN_DATA Wrong Message Size") );
+		return;
+	}
+CConsoleMessage::GetInstance()->Write(_T("CHINA_NET_RPN_DATA begin") );
+	// 복호화
+	m_Tea.decrypt( pNml->szUserid, USR_ID_LENGTH+1 );
+	m_Tea.decrypt( pNml->szUserEmail, USR_EMAIL+1 );
+	m_Tea.decrypt( pNml->szPassword, USR_PASS_LENGTH );
+	m_Tea.decrypt( pNml->szCaptcha, USR_CAPTCHA+1 );
+	m_Tea.decrypt( pNml->szPassword2, USR_PASS_LENGTH );
+	m_Tea.decrypt( pNml->szPassword2Hold, USR_PASS_LENGTH );
+
+	TCHAR szCaptcha[USR_CAPTCHA+1] = {0};
+	TCHAR szUserEmail[USR_EMAIL+1] = {0};
+	TCHAR szPassword[USR_PASS_LENGTH] = {0};
+	TCHAR szPassword2[USR_PASS_LENGTH] = {0};
+	TCHAR szPassword2Hold[USR_PASS_LENGTH] = {0};
+	TCHAR szUserid[USR_ID_LENGTH+1] = {0};
+	DWORD dwClient;
+
+	dwClient = pMsg->dwClient;
+	
+	
+	StringCchCopy( szUserid, USR_ID_LENGTH+1, m_pClientManager->GetUserID(pMsg->dwClient) );
+	StringCchCopy( szPassword, USR_PASS_LENGTH, pNml->szPassword );
+	StringCchCopy( szPassword2, USR_PASS_LENGTH, pNml->szPassword2 );
+	StringCchCopy( szPassword2Hold, USR_PASS_LENGTH, pNml->szPassword2Hold );
+	StringCchCopy( szUserEmail, USR_EMAIL+1, pNml->szUserEmail );
+	StringCchCopy( szCaptcha, USR_CAPTCHA+1, pNml->szCaptcha );
+		
+	
+	m_pClientManager->SetAccountPass( pMsg->dwClient, false );
+	CAgentUserResetPin* pAction = new CAgentUserResetPin(
+		szUserid,
+		szUserEmail,
+		szPassword,
+		szPassword2,
+		szPassword2Hold,
+		szCaptcha,
+		dwClient);
+	if ( pAction )	CConsoleMessage::GetInstance()->Write(_T("CHINA_NET_RPN_DATA Init Success") );
+	else	CConsoleMessage::GetInstance()->Write(_T("CHINA_NET_RPN_DATA failed") );
+	COdbcManager::GetInstance()->AddUserJob( (CDbAction*) pAction );
+
+}
+void CAgentServer::MsgResetPinBack ( NET_RPN_FEEDBACK_DATA2* nlfd2 )
+{
+	NET_RPN_FEEDBACK_DATA2		nlfd;
+
+	nlfd.nmg.nType = CHINA_NET_MSG_RESETPIN_FB;
+	
+	DWORD	dwClient   = (DWORD) nlfd2->nClient;
+	DWORD	dwSndBytes = 0;
+	int		nUserNum   = 0;		
+
+	if ( nlfd2->nResult == EM_PASS_FB_SUB_OK )
+	{
+		nlfd.nResult   = nlfd2->nResult;
+		StringCchCopy(nlfd.szUserpass2Hold,USR_ID_LENGTH+6, nlfd2->szUserpass2Hold); // ip
+		if ( m_pClientManager->IsOnline( dwClient ) == true )
+		{
+		
+			SendClient(dwClient, &nlfd);
+			CConsoleMessage::GetInstance()->Write(_T("NET_CP_FEEDBACK_DATA2 EM_PASS_FB_SUB_OK") );
+	
+		}
+	}else if ( nlfd2->nResult == EM_PASS_FB_SUB_FAIL )
+	{
+		nlfd.nResult   = nlfd2->nResult;
+		if ( m_pClientManager->IsOnline( dwClient ) == true )
+		{
+		
+			SendClient(dwClient, &nlfd);
+			CConsoleMessage::GetInstance()->Write(_T("NET_CP_FEEDBACK_DATA2 EM_PASS_FB_SUB_FAIL") );
+	
+		}
+	}
+}
+void CAgentServer::MsgResetPass ( MSG_LIST* pMsg )
+{
+	CHINA_NET_RPS_DATA* pNml = NULL;
+	
+	if (m_pClientManager->IsAccountPassing( pMsg->dwClient ) == true)
+	{
+		return;
+	}
+	else // 인증중으로 세팅
+	{
+		m_pClientManager->SetAccountPassing( pMsg->dwClient, true );
+	}
+
+	pNml = reinterpret_cast<CHINA_NET_RPS_DATA *> (pMsg->Buffer);
+
+	if (sizeof(CHINA_NET_RPS_DATA) != pNml->nmg.dwSize)
+	{
+		CConsoleMessage::GetInstance()->Write(
+			
+			_T("ERROR:CHINA_NET_RPS_DATA Wrong Message Size") );
+		return;
+	}
+CConsoleMessage::GetInstance()->Write(_T("CHINA_NET_RPS_DATA begin") );
+	// 복호화
+	m_Tea.decrypt( pNml->szUserid, USR_ID_LENGTH+1 );
+	m_Tea.decrypt( pNml->szPassword2, USR_PASS_LENGTH );
+	m_Tea.decrypt( pNml->szCaptcha, USR_CAPTCHA+1 );
+
+	TCHAR szCaptcha[USR_CAPTCHA+1] = {0};
+	TCHAR szPassword2[USR_PASS_LENGTH] = {0};
+	TCHAR szUserid[USR_ID_LENGTH+1] = {0};
+	DWORD dwClient;
+
+	dwClient = pMsg->dwClient;
+
+	StringCchCopy( szUserid, USR_ID_LENGTH+1, pNml->szUserid );
+	StringCchCopy( szPassword2, USR_PASS_LENGTH, pNml->szPassword2 );
+	StringCchCopy( szCaptcha, USR_CAPTCHA+1, pNml->szCaptcha );
+	m_pClientManager->SetUserID( dwClient, szUserid );
+	m_pClientManager->SetAccountPass( pMsg->dwClient, false );
+	CAgentUserResetPassword* pAction = new CAgentUserResetPassword(
+		szUserid,
+		szPassword2,
+		szCaptcha,
+		dwClient);
+	if ( pAction )	CConsoleMessage::GetInstance()->Write(_T("CHINA_NET_RPS_DATA Init Success") );
+	else	CConsoleMessage::GetInstance()->Write(_T("CHINA_NET_RPS_DATA failed") );
+	COdbcManager::GetInstance()->AddUserJob( (CDbAction*) pAction );
+}
+void CAgentServer::MsgResetPassBack ( NET_RPS_FEEDBACK_DATA2* nlfd2 )
+{
+	NET_RPS_FEEDBACK_DATA2		nlfd;
+
+	nlfd.nmg.nType = CHINA_NET_MSG_RESETPASS_FB;
+	
+	DWORD	dwClient   = (DWORD) nlfd2->nClient;
+	DWORD	dwSndBytes = 0;
+	int		nUserNum   = 0;		
+
+	if ( nlfd2->nResult == EM_PASS_FB_SUB_OK )
+	{
+		nlfd.nResult   = nlfd2->nResult;
+		StringCchCopy(nlfd.szUserid,USR_ID_LENGTH+6, nlfd2->szUserid); // ip
+		if ( m_pClientManager->IsOnline( dwClient ) == true )
+		{
+		
+			SendClient(dwClient, &nlfd);
+			CConsoleMessage::GetInstance()->Write(_T("NET_CP_FEEDBACK_DATA2 EM_PASS_FB_SUB_OK") );
+	
+		}
+	}else if ( nlfd2->nResult == EM_PASS_FB_SUB_FAIL )
+	{
+		nlfd.nResult   = nlfd2->nResult;
+		if ( m_pClientManager->IsOnline( dwClient ) == true )
+		{
+		
+			SendClient(dwClient, &nlfd);
+			CConsoleMessage::GetInstance()->Write(_T("NET_CP_FEEDBACK_DATA2 EM_PASS_FB_SUB_FAIL") );
+	
+		}
+	}
+}
+void CAgentServer::MsgResetPass2 ( MSG_LIST* pMsg )
+{
+	CHINA_NET_RPS2_DATA* pNml = NULL;
+
+	pNml = reinterpret_cast<CHINA_NET_RPS2_DATA *> (pMsg->Buffer);
+
+	if (sizeof(CHINA_NET_RPS2_DATA) != pNml->nmg.dwSize)
+	{
+		CConsoleMessage::GetInstance()->Write(
+			
+			_T("ERROR:CHINA_NET_RPS2_DATA Wrong Message Size") );
+		return;
+	}
+CConsoleMessage::GetInstance()->Write(_T("CHINA_NET_RPS2_DATA begin") );
+	// 복호화
+	m_Tea.decrypt( pNml->szPassword2, USR_PASS_LENGTH );
+	m_Tea.decrypt( pNml->szCaptcha, USR_CAPTCHA+1 );
+
+	TCHAR szCaptcha[USR_CAPTCHA+1] = {0};
+	TCHAR szPassword[USR_PASS_LENGTH] = {0};
+	TCHAR szUserid[USR_ID_LENGTH+1] = {0};
+	TCHAR szPassword2[USR_PASS_LENGTH] = {0};
+	DWORD dwClient;
+
+	dwClient = pMsg->dwClient;
+
+	StringCchCopy( szUserid, USR_ID_LENGTH+1, m_pClientManager->GetUserID(pMsg->dwClient) );
+	StringCchCopy( szPassword, USR_PASS_LENGTH, pNml->szPassword );
+	StringCchCopy( szPassword2, USR_PASS_LENGTH, pNml->szPassword2 );
+	StringCchCopy( szCaptcha, USR_CAPTCHA+1, pNml->szCaptcha );
+
+	m_pClientManager->SetAccountPass( pMsg->dwClient, false );
+	CAgentUserResetPassword2* pAction = new CAgentUserResetPassword2(
+		szUserid,
+		szPassword,
+		szPassword2,
+		szCaptcha,
+		dwClient);
+	if ( pAction )	CConsoleMessage::GetInstance()->Write(_T("CHINA_NET_RPS2_DATA Init Success") );
+	else	CConsoleMessage::GetInstance()->Write(_T("CHINA_NET_RPS2_DATA failed") );
+	COdbcManager::GetInstance()->AddUserJob( (CDbAction*) pAction );
+}
+
+void CAgentServer::MsgResetPassBack2 ( NET_RPS2_FEEDBACK_DATA2* nlfd2 )
+{
+	NET_RPS2_FEEDBACK_DATA2		nlfd;
+
+	nlfd.nmg.nType = CHINA_NET_MSG_RESETPASS2_FB;
+	
+	DWORD	dwClient   = (DWORD) nlfd2->nClient;
+	DWORD	dwSndBytes = 0;
+	int		nUserNum   = 0;		
+
+	if ( nlfd2->nResult == EM_RESETPASS_FB_SUB_OK )
+	{
+		nlfd.nResult   = nlfd2->nResult;
+		if ( m_pClientManager->IsOnline( dwClient ) == true )
+		{
+		
+			SendClient(dwClient, &nlfd);
+			CConsoleMessage::GetInstance()->Write(_T("NET_RPS_FEEDBACK_DATA2 EM_RESETPASS_FB_SUB_OK") );
+	
+		}
+	}else if ( nlfd2->nResult == EM_RESETPASS_FB_SUB_FAIL )
+	{
+		nlfd.nResult   = nlfd2->nResult;
+		if ( m_pClientManager->IsOnline( dwClient ) == true )
+		{
+		
+			SendClient(dwClient, &nlfd);
+			CConsoleMessage::GetInstance()->Write(_T("NET_RPS_FEEDBACK_DATA2 EM_RESETPASS_FB_SUB_FAIL") );
+	
+		}
+	}
+}
+

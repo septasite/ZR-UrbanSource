@@ -1,0 +1,31 @@
+#pragma	once
+
+#include "ItemSlot.h"
+
+class	CItemSlotPrivateMarket : public CItemSlot
+{
+public:
+	CItemSlotPrivateMarket ();
+	virtual	~CItemSlotPrivateMarket ();
+
+	void	CreateFlipImage ( int nMaxColumn );
+
+	int		m_nMaxColumn;
+
+public:
+	void	CreateSubControl ( int nMaxColumn );
+
+public:
+	virtual void Update ( int x, int y, BYTE LB, BYTE MB, BYTE RB, int nScroll, float fElapsedTime, BOOL bFirstControl );
+
+private:
+	CUIControl*	CreateFlipImage ( const char* szFlip );
+	CUIControl*		m_pWrap[6];
+
+public:
+	void	SetFlipItem ( WORD wIndex, BOOL bFlip );
+	BOOL	IsFlipItem ( WORD wIndex );
+
+private:
+	CUIControl*		m_pFlipImage[nLIMIT_COLUMN];
+};

@@ -1,0 +1,308 @@
+#include "StdAfx.h"
+#include "PartySlot.h"
+#include "../EngineUILib/GUInterface/BasicTextBox.h"
+#include "../EngineLib/DxCommon/DxFontMan.h"
+#include "GameTextControl.h"
+#include "UITextControl.h"
+#include "../EngineUILib/GUInterface/BasicProgressBar.h"
+#include "BasicTextButton.h"
+#include "BasicLineBox.h"
+#include "d3dfont.h"
+
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
+CPartySlot::CPartySlot () :
+	m_pPlayerName ( NULL ),
+	//m_pPlayerLvl ( NULL ),
+	m_pQuitButton ( NULL ),
+	m_pAuthorityButton( NULL ),
+	m_pHP ( NULL ),
+	m_pHPLineBack ( NULL ),
+	m_pMapText ( NULL ),
+	m_pMapLineBack ( NULL ),
+	m_pPosText ( NULL ),
+	m_bMaster ( FALSE )
+{
+	//add class
+	for ( int i = 0; i < GLCI_NUM_NEWEST; i++ )
+	{
+		m_pClass[i] = NULL;
+	}
+
+	for ( int i = 0; i < 3; i++ )
+	{
+		m_pSchool[i] = NULL;	
+	}
+}
+
+CPartySlot::~CPartySlot ()
+{
+}
+
+void CPartySlot::SetSameMap ( BOOL bSameMap )
+{
+	if ( m_pHP ) m_pHP->SetVisibleSingle ( bSameMap );
+	if ( m_pHPLineBack ) m_pHPLineBack->SetVisibleSingle ( bSameMap );
+	if ( m_pPosText ) m_pPosText->SetVisibleSingle ( bSameMap );
+
+	//if ( m_pMapText ) m_pMapText->SetVisibleSingle ( bSameMap );
+	if ( m_pMapLineBack ) m_pMapLineBack->SetVisibleSingle ( !bSameMap );
+}
+
+void CPartySlot::CreateSubControl ()
+{
+	CD3DFontPar* pFont8 = DxFontMan::GetInstance().LoadDxFont ( _DEFAULT_FONT, 9, TRUE, D3DFONT_SHADOW | D3DFONT_ASCII );
+	int nTextAlign = TEXT_ALIGN_LEFT;
+	D3DCOLOR dwFontColor = NS_UITEXTCOLOR::DEFAULT;
+	D3DCOLOR dwNameColor = NS_UITEXTCOLOR::PARTYNAME;
+	
+	CBasicTextBox* pTextBox = NULL;
+	{
+		//add class
+		CString strClassKeyword[GLCI_NUM_NEWEST] = 
+		{
+			"PARTY_SLOT_CLASS_FIGHTER_M",
+			"PARTY_SLOT_CLASS_ARMS_M",
+			"PARTY_SLOT_CLASS_ARCHER_W",
+			"PARTY_SLOT_CLASS_SPIRIT_W",
+			"PARTY_SLOT_CLASS_EXTREME_M",
+			"PARTY_SLOT_CLASS_EXTREME_W",
+			"PARTY_SLOT_CLASS_FIGHTER_W",
+			"PARTY_SLOT_CLASS_ARMS_W",
+			"PARTY_SLOT_CLASS_ARCHER_M",
+			"PARTY_SLOT_CLASS_SPIRIT_M",
+			"PARTY_SLOT_CLASS_SCIENCE_M",
+			"PARTY_SLOT_CLASS_SCIENCE_W",
+			"PARTY_SLOT_CLASS_ASSASSIN_M",
+			"PARTY_SLOT_CLASS_ASSASSIN_W",
+			"PARTY_SLOT_CLASS_TESTING_M",
+			"PARTY_SLOT_CLASS_TESTING_W",
+		};
+
+		for ( int i = 0; i < GLCI_NUM_NEWEST; i++ )
+		{
+			m_pClass[i] = CreateControl ( strClassKeyword[i].GetString() );
+		}
+	}
+	{
+		CString strSchool[3] = 
+		{
+			"PARTY_SLOT_SCHOOL0",
+			"PARTY_SLOT_SCHOOL1",
+			"PARTY_SLOT_SCHOOL2"
+		};
+
+		for ( int i = 0; i < 3; i++ )
+		{
+			m_pSchool[i] = CreateControl ( strSchool[i].GetString() );
+		}
+	}
+	{
+		m_pBackLine1 = new CBasicLineBox;
+		m_pBackLine1->CreateSub ( this, "BASIC_LINE_BOX_SKILL", UI_FLAG_XSIZE | UI_FLAG_YSIZE );
+		m_pBackLine1->CreateBaseBoxSkill ( "RNPARTY_WINDOW_SLOT_BACK" );
+		RegisterControl ( m_pBackLine1 );
+	}
+	{
+		m_pMaster = CreateControl ( "PARTY_NUMBER_M" );
+		m_pNumberSlot = CreateStaticControl ( "PARTY_NUMBER", pFont8, dwFontColor, nTextAlign );
+	}
+
+	{
+		//	ÇÇ Ç¥½Ã ¹Ú½º
+		m_pHPLineBack = CreateControl ( "PARTY_SLOT_HP_BACK" );
+
+		//	ÇÇ Ç¥½Ã
+		/*CBasicProgressBar*	pProgressBar = new CBasicProgressBar;
+		pProgressBar->CreateSub ( this, "PARTY_SLOT_HP", UI_FLAG_DEFAULT, PARTY_HP_BAR );
+		pProgressBar->CreateOverImage ( "PARTY_SLOT_HP_OVERIMAGE" );
+//		pProgressBar->SetPercent ( 0.3f );
+		RegisterControl ( pProgressBar );
+		m_pHP = pProgressBar;*/
+
+	}
+
+	{
+		nTextAlign = TEXT_ALIGN_RIGHT;
+		m_pPlayerName = CreateStaticControl ( "PARTY_SLOT_PLAYER_NAME", pFont8, dwNameColor, nTextAlign );
+
+		//nTextAlign = TEXT_ALIGN_LEFT;
+		//m_pPlayerLvl = CreateStaticControl ( "PARTY_SLOT_PLAYER_LEVEL", pFont8, dwNameColor, nTextAlign );
+
+		nTextAlign = TEXT_ALIGN_RIGHT;
+		m_pPosText = CreateStaticControl ( "PARTY_SLOT_PLAYER_POS", pFont8, dwFontColor, nTextAlign );
+
+		m_pQuitButton = CreateTextButton24 ( "PARTY_SLOT_QUIT_BUTTON", PARTY_QUIT_BUTTON, (char*)ID2GAMEWORD ( "QUIT_PARTY", 0 ) );
+		m_pAuthorityButton = CreateTextButton24 ( "PARTY_SLOT_AUTHORITY_BUTTON", PARTY_AUTH_BUTTON, (char*)ID2GAMEWORD ( "AUTHORITY_PARTY", 0 ) );
+	}
+
+	{
+		nTextAlign = TEXT_ALIGN_LEFT;
+		m_pMapText = CreateStaticControl ( "PARTY_SLOT_POS_TEXT", pFont8, dwFontColor, nTextAlign );
+		m_pMapText->SetVisibleSingle ( TRUE );
+	}
+
+	SetSameMap ( TRUE );
+}
+
+
+CBasicTextButton*	 CPartySlot::CreateTextButton24 ( char* szButton, UIGUID ControlID, char* szText )
+{
+	const int nBUTTONSIZE = CBasicTextButton::SIZE24;
+	CBasicTextButton* pTextButton = new CBasicTextButton;
+	pTextButton->CreateSub ( this, "BASIC_TEXT_BUTTON24", UI_FLAG_XSIZE | UI_FLAG_YSIZE , ControlID );
+	pTextButton->CreateBaseButton ( szButton, nBUTTONSIZE, CBasicButton::CLICK_FLIP, szText );
+	pTextButton->SetFlip ( TRUE );
+	RegisterControl ( pTextButton );
+	return pTextButton;
+}
+
+CUIControl*	CPartySlot::CreateControl ( const char* szControl )
+{
+	CUIControl* pControl = new CUIControl;
+	pControl->CreateSub ( this, szControl );
+	RegisterControl ( pControl );
+	return pControl;
+}
+
+CBasicTextBox* CPartySlot::CreateStaticControl ( char* szControlKeyword, CD3DFontPar* pFont, D3DCOLOR dwColor, int nAlign )
+{
+	CBasicTextBox* pStaticText = new CBasicTextBox;
+	pStaticText->CreateSub ( this, szControlKeyword );
+	pStaticText->SetFont ( pFont );
+	pStaticText->SetTextAlign ( nAlign );
+	RegisterControl ( pStaticText );
+	return pStaticText;
+}
+
+void CPartySlot::SetPlayerName ( CString strName )
+{
+	if ( m_pPlayerName )
+	{
+		m_pPlayerName->SetOneLineText ( strName, NS_UITEXTCOLOR::WHITE );
+	}
+}
+
+void CPartySlot::SetPlayerPos ( CString strPos )
+{
+	if ( m_pPosText ) m_pPosText->SetOneLineText ( strPos );
+}
+
+void CPartySlot::SetHP ( float fPercent )
+{
+	if ( m_pHP ) m_pHP->SetPercent ( fPercent );
+}
+
+void CPartySlot::SetMapName ( CString strMapName )
+{
+	if ( m_pMapText ) m_pMapText->SetOneLineText ( strMapName );
+	m_pMapText->SetVisibleSingle ( TRUE );
+}
+
+void CPartySlot::SetClass ( int nClassType )
+{
+	//add class
+	if ( nClassType < GLCI_FIGHTER_M && GLCI_TESTING_W < nClassType )
+	{
+		GASSERT ( 0 && "Å¬·¡½ºÅ¸ÀÔÀÇ ÀÎµ¦½º¹E§°¡ °æ°è¸¦ ¹þ¾ûÏ³´Ï´Ù." );
+		return ;
+	}
+	//add class
+	for ( int i = 0; i < GLCI_NUM_NEWEST; i++ )
+	{
+		m_pClass[i]->SetVisibleSingle ( FALSE );
+	}
+
+	m_pClass[nClassType]->SetVisibleSingle ( TRUE );
+}
+
+void CPartySlot::SetVisibleQuitButton ( BOOL bVisible )
+{
+	if ( m_pQuitButton ) m_pQuitButton->SetVisibleSingle ( bVisible );
+}
+
+void CPartySlot::SetVisibleAuthButton( BOOL bVisible )
+{
+	if ( m_pAuthorityButton ) m_pAuthorityButton->SetVisibleSingle ( bVisible );
+}
+
+void CPartySlot::TranslateUIMessage ( UIGUID ControlID, DWORD dwMsg )
+{
+	switch ( ControlID )
+	{
+	case PARTY_QUIT_BUTTON:
+		{
+			if ( CHECK_MOUSEIN_LBUPLIKE ( dwMsg ) )
+			{
+				AddMessageEx ( UIMSG_MOUSEIN_LBUP_EVENT );
+			}
+		}
+		break;
+
+	case PARTY_HP_BAR:
+		{
+			if ( CHECK_MOUSEIN_RBUPLIKE ( dwMsg ) )
+			{
+				AddMessageEx ( UIMSG_MOUSEIN_RBUP_EVENT );
+			}
+		}
+		break;
+
+	case PARTY_AUTH_BUTTON:
+		{
+			if( CHECK_MOUSEIN_LBUPLIKE( dwMsg ) )
+			{
+				AddMessageEx( UIMSG_MOUSEIN_LBUP_AUTH );
+			}
+		}
+		break;
+	}
+}
+
+void CPartySlot::SetMaster ( BOOL bMaster )
+{
+	m_bMaster = bMaster;
+
+	if ( m_bMaster )
+		m_pQuitButton->SetOneLineText ( (char*)ID2GAMEWORD ( "QUIT_PARTY", 0 ) );
+	else
+		m_pQuitButton->SetOneLineText ( (char*)ID2GAMEWORD ( "QUIT_PARTY", 1 ) );
+}
+void CPartySlot::SetNumber ( int nSlotNumber )
+{
+	if ( nSlotNumber < 0 && MAXPARTY <= nSlotNumber )
+	{
+		GASSERT ( 0 && "?????? ?????? ??? ?????." );
+		return ;
+	}
+	m_pMaster->SetVisibleSingle ( FALSE );
+	m_pNumberSlot->SetVisibleSingle ( FALSE );
+
+	if ( nSlotNumber == 0 )
+	{
+		m_pMaster->SetVisibleSingle ( TRUE );
+		m_pNumberSlot->SetVisibleSingle ( FALSE );
+	}
+	else
+	{
+		m_pNumberSlot->SetVisibleSingle ( TRUE );
+	
+		CString strNum;
+		strNum.Format ( "%d", nSlotNumber );
+
+		m_pNumberSlot->AddText ( strNum, NS_UITEXTCOLOR::WHITE );
+	}
+}
+
+void CPartySlot::SetSchool ( int nSchoolType )
+{
+	//add class
+	for ( int i = 0; i < 3; i++ )
+	{
+		m_pSchool[i]->SetVisibleSingle ( FALSE );
+	}
+
+	m_pSchool[nSchoolType]->SetVisibleSingle ( TRUE );
+}

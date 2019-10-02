@@ -1,0 +1,440 @@
+#include "StdAfx.h"
+
+#include "./BasicVarTextBoxEx.h"
+#include "../EngineUIlib/GUInterface/BasicTextBox.h"
+#include "../EngineUIlib/GUInterface/BasicButton.h"
+#include "./BasicLineBoxEx.h"
+#include "../EngineLib/DxCommon/DxFontMan.h"
+#include "./UITextControl.h"
+#include "../EngineUIlib/GUInterface/UIDebugSet.h"
+#include "ItemImage.h"
+#include "GLItemMan.h"
+#include "GLItem.h"
+#include "GLGaeaClient.h"
+#include "d3dfont.h"
+
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
+const	float	CBasicVarTextBoxEx::fMOUSEPOINT_GAP = 20.0f;
+
+CBasicVarTextBoxEx::CBasicVarTextBoxEx () :
+	m_pTextBox ( NULL ),
+	m_pTextBoxName ( NULL ),
+	m_pLineBox ( NULL ),
+	m_pFont ( NULL ),
+	m_pSelfDummy ( NULL ),
+	m_pCloseButton ( NULL ),
+	m_pItemImageRender ( NULL ),
+	m_pItemWrap ( NULL ),
+
+	m_vMousePointGap (fMOUSEPOINT_GAP,fMOUSEPOINT_GAP),
+	m_bBLOCK_MOUSETRACKING ( false ),
+	m_pElecIcon(NULL),
+	m_pFireIcon(NULL),
+	m_pIceIcon(NULL),
+	m_pPoiIcon(NULL),
+	m_pSpiIcon(NULL),
+	m_pWrap( NULL )
+
+{
+	memset ( m_pItemImage, 0, sizeof ( CUIControl* ) * ITEM::SBOX::ITEM_SIZE );	
+}
+
+CBasicVarTextBoxEx::~CBasicVarTextBoxEx ()
+{
+}
+
+CItemImage*	CBasicVarTextBoxEx::CreateItemImage ( const char* szControl )
+{
+	CItemImage* pItemImage = new CItemImage;
+	pItemImage->CreateSub ( this, szControl );
+	pItemImage->CreateSubControl ();
+	pItemImage->SetUseRender ( TRUE );
+	pItemImage->SetVisibleSingle ( FALSE );
+	RegisterControl ( pItemImage );
+
+	return pItemImage;
+}
+
+void CBasicVarTextBoxEx::CreateSubControl ()
+{
+	m_pFont = DxFontMan::GetInstance().LoadDxFont ( _DEFAULT_FONT, 9, FALSE, _DEFAULT_FONT_FLAG );
+	m_pFont10 = DxFontMan::GetInstance().LoadDxFont ( _DEFAULT_FONT, 12, FALSE, _DEFAULT_FONT_FLAG);
+
+	CBasicLineBoxEx* pLineBox = new CBasicLineBoxEx;
+	pLineBox->CreateSub ( this, "BASIC_VAR_LINE_BOX", UI_FLAG_XSIZE | UI_FLAG_YSIZE );
+	pLineBox->CreateBaseBoxVarTextBox ( "BASIC_VAR_LINE_BOX" );
+	pLineBox->SetNoUpdate ( true );
+	pLineBox->SetDiffuse ( D3DCOLOR_ARGB (170,0xFF,0xFF,0xFF) );
+	RegisterControl ( pLineBox );
+	m_pLineBox = pLineBox;
+
+	CUIControl* pSelfDummy = new CUIControl;
+	pSelfDummy->CreateSub ( this, "BASIC_VAR_LINE_BOX" );
+	pSelfDummy->SetVisibleSingle ( FALSE );
+	RegisterControl ( pSelfDummy );
+	m_pSelfDummy = pSelfDummy;
+	
+	//Item Image Render by NjD
+	CItemImage* pItemImage = new CItemImage;
+	pItemImage->CreateSub ( this, "ITEM_IMAGE_RENDER" );
+	pItemImage->CreateSubControl ();
+	pItemImage->SetUseRender ( TRUE );
+	pItemImage->SetVisibleSingle ( FALSE );
+	RegisterControl ( pItemImage );
+    m_pItemImageRender = pItemImage;
+
+	CBasicTextBox* pTextBox = new CBasicTextBox;
+	pTextBox->CreateSub ( this, "VAR_TEXT_BOX", UI_FLAG_XSIZE | UI_FLAG_YSIZE );
+	pTextBox->SetFont ( m_pFont );
+	pTextBox->SetTextAlign ( TEXT_ALIGN_LEFT );
+	pTextBox->SetNoUpdate ( true );
+	RegisterControl ( pTextBox );
+	m_pTextBox = pTextBox;
+
+	m_pCloseButton = new CBasicButton;
+	m_pCloseButton->CreateSub ( this, "INFO_DISPLAY_LINK_CLOSE" , UI_FLAG_DEFAULT, BUTTON_CLOSE );
+	m_pCloseButton->CreateFlip ( "INFO_DISPLAY_LINK_CLOSE_F", CBasicButton::CLICK_FLIP );
+	m_pCloseButton->CreateMouseOver( "INFO_DISPLAY_LINK_CLOSE_OVER" );
+	m_pCloseButton->SetVisibleSingle ( FALSE );
+	RegisterControl ( m_pCloseButton );
+
+	//Name Render by NjD
+	CBasicTextBox* pTextBoxName = new CBasicTextBox;
+	pTextBoxName->CreateSub ( this, "VAR_TEXT_BOX", UI_FLAG_XSIZE | UI_FLAG_YSIZE );
+	pTextBoxName->SetFont ( m_pFont10 );
+	pTextBoxName->SetTextAlign ( TEXT_ALIGN_LEFT );
+	pTextBoxName->SetNoUpdate ( true );
+	RegisterControl ( pTextBoxName );
+	m_pTextBoxName = pTextBoxName;
+
+	{
+		CString strItemBox[ITEM::SBOX::ITEM_SIZE] = 
+		{
+			"ITEM_BOX_IMAGE0",
+			"ITEM_BOX_IMAGE1",
+			"ITEM_BOX_IMAGE2",
+			"ITEM_BOX_IMAGE3",
+			"ITEM_BOX_IMAGE4",
+			"ITEM_BOX_IMAGE5",
+			"ITEM_BOX_IMAGE6",
+			"ITEM_BOX_IMAGE7",
+			"ITEM_BOX_IMAGE8",
+			"ITEM_BOX_IMAGE9",
+		};
+
+		for ( int i = 0; i < ITEM::SBOX::ITEM_SIZE; i++ )
+		{
+			m_pItemImage[i] = CreateItemImage ( strItemBox[i].GetString () );
+		}
+	}
+
+	{
+		m_pElecIcon = CreateControl ( "ELEC_ITEM_IMAGE" );
+		m_pFireIcon = CreateControl ( "FIRE_ITEM_IMAGE" );
+		m_pIceIcon = CreateControl  ( "ICE_ITEM_IMAGE"  );
+		m_pPoiIcon = CreateControl  ( "POI_ITEM_IMAGE"  );
+		m_pSpiIcon = CreateControl  ( "SPI_ITEM_IMAGE"  );
+
+		m_pElecIcon->SetVisibleSingle ( FALSE );
+		m_pFireIcon->SetVisibleSingle ( FALSE );
+		m_pIceIcon->SetVisibleSingle ( FALSE );
+		m_pPoiIcon->SetVisibleSingle ( FALSE );
+		m_pSpiIcon->SetVisibleSingle ( FALSE );
+	}
+	m_pWrap = new CUIControl;
+	m_pWrap->CreateSub ( this, "ITEM_IMAGE_WRAPPED" );	
+	m_pWrap->SetVisibleSingle ( FALSE );
+	RegisterControl ( m_pWrap );
+
+
+	CUIControl* pItemWrap = new CUIControl;
+	pItemWrap->CreateSub ( this, "ITEMWRAP_DISPLAY");
+	pSelfDummy->SetVisibleSingle ( FALSE );
+	RegisterControl ( pItemWrap );
+	m_pItemWrap = pItemWrap;
+}
+
+void CBasicVarTextBoxEx::SetTextAlign ( int nALIGN )
+{
+	m_pTextBox->SetTextAlign ( nALIGN );
+}
+
+void CBasicVarTextBoxEx::ClearText ()
+{
+	if ( m_pTextBox ) m_pTextBox->ClearText ();
+	if ( m_pTextBoxName ) m_pTextBoxName->ClearText ();
+	//	박스 크기 최소화
+}
+
+int CBasicVarTextBoxEx::AddTextNoSplit ( CString strText, D3DCOLOR dwColor )
+{
+	if ( m_pTextBox ) return m_pTextBox->AddTextNoSplit ( strText, dwColor );
+
+	return -1;
+}
+
+int CBasicVarTextBoxEx::AddTextNoSplitBig ( CString strText, D3DCOLOR dwColor )
+{
+	if ( m_pTextBoxName ) return m_pTextBoxName->AddTextNoSplitBig ( strText, dwColor );
+								 m_pTextBoxName->SetFont ( m_pFont10 );
+	return -1;
+}
+
+int	CBasicVarTextBoxEx::SetTextNoSplit ( CString strText, D3DCOLOR dwColor )
+{
+	if ( m_pTextBox ) return m_pTextBox->SetTextNoSplit ( strText, dwColor );
+
+	return -1;
+}
+
+void CBasicVarTextBoxEx::SetText( CString strText, D3DCOLOR dwColor )
+{
+	if ( m_pTextBox ) m_pTextBox->SetText( strText, dwColor );
+}
+
+void CBasicVarTextBoxEx::AddString ( int nIndex, const CString& strText, const D3DCOLOR& dwColor )
+{
+	if ( m_pTextBox ) m_pTextBox->AddString ( nIndex, strText, dwColor );
+}
+
+int CBasicVarTextBoxEx::AddText ( CString strText, D3DCOLOR dwColor )
+{
+	if ( m_pTextBox ) return m_pTextBox->AddText ( strText, dwColor );
+
+	return -1;
+}
+
+void CBasicVarTextBoxEx::SetUseOverColor ( bool bUseColor )
+{
+	m_pTextBox->SetUseOverColor ( (bUseColor)?TRUE:FALSE );
+}
+
+void CBasicVarTextBoxEx::SetOverColor ( const D3DCOLOR& dwColor )
+{
+	int nIndex = m_pTextBox->GetCount () - 1;
+	m_pTextBox->SetOverColor ( nIndex, dwColor );
+}
+
+void CBasicVarTextBoxEx::RePosControl ( int x, int y )
+{
+	const float fTextBoxGapX_ = (float)m_pTextBox->GetLongestLine ();
+	const float fTextBoxGapXName_ = (float)m_pTextBoxName->GetLongestLine ();
+
+	if ( fTextBoxGapXName_ > fTextBoxGapX_ )
+	{
+		const UIRECT& rcTextBoxLocalPos = m_pTextBoxName->GetLocalPos ();
+		const UIRECT& rcLocalPosDummy = m_pSelfDummy->GetLocalPos ();
+		const UIRECT& rcOriginPos = GetLocalPos ();
+
+		AlignSubControl ( rcOriginPos, rcLocalPosDummy );
+
+		if ( m_pTextBoxName )
+		{
+			int nTotalLine = m_pTextBox->GetTotalLine ();
+			const float fAllLine = m_pTextBox->CalcMaxHEIGHT ( 0, nTotalLine );
+			const float fTextBoxGapX = (float)m_pTextBoxName->GetLongestLine () - rcTextBoxLocalPos.sizeX;
+			const float fTextBoxGapY = fAllLine - rcTextBoxLocalPos.sizeY;
+			
+			UIRECT rcLocalNewPos = UIRECT ( float(x) + m_vMousePointGap.x, float(y) + m_vMousePointGap.y,
+				rcOriginPos.sizeX + fTextBoxGapX, rcOriginPos.sizeY + fTextBoxGapY );
+
+			AlignSubControl ( rcLocalPosDummy, rcLocalNewPos );
+
+			SetGlobalPos ( rcLocalNewPos );		
+		}
+	}
+	else
+	{
+		const UIRECT& rcTextBoxLocalPos = m_pTextBox->GetLocalPos ();
+		const UIRECT& rcLocalPosDummy = m_pSelfDummy->GetLocalPos ();
+		const UIRECT& rcOriginPos = GetLocalPos ();
+
+		AlignSubControl ( rcOriginPos, rcLocalPosDummy );
+
+		if ( m_pTextBox )
+		{
+			int nTotalLine = m_pTextBox->GetTotalLine ();
+			const float fAllLine = m_pTextBox->CalcMaxHEIGHT ( 0, nTotalLine );
+			const float fTextBoxGapX = (float)m_pTextBox->GetLongestLine () - rcTextBoxLocalPos.sizeX;
+			const float fTextBoxGapY = fAllLine - rcTextBoxLocalPos.sizeY;
+			
+			UIRECT rcLocalNewPos = UIRECT ( float(x) + m_vMousePointGap.x, float(y) + m_vMousePointGap.y,
+				rcOriginPos.sizeX + fTextBoxGapX, rcOriginPos.sizeY + fTextBoxGapY );
+
+			AlignSubControl ( rcLocalPosDummy, rcLocalNewPos );
+
+			SetGlobalPos ( rcLocalNewPos );	
+		}	
+
+		/*if ( m_pCloseButton )
+		{
+			const UIRECT& rcOriginPos1 = m_pTextBoxName->GetLocalPos();
+			const UIRECT& rcOriginPos2 = m_pCloseButton->GetLocalPos();
+			float fx = rcOriginPos1.right - rcOriginPos2.sizeX;
+			float fy = rcOriginPos1.top;
+			m_pCloseButton->SetLocalPos( D3DXVECTOR2 ( fx , fy ));
+		}*/
+	}
+}
+
+void CBasicVarTextBoxEx::Update ( int x, int y, BYTE LB, BYTE MB, BYTE RB, int nScroll, float fElapsedTime, BOOL bFirstControl )
+{
+	if ( !IsVisible () ) return ;
+
+	if ( m_pCloseButton )
+	{
+		const UIRECT& rcOriginPos1 = m_pTextBoxName->GetLocalPos();
+		const UIRECT& rcOriginPos2 = m_pCloseButton->GetLocalPos();
+		float fx = rcOriginPos1.right - rcOriginPos2.sizeX;
+		float fy = rcOriginPos1.top;
+		m_pCloseButton->SetLocalPos( D3DXVECTOR2 ( fx , fy ));
+	}
+
+	SetUseOverColor ( false );
+	CUIGroup::Update ( x, y, LB, MB, RB, nScroll, fElapsedTime, bFirstControl );
+
+	if ( !m_bBLOCK_MOUSETRACKING ) RePosControl ( x, y );	
+}
+
+void CBasicVarTextBoxEx::TranslateUIMessage ( UIGUID ControlID, DWORD dwMsg )
+{
+	switch ( ControlID )
+	{
+	case BUTTON_CLOSE:
+		{
+			if ( CHECK_MOUSE_IN ( dwMsg ) )
+			{
+				if ( UIMSG_LB_UP & dwMsg )
+				{
+					AddMessageEx ( UIMSG_UIVARTEXT_BUTTON_CLOSE_CLICK );
+				}
+
+				AddMessageEx ( UIMSG_UIVARTEXT_BUTTON_CLOSE_MOUSEIN );
+			}
+		}break;
+	};
+
+	CUIGroup::TranslateUIMessage ( ControlID, dwMsg );
+}
+
+void CBasicVarTextBoxEx::SetMousePointGap ( D3DXVECTOR2 vGap )
+{
+	m_vMousePointGap = vGap;
+}
+
+float CBasicVarTextBoxEx::GetLongestLine ()
+{
+	if ( m_pTextBox )
+	{
+		return (float)m_pTextBox->GetLongestLine ();
+	}
+	return 0.0f;
+}
+
+void CBasicVarTextBoxEx::AddTextLongestLineSplit ( CString strText, D3DCOLOR dwColor )
+{
+	float fLongestLine = GetLongestLine ();
+	
+	NS_UITEXTCONTROL::MULTILINETEXT& MLTextSet =
+		NS_UITEXTCONTROL::GetMLTextWithoutCRLF ( strText, fLongestLine, m_pFont );
+
+	for ( int i = 0; i < (int)MLTextSet.size(); ++i )
+	{
+		CString strTemp = MLTextSet[i].strLine;
+		if ( strTemp.GetLength() )
+		{
+			AddTextNoSplit ( strTemp, NS_UITEXTCOLOR::DEFAULT );		
+		}
+	}	
+}
+
+int	CBasicVarTextBoxEx::GetCount ()
+{
+	return m_pTextBox->GetCount ();
+}
+
+void CBasicVarTextBoxEx::SetLineInterval ( const float fLineInterval )
+{
+	m_pTextBox->SetLineInterval ( fLineInterval );
+}
+
+void CBasicVarTextBoxEx::SetBlockMouseTracking ( bool bBlock )
+{
+	m_bBLOCK_MOUSETRACKING = bBlock;
+}
+//Item Texture
+void CBasicVarTextBoxEx::SetItemRender ( SNATIVEID sICONINDEX, const char* szTexture, SITEMCUSTOM sCustom ) 
+{
+	m_pWrap->SetVisibleSingle( FALSE );
+	SITEM* pItem = GLItemMan::GetInstance().GetItem ( sICONINDEX );
+	if ( !pItem ) m_pItemImageRender->SetVisibleSingle ( FALSE );
+
+	if ( m_pItemImageRender )
+	{
+		m_pItemImageRender->SetItem( sICONINDEX, szTexture );
+		m_pItemImageRender->SetVisibleSingle ( TRUE );
+	}
+	
+	if ( sCustom.IsWrap() && sCustom.sNativeID.IsValidNativeID() )
+		m_pWrap->SetVisibleSingle( TRUE );
+}
+//Item Image Render by NjD :: 07 / 08 / 2014
+void CBasicVarTextBoxEx::ResetItemRender ()
+{
+	if ( m_pItemImageRender )
+	{
+		m_pItemImageRender->ResetItem();
+		m_pItemImageRender->SetVisibleSingle ( FALSE );
+	}
+}
+
+void CBasicVarTextBoxEx::SetItemBoxRender ( SNATIVEID sICONINDEX, const char* szTexture, int nIndex )
+{
+	SITEM* pItem = GLItemMan::GetInstance().GetItem ( sICONINDEX );
+	if ( !pItem ) m_pItemImageRender->SetVisibleSingle ( FALSE );
+		
+	if ( m_pItemImage[nIndex] )
+	{
+		m_pItemImage[nIndex]->SetItem( sICONINDEX, szTexture );
+		m_pItemImage[nIndex]->SetVisibleSingle ( TRUE );
+	}
+}
+//Item Image Render by NjD :: 07 / 08 / 2014
+void CBasicVarTextBoxEx::ResetItemBoxRender ()
+{
+	for ( int i = 0; i < ITEM::SBOX::ITEM_SIZE; i++ )
+	{
+		if ( m_pItemImage[i] )
+		{
+			m_pItemImage[i]->ResetItem();
+			m_pItemImage[i]->SetVisibleSingle ( FALSE );
+		}
+	}
+}
+
+void CBasicVarTextBoxEx::ShowCloseButton( bool bSHOW )
+{
+	if ( m_pCloseButton )
+		m_pCloseButton->SetVisibleSingle( bSHOW );
+}
+
+void CBasicVarTextBoxEx::SetResiIcon()
+{
+	m_pElecIcon->SetVisibleSingle ( TRUE );
+	m_pFireIcon->SetVisibleSingle ( TRUE );
+	m_pIceIcon->SetVisibleSingle ( TRUE );
+	m_pPoiIcon->SetVisibleSingle ( TRUE );
+	m_pSpiIcon->SetVisibleSingle ( TRUE );
+}
+
+void CBasicVarTextBoxEx::HideResiIcon()
+{
+	m_pElecIcon->SetVisibleSingle ( FALSE );
+	m_pFireIcon->SetVisibleSingle ( FALSE );
+	m_pIceIcon->SetVisibleSingle ( FALSE );
+	m_pPoiIcon->SetVisibleSingle ( FALSE );
+	m_pSpiIcon->SetVisibleSingle ( FALSE );
+}

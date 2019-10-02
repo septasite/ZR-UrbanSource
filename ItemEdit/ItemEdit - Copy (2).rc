@@ -1,0 +1,946 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Korean resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_KOR)
+#ifdef _WIN32
+LANGUAGE LANG_KOREAN, SUBLANG_DEFAULT
+#pragma code_page(949)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_KOR)\r\n"
+    "LANGUAGE 18, 1\r\n"
+    "#pragma code_page(949)\r\n"
+    "#include ""res\\ItemEdit.rc2""  // Microsoft Visual C++에서 편집되지 않은 리소스\r\n"
+    "#include ""afxres.rc""         // 표준 구성 요소\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "..\\res\\basic_tool.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041203b5"
+        BEGIN
+            VALUE "CompanyName", "TODO: <회사 이름>"
+            VALUE "FileDescription", "TODO: <파일 설명>"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "InternalName", "ItemEdit.exe"
+            VALUE "LegalCopyright", "TODO: (c) <회사 이름>.  All rights reserved."
+            VALUE "OriginalFilename", "ItemEdit.exe"
+            VALUE "ProductName", "TODO: <제품 이름>"
+            VALUE "ProductVersion", "1.0.0.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "변환", 0x412, 949
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// RT_MANIFEST
+//
+
+IDR_MANIFEST            RT_MANIFEST             "res\\ItemEdit.manifest"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MENU_MAINFRAME MENU 
+BEGIN
+    POPUP "파일"
+    BEGIN
+        MENUITEM "새 파일",                     ID_MENUITEM_NEW
+        MENUITEM SEPARATOR
+        MENUITEM "불러오기",                    ID_MENUITEM_LOAD
+        MENUITEM "저장하기",                    ID_MENUITEM_SAVE
+        MENUITEM SEPARATOR
+        MENUITEM "종료",                        ID_MENUITEM_EXIT
+    END
+END
+
+IDR_MENU_ITEMSUIT_POPUP MENU 
+BEGIN
+    POPUP "ItemSuit"
+    BEGIN
+        MENUITEM "추가",                        ID_MENUITEM_ADD
+        MENUITEM "삭제",                        ID_MENUITEM_DEL
+        MENUITEM SEPARATOR
+        MENUITEM "복사하기",                    129
+        MENUITEM "붙여넣기 ( 새로 만듬 )",      130
+        MENUITEM "붙여넣기 ( 값만 복사)",       131
+        MENUITEM SEPARATOR
+        MENUITEM "ItemParent 편집",             ID_MENUITEM_PARENTMODIFY
+        MENUITEM "ItemSuit 편집",               ID_MENUITEM_SUITMODIFY
+    END
+END
+
+IDR_MENU_ITEMSIMPLE_POPUP MENU 
+BEGIN
+    POPUP "ItemSimple"
+    BEGIN
+        MENUITEM "추가",                        ID_MENUITEM_ADD
+        MENUITEM "삭제",                        ID_MENUITEM_DEL
+        MENUITEM SEPARATOR
+        MENUITEM "복사하기",                    ID_MENUITEM_COPY
+        MENUITEM "붙여넣기 ( 새로 만듬 )",      ID_MENUITEM_PASTE_NEW
+        MENUITEM "붙여넣기 ( 값만 복사)",       ID_MENUITEM_PASTE_VALUE
+        MENUITEM SEPARATOR
+        MENUITEM "ItemParent 편집",             ID_MENUITEM_PARENTMODIFY
+        MENUITEM "ItemSimple 편집",             ID_MENUITEM_SIMPLEMODIFY
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Toolbar
+//
+
+IDR_TOOLBAR1 TOOLBAR  16, 15
+BEGIN
+    BUTTON      ID_MENUITEM_NEW
+    SEPARATOR
+    BUTTON      ID_MENUITEM_LOAD
+    BUTTON      ID_MENUITEM_SAVE
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDR_TOOLBAR1            BITMAP                  "res\\toolbar1.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_ABOUTBOX            "ItemEdit Information(&A)..."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_PROPSHT_CAPTION     "Sheet"
+END
+
+#endif    // Korean resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MENU_ITEMSIMPLE_POPUP MENU 
+BEGIN
+    POPUP "ItemSimple"
+    BEGIN
+        MENUITEM "Add",                         ID_MENUITEM_ADD
+        MENUITEM "Del",                         ID_MENUITEM_DEL
+        MENUITEM SEPARATOR
+        MENUITEM "Copy",                        ID_MENUITEM_COPY
+        MENUITEM "Paste ( New )",               ID_MENUITEM_PASTE_NEW
+        MENUITEM "Paste ( Value )",             ID_MENUITEM_PASTE_VALUE
+        MENUITEM SEPARATOR
+        MENUITEM "ItemParent Edit",             ID_MENUITEM_PARENTMODIFY
+        MENUITEM "ItemSimple Edit",             ID_MENUITEM_SIMPLEMODIFY
+    END
+END
+
+IDR_MENU_ITEMSUIT_POPUP MENU 
+BEGIN
+    POPUP "ItemSuit"
+    BEGIN
+        MENUITEM "Add",                         ID_MENUITEM_ADD
+        MENUITEM "Del",                         ID_MENUITEM_DEL
+        MENUITEM SEPARATOR
+        MENUITEM "Copy",                        129
+        MENUITEM "Paste ( New )",               130
+        MENUITEM "Paste ( Value )",             131
+        MENUITEM SEPARATOR
+        MENUITEM "ItemParent Edit",             ID_MENUITEM_PARENTMODIFY
+        MENUITEM "ItemSuit Edit",               ID_MENUITEM_SUITMODIFY
+    END
+END
+
+IDR_MENU_MAINFRAME MENU 
+BEGIN
+    POPUP "File"
+    BEGIN
+        MENUITEM "New",                         ID_MENUITEM_NEW
+        MENUITEM SEPARATOR
+        MENUITEM "Load",                        ID_MENUITEM_LOAD
+        MENUITEM "Save",                        ID_MENUITEM_SAVE
+        MENUITEM SEPARATOR
+        MENUITEM "Exit",                        ID_MENUITEM_EXIT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 235, 55
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "ItemEdit Information ( English )"
+FONT 9, "Arial", 400, 0, 0xA3
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
+    LTEXT           "ItemEdit Info 1.0",IDC_STATIC,40,10,55,8,SS_NOPREFIX
+    LTEXT           "Copyright (c) 2003",IDC_STATIC,40,25,60,8
+    DEFPUSHBUTTON   "OK",IDOK,178,7,50,16,WS_GROUP
+END
+
+IDD_DIALOG_ITEM DIALOGEX 0, 0, 185, 277
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Dialog ( English )"
+FONT 8, "Arial", 400, 0, 0xA3
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,78,258,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,131,258,50,14
+    LISTBOX         IDC_LIST_ITEM,10,7,173,227,LBS_SORT | LBS_MULTIPLESEL | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Percent",IDC_STATIC,6,243,26,8
+    EDITTEXT        IDC_EDIT_PERCENT,33,240,40,12,ES_AUTOHSCROLL
+    LTEXT           "Number",IDC_STATIC,90,240,24,7
+    EDITTEXT        IDC_EDIT_NUM,120,240,40,12,ES_AUTOHSCROLL
+    LISTBOX         IDC_LIST_ITEM2,10,7,173,227,LBS_SORT | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+END
+
+IDD_DIALOG_LOG DIALOGEX 0, 0, 300, 156
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Log ( English )"
+FONT 8, "Arial", 400, 0, 0xA3
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,0,144,300,12
+    LISTBOX         IDC_LIST_CONNETS,0,0,300,138,LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
+END
+
+IDD_ITEMEDIT_DIALOG DIALOGEX 0, 0, 657, 357
+STYLE DS_SETFONT | DS_MODALFRAME | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | 
+    WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "ItemEdit ( English )"
+MENU IDR_MENU_MAINFRAME
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    GROUPBOX        "",IDC_STATIC_CONTROL,7,40,643,310
+    PUSHBUTTON      "Data Synchronization",IDC_BUTTON_UPDATE_SYNC,119,17,78,
+                    11
+    PUSHBUTTON      "String Table Sync",IDC_BUTTON_STRTB_SYNC,282,17,71,11,
+                    WS_DISABLED
+    PUSHBUTTON      "String Table Reload",IDC_BUTTON_RELOAD_STRTBL,203,17,73,
+                    11
+    PUSHBUTTON      "CSV Save",IDC_BTN_CSV_SAVE,19,17,36,11
+    PUSHBUTTON      "CSV Load",IDC_BTN_CSV_LOAD,60,17,34,11
+    PUSHBUTTON      "FIND",IDC_ITEM_SEARCH_BUTTON,578,17,33,12,NOT 
+                    WS_VISIBLE
+    EDITTEXT        IDC_ITEM_SEARCH_EDIT,475,17,99,12,ES_AUTOHSCROLL | NOT 
+                    WS_VISIBLE
+    COMBOBOX        IDC_ITEM_SEARCH_COMBO,395,17,79,15,CBS_DROPDOWNLIST | 
+                    CBS_AUTOHSCROLL | NOT WS_VISIBLE | WS_VSCROLL | 
+                    WS_TABSTOP
+    PUSHBUTTON      "▼",IDC_SEARCH_REPORT_BUTTON,616,17,33,12,NOT 
+                    WS_VISIBLE
+END
+
+IDD_ITEMPARENT_DIALOG DIALOGEX 0, 0, 547, 319
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION
+CAPTION "ItemParent ( English )"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    LTEXT           "ID",IDC_STATIC_GUID,9,8,8,8
+    EDITTEXT        IDC_EDIT_MID,52,7,32,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_EDIT_SID,85,7,38,12,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Item Name",IDC_STATIC_ITEMNAME,9,20,36,8
+    LTEXT           "Value Grade",IDC_STATIC_LEVEL,9,101,40,8
+    COMBOBOX        IDC_COMBO_LEVEL,49,98,70,147,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Sale",IDC_CHECK_SELLENABLE,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,10,138,26,8
+    CONTROL         "Store",IDC_CHECK_BUYABLE,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,69,138,29,8
+    GROUPBOX        "Item Gen.",IDC_STATIC_GEN,5,200,117,46
+    LTEXT           "Gen Type ID",IDC_STATIC_SPECID,14,208,41,8
+    EDITTEXT        IDC_EDIT_SPECID,55,206,62,12,ES_AUTOHSCROLL
+    LTEXT           "Base Time",IDC_STATIC_ONE_TIME_LIMIT,21,221,33,8
+    EDITTEXT        IDC_EDIT_TIME_SET,55,219,62,13,ES_AUTOHSCROLL
+    LTEXT           "Limit Num.",IDC_STATIC_ONE_TIME_LIMIT2,19,234,34,8
+    EDITTEXT        IDC_EDIT_TIME_LIMIT,55,232,62,12,ES_AUTOHSCROLL
+    LTEXT           "Inventory Size XY",IDC_STATIC_INVENSIZEX,229,175,48,8
+    EDITTEXT        IDC_EDIT_INVENSIZEX,279,172,47,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_INVENSIZEY,328,172,47,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Shape Of Filed",IDC_BUTTON_FIELDFILE,389,187,60,12
+    EDITTEXT        IDC_EDIT_FIELDFILE,455,187,84,12,ES_AUTOHSCROLL | NOT 
+                    WS_TABSTOP
+    PUSHBUTTON      "Shape Of Inven.",IDC_BUTTON_INVENFILE,389,173,60,12
+    EDITTEXT        IDC_EDIT_INVENFILE,455,173,84,12,ES_AUTOHSCROLL | NOT 
+                    WS_TABSTOP
+    PUSHBUTTON      "Fighter[M]",IDC_BUTTON_WEARINGFILE_C1,226,15,60,12
+    EDITTEXT        IDC_EDIT_WEARINGFILE_C1,291,15,84,12,ES_AUTOHSCROLL | 
+                    NOT WS_TABSTOP
+    PUSHBUTTON      "Swordsman[M]",IDC_BUTTON_WEARINGFILE_C3,226,28,60,12
+    EDITTEXT        IDC_EDIT_WEARINGFILE_C3,291,28,84,12,ES_AUTOHSCROLL | 
+                    NOT WS_TABSTOP
+    PUSHBUTTON      "Archer[W]",IDC_BUTTON_WEARINGFILE_C6,387,42,60,12
+    EDITTEXT        IDC_EDIT_WEARINGFILE_C6,454,42,84,12,ES_AUTOHSCROLL | 
+                    NOT WS_TABSTOP
+    PUSHBUTTON      "Shaman[W]",IDC_BUTTON_WEARINGFILE_C8,387,56,60,12
+    EDITTEXT        IDC_EDIT_WEARINGFILE_C8,454,56,84,12,ES_AUTOHSCROLL | 
+                    NOT WS_TABSTOP
+    EDITTEXT        IDC_EDIT_COMMENT,9,50,113,24,ES_MULTILINE | 
+                    ES_WANTRETURN | WS_VSCROLL
+    LTEXT           "Description",IDC_STATIC_COMMENT,9,38,36,8
+    GROUPBOX        "Req Attri",IDC_STATIC,158,5,62,33
+    CONTROL         "Light",IDC_RADIO_BRIGHT_LIGHT,"Button",
+                    BS_AUTORADIOBUTTON | WS_GROUP,161,18,28,9
+    CONTROL         "Dark",IDC_RADIO_BRIGHT_DARK,"Button",BS_AUTORADIOBUTTON,
+                    189,18,27,9
+    CONTROL         "Light + Dark",IDC_RADIO_BRIGHT_BOTH,"Button",
+                    BS_AUTORADIOBUTTON,161,27,55,8
+    GROUPBOX        "Class",IDC_STATIC_NEEDJOB,125,35,95,88
+    CONTROL         "FightM",IDC_CHECK_FIGHTER_M,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,128,52,37,8
+    CONTROL         "SwordM",IDC_CHECK_ARMS_M,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,128,60,42,8
+    CONTROL         "ArcherM",IDC_CHECK_ARCHER_M,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,128,69,44,9
+    CONTROL         "SpiritM",IDC_CHECK_SPIRIT_M,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,128,78,40,8
+    LTEXT           "Req Lvl",IDC_STATIC_NEEDLEVEL,125,126,24,8
+    EDITTEXT        IDC_EDIT_NEEDLEVELDW,151,124,28,12,ES_AUTOHSCROLL
+    GROUPBOX        "Char Stat Req Val.",IDC_STATIC_NEEDVALUE,125,135,94,75
+    LTEXT           "POW",IDC_STATIC_POWER,129,147,17,8
+    EDITTEXT        IDC_EDIT_POWER,147,144,22,12,ES_AUTOHSCROLL
+    LTEXT           "STR",IDC_STATIC_STRENGTH,173,147,14,8
+    EDITTEXT        IDC_EDIT_STRENGTH,189,144,27,12,ES_AUTOHSCROLL
+    LTEXT           "SPR",IDC_STATIC_SPIRIT,130,160,14,8
+    EDITTEXT        IDC_EDIT_SPIRIT,147,157,22,12,ES_AUTOHSCROLL
+    LTEXT           "DEX",IDC_STATIC_DEXTERITY,174,160,14,8
+    EDITTEXT        IDC_EDIT_DEXTERITY,189,157,26,12,ES_AUTOHSCROLL
+    LTEXT           "INT",IDC_STATIC_INTELLIGENT,132,173,12,8
+    EDITTEXT        IDC_EDIT_INTELLIGENT,147,170,22,12,ES_AUTOHSCROLL
+    LTEXT           "STA",IDC_STATIC,173,172,14,8
+    EDITTEXT        IDC_EDIT_STAMINA,189,170,26,12,ES_AUTOHSCROLL
+    LTEXT           "Melee",IDC_STATIC_POWER2,139,185,21,8
+    EDITTEXT        IDC_EDIT_REQ_PA,163,183,52,12,ES_AUTOHSCROLL
+    LTEXT           "Shooting",IDC_STATIC_STRENGTH2,133,197,29,8
+    EDITTEXT        IDC_EDIT_REQ_SA,163,196,52,12,ES_AUTOHSCROLL
+    LTEXT           "Item Type",IDC_STATIC,11,86,34,8
+    COMBOBOX        IDC_COMBO_ITEM_TYPE,49,84,70,147,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Consumable",IDC_CHECK_INSTANCE,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,10,164,55,9
+    LTEXT           "Remodel Num",IDC_STATIC_INTELLIGENT2,14,280,48,8
+    EDITTEXT        IDC_EDIT_REMODEL_NUM,61,279,47,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Skin Effect",IDC_BUTTON_SKIN_EFFECTFILE,226,209,60,12
+    EDITTEXT        IDC_EDIT_SKIN_EFFECTFILE,292,209,84,12,ES_AUTOHSCROLL | 
+                    NOT WS_TABSTOP
+    PUSHBUTTON      "Target Effect",IDC_BUTTON_EFFECTFILE,226,222,60,12
+    EDITTEXT        IDC_EDIT_EFFECTFILE,292,222,84,12,ES_AUTOHSCROLL | NOT 
+                    WS_TABSTOP
+    PUSHBUTTON      "Partner Effect",IDC_BUTTON_SKIN_TAR_EFFECTFILE,226,235,
+                    60,12
+    EDITTEXT        IDC_EDIT_TAR_EFFECTFILE,292,234,84,12,ES_AUTOHSCROLL | 
+                    NOT WS_TABSTOP
+    PUSHBUTTON      "Next",IDC_BUTTON_NEXT,229,265,46,17
+    LTEXT           "Inventory Icon",IDC_STATIC_INVENICON,229,187,49,8
+    EDITTEXT        IDC_EDIT_INVENICON_X,279,186,47,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_INVENICON_Y,328,186,47,12,ES_AUTOHSCROLL
+    CONTROL         "Event(Item)",IDC_CHECK_EVENT_SGL,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,50,155,55,10
+    CONTROL         "Costume",IDC_CHECK_DISGUISE,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,50,147,44,8
+    EDITTEXT        IDC_EDIT_LMT_D,26,184,18,14,ES_AUTOHSCROLL
+    LTEXT           "D",IDC_STATIC,18,186,8,8
+    EDITTEXT        IDC_EDIT_LMT_H,58,184,18,14,ES_AUTOHSCROLL
+    LTEXT           "H",IDC_STATIC,48,186,8,8
+    EDITTEXT        IDC_EDIT_LMT_M,90,184,18,14,ES_AUTOHSCROLL
+    LTEXT           "M",IDC_STATIC,80,186,8,8
+    CONTROL         "Limitary",IDC_CHECK_TIMELMT,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,10,155,37,9
+    EDITTEXT        IDC_EDIT_ITEMNAME,52,20,32,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    EDITTEXT        IDC_EDIT_NAME,85,20,38,13,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_ITEMDESC,52,35,71,13,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    GROUPBOX        "School",IDC_STATIC_NEEDSCHOOL,125,5,33,33
+    CONTROL         "SG",IDC_CHECK_SCHOOL1,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,128,13,24,8
+    CONTROL         "MP",IDC_CHECK_SCHOOL2,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,128,21,24,8
+    CONTROL         "PH",IDC_CHECK_SCHOOL3,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,128,29,24,8
+    PUSHBUTTON      "Random Opt",IDC_BUTTON_RANDOM_OPT,226,248,60,12
+    EDITTEXT        IDC_EDIT_RANDOM_OPT,292,248,84,12,ES_AUTOHSCROLL | NOT 
+                    WS_TABSTOP
+    PUSHBUTTON      "PET",IDC_BUTTON_WEARINGFILE_C11,129,229,29,11
+    EDITTEXT        IDC_EDIT_WEARINGFILE_C11,161,228,56,12,ES_AUTOHSCROLL | 
+                    NOT WS_TABSTOP
+    LTEXT           "MID",IDC_STATIC_NEEDLEVEL4,144,217,15,8
+    LTEXT           "SID",IDC_STATIC_NEEDLEVEL3,180,217,11,8
+    GROUPBOX        "PET",IDC_STATIC,125,209,94,46
+    LTEXT           "Pet Type",IDC_STATIC_NEEDLEVEL5,129,243,31,8
+    EDITTEXT        IDC_EDIT_PET_MID,159,215,19,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_PET_SID,193,215,19,12,ES_AUTOHSCROLL
+    COMBOBOX        IDC_COMBO_PET_TYPE,161,241,56,147,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    CONTROL         "ExtrM",IDC_CHECK_EXTREME_M,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,128,87,45,8
+    CONTROL         "ExtrW",IDC_CHECK_EXTREME_W,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,173,86,45,8
+    PUSHBUTTON      "Extreme[M]",IDC_BUTTON_WEARINGFILE_C9,226,69,60,12
+    EDITTEXT        IDC_EDIT_WEARINGFILE_C9,291,69,84,12,ES_AUTOHSCROLL | 
+                    NOT WS_TABSTOP
+    PUSHBUTTON      "Extreme[W]",IDC_BUTTON_WEARINGFILE_C80,387,69,60,12
+    EDITTEXT        IDC_EDIT_WEARINGFILE_C10,454,69,84,12,ES_AUTOHSCROLL | 
+                    NOT WS_TABSTOP
+    PUSHBUTTON      "Fighter[W]",IDC_BUTTON_WEARINGFILE_C2,387,15,60,12
+    EDITTEXT        IDC_EDIT_WEARINGFILE_C2,454,15,84,12,ES_AUTOHSCROLL | 
+                    NOT WS_TABSTOP
+    PUSHBUTTON      "Swordsman[W]",IDC_BUTTON_WEARINGFILE_C4,387,28,60,12
+    EDITTEXT        IDC_EDIT_WEARINGFILE_C4,454,28,84,12,ES_AUTOHSCROLL | 
+                    NOT WS_TABSTOP
+    PUSHBUTTON      "Archer[M]",IDC_BUTTON_WEARINGFILE_C5,226,42,60,12
+    EDITTEXT        IDC_EDIT_WEARINGFILE_C5,291,42,84,12,ES_AUTOHSCROLL | 
+                    NOT WS_TABSTOP
+    PUSHBUTTON      "Shaman[M]",IDC_BUTTON_WEARINGFILE_C7,226,56,60,12
+    EDITTEXT        IDC_EDIT_WEARINGFILE_C7,291,56,84,12,ES_AUTOHSCROLL | 
+                    NOT WS_TABSTOP
+    CONTROL         "FightW",IDC_CHECK_FIGHTER_W,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,173,52,38,8
+    CONTROL         "SpiritW",IDC_CHECK_SPIRIT_W,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,173,77,38,9
+    CONTROL         "SwordW",IDC_CHECK_ARMS_W,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,173,60,45,8
+    CONTROL         "ArcherW",IDC_CHECK_ARCHER_W,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,173,69,46,8
+    EDITTEXT        IDC_EDIT_NEEDLEVELUP,187,124,33,12,ES_AUTOHSCROLL
+    CTEXT           "-",IDC_STATIC,178,126,8,8
+    LTEXT           "Vehicle Type",IDC_STATIC_NEEDLEVEL6,396,280,42,10
+    COMBOBOX        IDC_COMBO_VEHICLE_TYPE,451,279,84,58,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Garbage",IDC_CHECK_GARBAGE,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,10,147,40,9
+    LTEXT           "MID",IDC_STATIC,11,253,13,8
+    EDITTEXT        IDC_EDIT_MAP_MID,25,253,24,12,ES_AUTOHSCROLL | NOT 
+                    WS_TABSTOP
+    LTEXT           "SID",IDC_STATIC,68,254,12,8
+    EDITTEXT        IDC_EDIT_MAP_SID,82,252,24,12,ES_AUTOHSCROLL | NOT 
+                    WS_TABSTOP
+    LTEXT           "X:",IDC_STATIC,13,266,8,8
+    EDITTEXT        IDC_EDIT_MAP_POSX,25,265,24,12,ES_AUTOHSCROLL | NOT 
+                    WS_TABSTOP
+    LTEXT           "Y:",IDC_STATIC,71,266,9,10
+    EDITTEXT        IDC_EDIT_MAP_POSY,82,265,24,12,ES_AUTOHSCROLL | NOT 
+                    WS_TABSTOP
+    LTEXT           "Buy Price",IDC_STATIC_PRICE,10,114,30,11
+    EDITTEXT        IDC_EDIT_PRICE,49,112,69,12,ES_AUTOHSCROLL
+    LTEXT           "Sell Price",IDC_STATIC_PRICE2,10,128,31,9
+    EDITTEXT        IDC_EDIT_PRICE2,49,126,69,12,ES_AUTOHSCROLL | ES_NUMBER
+    PUSHBUTTON      "Science[M]",IDC_BUTTON_WEARINGFILE_C12,226,82,60,12
+    EDITTEXT        IDC_EDIT_WEARINGFILE_C12,291,82,84,12,ES_AUTOHSCROLL | 
+                    NOT WS_TABSTOP
+    PUSHBUTTON      "Science[W]",IDC_BUTTON_WEARINGFILE_C81,387,82,60,12
+    EDITTEXT        IDC_EDIT_WEARINGFILE_C13,454,82,84,12,ES_AUTOHSCROLL | 
+                    NOT WS_TABSTOP
+    CONTROL         "ScienceM",IDC_CHECK_EXTREME_M2,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,128,95,42,8
+    CONTROL         "ScienceW",IDC_CHECK_EXTREME_W2,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,173,95,42,8
+    GROUPBOX        "Item Cool Time",IDC_STATIC,125,256,94,40,NOT WS_VISIBLE
+    LTEXT           "Type",IDC_STATIC,131,267,16,8
+    LTEXT           "Time",IDC_STATIC,131,283,17,8
+    EDITTEXT        IDC_EDIT_COOL_TIME,153,280,62,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Weapon L [M]",IDC_BUTTON_ABL_M_LEFT,227,135,60,12
+    EDITTEXT        IDC_EDIT_ABL_M_LEFT,293,135,84,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Weapon R [M]",IDC_BUTTON_ABL_M_RIGHT,387,134,60,12
+    EDITTEXT        IDC_EDIT_ABL_M_RIGHT,453,134,84,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Weapon L [W]",IDC_BUTTON_ABL_W_LEFT,227,149,60,12
+    EDITTEXT        IDC_EDIT_ABL_W_LEFT,293,149,84,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Weapon R [W]",IDC_BUTTON_ABL_W_RIGHT,387,148,60,12
+    EDITTEXT        IDC_EDIT_ABL_W_RIGHT,453,148,84,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Scooter Part",IDC_BUTTON_VEHICLEPART_SCUTER,385,214,60,
+                    12
+    EDITTEXT        IDC_EDIT_VEHICLEPART_SCUTER,451,214,84,12,ES_AUTOHSCROLL | 
+                    NOT WS_TABSTOP
+    GROUPBOX        "Effects",IDC_STATIC,221,201,158,63
+    GROUPBOX        "ABL",IDC_STATIC,221,126,321,39
+    GROUPBOX        "Special Map",IDC_STATIC,8,244,115,50
+    GROUPBOX        "Icons",IDC_STATIC,221,164,157,36
+    GROUPBOX        "CPS",IDC_STATIC,221,7,321,119
+    GROUPBOX        "Shape",IDC_STATIC,381,164,161,42
+    CONTROL         "AssassM",IDC_CHECK_ASSASSIN_M,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,128,103,41,9
+    CONTROL         "AssassW",IDC_CHECK_ASSASSIN_W,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,173,103,42,8
+    EDITTEXT        IDC_EDIT_WEARINGFILE_C14,291,95,84,12,ES_AUTOHSCROLL | 
+                    NOT WS_TABSTOP
+    PUSHBUTTON      "Assassin[W]",IDC_BUTTON_WEARINGFILE_C82,387,95,60,12
+    EDITTEXT        IDC_EDIT_WEARINGFILE_C16,454,95,84,12,ES_AUTOHSCROLL | 
+                    NOT WS_TABSTOP
+    PUSHBUTTON      "Etc[M]",IDC_BUTTON_WEARINGFILE_C17,226,109,60,12
+    EDITTEXT        IDC_EDIT_WEARINGFILE_C17,291,109,84,12,ES_AUTOHSCROLL | 
+                    NOT WS_TABSTOP
+    PUSHBUTTON      "Etc[W]",IDC_BUTTON_WEARINGFILE_C18,387,109,60,12
+    EDITTEXT        IDC_EDIT_WEARINGFILE_C18,454,109,84,12,ES_AUTOHSCROLL | 
+                    NOT WS_TABSTOP
+    CONTROL         "ALL",IDC_RADIO_ALL,"Button",BS_AUTORADIOBUTTON,130,43,
+                    24,8
+    CONTROL         "Man",IDC_RADIO_MAN,"Button",BS_AUTORADIOBUTTON,155,43,
+                    27,8
+    CONTROL         "Woman",IDC_RADIO_WOMAN,"Button",BS_AUTORADIOBUTTON,181,
+                    43,36,8
+    PUSHBUTTON      "BT5 Part",IDC_BUTTON_VEHICLEPART_BT5,385,227,60,12
+    EDITTEXT        IDC_EDIT_VEHICLEPART_BT5,451,227,84,12,ES_AUTOHSCROLL | 
+                    NOT WS_TABSTOP
+    PUSHBUTTON      "BT7 Part",IDC_BUTTON_VEHICLEPART_BT7,385,240,60,12
+    EDITTEXT        IDC_EDIT_VEHICLEPART_BT7,451,240,84,12,ES_AUTOHSCROLL | 
+                    NOT WS_TABSTOP
+    PUSHBUTTON      "BT9 Part",IDC_BUTTON_VEHICLEPART_BT9,385,253,60,12
+    EDITTEXT        IDC_EDIT_VEHICLEPART_BT9,451,253,84,12,ES_AUTOHSCROLL | 
+                    NOT WS_TABSTOP
+    PUSHBUTTON      "Rare Part",IDC_BUTTON_VEHICLEPART_RARE,385,266,60,12
+    EDITTEXT        IDC_EDIT_VEHICLEPART_RARE,451,266,84,12,ES_AUTOHSCROLL | 
+                    NOT WS_TABSTOP
+    COMBOBOX        IDC_COMBO_COOL_TYPE,153,265,63,48,CBS_DROPDOWN | 
+                    WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Item Trade Options",IDC_STATIC_NEEDVALUE2,8,74,115,100
+    GROUPBOX        "Term of Validity if Limitary",IDC_STATIC_NEEDVALUE3,5,
+                    175,117,27
+    CONTROL         "EtcM",IDC_CHECK_ETC_M,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,128,112,41,8
+    CONTROL         "EtcW",IDC_CHECK_ETC_W,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,173,112,42,8
+    GROUPBOX        "Vehicle Option",IDC_STATIC,380,206,162,88
+    CONTROL         "Detergent",IDC_CHECK_DETERGENT,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,65,164,45,8
+    CONTROL         "Drop",IDC_CHECK_THROW,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,38,138,29,8
+    PUSHBUTTON      "Okay",IDC_BUTTON_OK,277,265,46,17
+    PUSHBUTTON      "Cancel",IDC_BUTTON_CANCEL,325,265,46,17
+    PUSHBUTTON      "Assassin[M]",IDC_BUTTON_WEARINGFILE_C13,226,95,60,12
+END
+
+IDD_ITEMSUIT_DIALOG DIALOGEX 0, 0, 743, 319
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "ItemSuit ( English )"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    LTEXT           "Wear Position",IDC_STATIC_SUIT,8,30,46,8
+    COMBOBOX        IDC_COMBO_SUIT,80,30,84,145,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "By Hands",IDC_STATIC_PROPERTYFLAG,8,41,156,35
+    CONTROL         "Both Hands",IDC_CHECK_TWOH,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,20,51,53,11
+    CONTROL         "Large",IDC_CHECK_BIGH,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,75,51,30,11
+    CONTROL         "Right Hand",IDC_RADIO_RIGHT,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,20,62,51,11
+    CONTROL         "Left Hand",IDC_RADIO_LEFT,"Button",BS_AUTORADIOBUTTON,
+                    73,62,47,11
+    CONTROL         "Both",IDC_RADIO_BOTH,"Button",BS_AUTORADIOBUTTON,121,62,
+                    31,11
+    LTEXT           "Attack Attribute",IDC_STATIC_SUIT2,8,81,53,8
+    COMBOBOX        IDC_COMBO_ATT_TYPE,80,78,84,145,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Attackable Distance",IDC_STATIC_DEFENSE2,8,95,65,8
+    EDITTEXT        IDC_EDIT_ATT_RANGE,80,94,84,12,ES_AUTOHSCROLL
+    LTEXT           "Damage(Low/High)",IDC_STATIC_DAMAGE,8,110,65,8
+    EDITTEXT        IDC_EDIT_DAMAGE_LOW,74,110,42,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_DAMAGE_HIGH,122,110,42,12,ES_AUTOHSCROLL
+    LTEXT           "Required SP",IDC_STATIC_REQSP,8,126,41,8
+    EDITTEXT        IDC_EDIT_REQSP,53,126,36,12,ES_AUTOHSCROLL
+    LTEXT           "Defense",IDC_STATIC_DEFENSE,92,126,29,8
+    EDITTEXT        IDC_EDIT_DEFENSE,122,126,42,12,ES_AUTOHSCROLL
+    LTEXT           "Hit Rate",IDC_STATIC_HIT,9,143,27,8
+    EDITTEXT        IDC_EDIT_HIT,38,142,42,12,ES_AUTOHSCROLL
+    LTEXT           "Avoid. Rate",IDC_STATIC_AVOIDRATE,83,143,39,8
+    EDITTEXT        IDC_EDIT_AVOIDRATE,122,142,42,12,ES_AUTOHSCROLL
+    GROUPBOX        "Drugs, Consumption",IDC_STATIC_RESIST5,8,209,156,85
+    LTEXT           "Type",IDC_STATIC,14,220,17,8
+    COMBOBOX        IDC_COMBO_DRUG_TYPE,38,219,48,145,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Max. Pile",IDC_STATIC,92,220,34,8
+    EDITTEXT        IDC_EDIT_INSTANCE_NUM,128,219,30,12,ES_AUTOHSCROLL
+    LTEXT           "Volume",IDC_STATIC,14,241,24,8
+    EDITTEXT        IDC_EDIT_INSTANCE_VOLUME,41,238,60,12,ES_AUTOHSCROLL
+    CONTROL         "Ratio Volume",IDC_CHECK_CURE_RATIO,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,105,239,56,11
+    LTEXT           "Trouble Cure",IDC_STATIC,14,254,42,8
+    CONTROL         "Paralysis",IDC_CHECK_PALSY,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,13,265,44,11
+    CONTROL         "Faint",IDC_CHECK_SWOON,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,53,265,32,11
+    CONTROL         "Stone",IDC_CHECK_PETRIFY,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,94,265,35,11
+    CONTROL         "Flame",IDC_CHECK_BURN,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,127,265,35,11
+    CONTROL         "Freeze",IDC_CHECK_FROZEN,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,13,275,39,11
+    CONTROL         "Madness",IDC_CHECK_DERANGE,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,53,275,44,11
+    CONTROL         "Poison",IDC_CHECK_POISON,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,94,275,37,11
+    CONTROL         "Curse",IDC_CHECK_CURSE,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,127,275,35,11
+    GROUPBOX        "Resistance",IDC_STATIC_RESIST,183,119,162,55
+    LTEXT           "Fire",IDC_STATIC_FIRE,197,131,13,8
+    EDITTEXT        IDC_EDIT_FIRE,219,130,39,12,ES_AUTOHSCROLL
+    LTEXT           "Ice",IDC_STATIC_ICE,279,131,11,8
+    EDITTEXT        IDC_EDIT_ICE,299,130,39,12,ES_AUTOHSCROLL
+    LTEXT           "Electricity",IDC_STATIC_ELECTRIC,188,146,32,8
+    EDITTEXT        IDC_EDIT_ELECTRIC,219,143,39,12,ES_AUTOHSCROLL
+    LTEXT           "Poison",IDC_STATIC_POISON,271,146,22,8
+    EDITTEXT        IDC_EDIT_POISON,299,143,39,12,ES_AUTOHSCROLL
+    GROUPBOX        "Abrasive",IDC_STATIC,183,178,162,52
+    LTEXT           "Type",IDC_STATIC,192,187,18,12
+    COMBOBOX        IDC_COMBO_GRINDING_TYPE,221,186,109,181,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Addition Effect",IDC_STATIC_RESIST2,350,30,203,56
+    LTEXT           "Order",IDC_STATIC,354,47,18,12
+    COMBOBOX        IDC_COMBO_ADDON_NO,378,47,30,144,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Add Val.",IDC_STATIC_FIRE3,414,47,29,8
+    EDITTEXT        IDC_EDIT_ADDON_VAR,444,47,60,12,ES_AUTOHSCROLL
+    LTEXT           "Type",IDC_STATIC,354,66,18,12
+    COMBOBOX        IDC_COMBO_ADDON_TYPE,378,66,126,181,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Rate Of Change Effect",IDC_STATIC_RESIST3,350,91,203,30
+    LTEXT           "Type",IDC_STATIC,354,103,18,8
+    COMBOBOX        IDC_COMBO_VARIATE,370,103,89,144,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Rate Of Change",IDC_STATIC,461,106,53,8
+    EDITTEXT        IDC_EDIT_VARIATE_VAR,512,103,39,12,ES_AUTOHSCROLL
+    GROUPBOX        "State Trouble Effect",IDC_STATIC_RESIST4,351,162,202,68
+    LTEXT           "Type",IDC_STATIC,357,174,18,8
+    COMBOBOX        IDC_COMBO_BLOW,381,175,166,144,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Time",IDC_STATIC_ICE3,357,193,17,8
+    EDITTEXT        IDC_EDIT_BLOW_LIFE,384,193,58,12,ES_AUTOHSCROLL
+    LTEXT           "Percent",IDC_STATIC_ICE2,463,195,27,8
+    EDITTEXT        IDC_EDIT_BLOW_RATE,489,191,61,12,ES_AUTOHSCROLL
+    LTEXT           "Value1",IDC_STATIC_BLOWVAR1,357,212,41,8
+    EDITTEXT        IDC_EDIT_BLOW_VALUE1,384,211,58,12,ES_AUTOHSCROLL
+    LTEXT           "Value2",IDC_STATIC_BLOWVAR2,465,211,31,8
+    EDITTEXT        IDC_EDIT_BLOW_VALUE2,489,211,61,12,ES_AUTOHSCROLL
+    LTEXT           "Skill Book(ID)",IDC_STATIC_HIT4,191,103,41,8
+    EDITTEXT        IDC_EDIT_SKILL_MID,245,102,49,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_SKILL_SID,296,102,49,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Before",IDC_BUTTON_PREV,184,233,51,14
+    PUSHBUTTON      "Next",IDC_BUTTON_NEXT,240,233,51,14
+    PUSHBUTTON      "Cancel",IDC_BUTTON_CANCEL,296,233,51,14
+    PUSHBUTTON      "OK",IDC_BUTTON_OK,352,233,51,14
+    CONTROL         "Arms",IDC_RADIO_GRIND_ARM,"Button",BS_AUTORADIOBUTTON,
+                    215,215,32,11
+    CONTROL         "Costume",IDC_RADIO_GRIND_CLOTH,"Button",
+                    BS_AUTORADIOBUTTON,269,215,44,11
+    LTEXT           "Spirit and Energy",IDC_STATIC_SPIRIT,240,159,56,8
+    EDITTEXT        IDC_EDIT_SPIRIT,299,158,39,12,ES_AUTOHSCROLL
+    CONTROL         "Broom",IDC_CHECK_BROOM,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,111,51,36,11
+    LISTBOX         IDC_LIST_BOX,557,39,131,51,LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Present Box",IDC_STATIC_PRESENT,557,30,39,8
+    PUSHBUTTON      "add",IDC_BUTTON_BOX_ADD,692,65,19,11
+    PUSHBUTTON      "del",IDC_BUTTON_BOX_DEL,692,78,19,11
+    LTEXT           "Random Box",IDC_STATIC_RANDOM,557,92,44,8
+    LISTBOX         IDC_LIST_BOX2,557,102,131,51,LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "add",IDC_BUTTON_BOX_ADD2,692,127,19,11
+    PUSHBUTTON      "del",IDC_BUTTON_BOX_DEL2,692,140,19,11
+    GROUPBOX        "Volume Of Change Effect",IDC_STATIC_RESIST6,350,126,202,
+                    30
+    LTEXT           "Type",IDC_STATIC,354,139,18,8
+    COMBOBOX        IDC_COMBO_VARIATE2,370,139,90,144,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Vol.Of Change",IDC_STATIC,462,140,48,8
+    EDITTEXT        IDC_EDIT_VARIATE_VAR2,510,139,39,12,ES_AUTOHSCROLL
+    GROUPBOX        "Question Item",IDC_STATIC_RESIST7,183,30,162,67
+    LTEXT           "Type",IDC_STATIC,191,43,18,8
+    COMBOBOX        IDC_COMBO_QUESTION,215,43,120,144,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Time(sec)",IDC_STATIC_ICE6,191,60,37,8
+    EDITTEXT        IDC_EDIT_QUE_TIME,233,60,24,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_QUE_EXP,311,59,24,12,ES_AUTOHSCROLL
+    LTEXT           "Value1",IDC_STATIC_QUEVAR1,191,78,39,8
+    EDITTEXT        IDC_EDIT_QUE_PARAM1,233,78,24,12,ES_AUTOHSCROLL
+    LTEXT           "Value2",IDC_STATIC_QUEVAR2,264,78,43,8
+    EDITTEXT        IDC_EDIT_QUE_PARAM2,311,78,24,12,ES_AUTOHSCROLL
+    LTEXT           "Gain Exp.",IDC_STATIC_ICE8,263,62,41,8
+    GROUPBOX        "Grade",IDC_STATIC,8,158,75,44
+    LTEXT           "Attack",IDC_STATIC,17,171,22,8
+    EDITTEXT        IDC_EDIT_GRADE_1,42,171,34,12,ES_AUTOHSCROLL
+    LTEXT           "Defense",IDC_STATIC,17,187,22,8
+    EDITTEXT        IDC_EDIT_GRADE_2,42,186,34,12,ES_AUTOHSCROLL
+    GROUPBOX        "Exp Multiple",IDC_STATIC,91,158,73,44
+    EDITTEXT        IDC_EDIT_X_EXP,97,171,46,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "UP",IDC_BUTTON_BOX_UP1,692,39,19,11
+    PUSHBUTTON      "DW",IDC_BUTTON_BOX_DW1,692,51,19,11
+    PUSHBUTTON      "UP",IDC_BUTTON_BOX_UP2,692,102,19,11
+    PUSHBUTTON      "DW",IDC_BUTTON_BOX_DW2,692,115,19,11
+    LTEXT           "Level",IDC_STATIC,193,203,18,11
+    COMBOBOX        IDC_COMBO_GRINDING_LEVEL,221,201,109,181,
+                    CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "",IDC_LIST_MONSTER,"SysListView32",LVS_REPORT | 
+                    LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | NOT WS_VISIBLE | 
+                    WS_BORDER | WS_TABSTOP,554,166,156,79
+    LTEXT           "PET SKIN PACK",IDC_STATIC_PETSKINPACK,555,158,70,8,NOT 
+                    WS_VISIBLE
+    PUSHBUTTON      "ADD",IDC_BUTTON_ADD_PETSKIN,554,259,25,12,NOT 
+                    WS_VISIBLE
+    EDITTEXT        IDC_EDIT_MOB_SCALE,649,246,39,12,ES_AUTOHSCROLL | NOT 
+                    WS_VISIBLE
+    LTEXT           "Scale",IDC_STATIC_MOB_SCALE,629,249,19,8,NOT WS_VISIBLE
+    PUSHBUTTON      "DEL",IDC_BUTTON_DEL_PETSKIN,582,259,24,12,NOT 
+                    WS_VISIBLE
+    LTEXT           "Skin Time",IDC_STATIC_MOB_SKINTIME,553,249,32,9,NOT 
+                    WS_VISIBLE
+    EDITTEXT        IDC_EDIT_MOB_SKINTIME,586,246,39,12,ES_AUTOHSCROLL | 
+                    ES_NUMBER | NOT WS_VISIBLE
+END
+
+IDD_ITEMSUITTREE_DIALOG DIALOGEX 0, 0, 359, 341
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Item Tree View ( English )"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    CONTROL         "",IDC_TREE_ITEM,"SysTreeView32",TVS_HASBUTTONS | 
+                    TVS_HASLINES | TVS_LINESATROOT | TVS_NOTOOLTIPS | 
+                    WS_TABSTOP,7,7,343,328,WS_EX_STATICEDGE
+END
+
+IDD_ITEM_SEARCH_DIALOG DIALOGEX 0, 0, 319, 148
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "ITEM LIST ( English )"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "GO ITEM",IDOK,161,127,97,14
+    CONTROL         "",IDC_ITEM_SEARCH_LIST,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,
+                    7,305,117
+    PUSHBUTTON      "CANCEL",IDCANCEL,262,127,50,14
+END
+
+IDD_INPUTDATADLG DIALOGEX 0, 0, 187, 28
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "INPUT_DATA ( English )"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,145,7,36,14
+    LTEXT           "ITEMNAME NUM",IDC_ITEM_STATIC,7,7,84,14,SS_CENTERIMAGE,
+                    WS_EX_RIGHT
+    EDITTEXT        IDC_EDIT_NUM,95,7,42,14,ES_AUTOHSCROLL
+END
+
+IDD_DIALOG_LOG1 DIALOGEX 0, 0, 300, 156
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Log ( English )"
+FONT 8, "Arial", 400, 0, 0xA3
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,0,144,300,12
+    LISTBOX         IDC_LIST_CONNETS,0,0,300,138,LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 228
+        TOPMARGIN, 7
+    END
+
+    IDD_DIALOG_ITEM, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 179
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 260
+    END
+
+    IDD_DIALOG_LOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 293
+        TOPMARGIN, 7
+    END
+
+    IDD_ITEMEDIT_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 650
+        TOPMARGIN, 17
+        BOTTOMMARGIN, 350
+    END
+
+    IDD_ITEMPARENT_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 5
+        TOPMARGIN, 7
+    END
+
+    IDD_ITEMSUIT_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 6
+        RIGHTMARGIN, 737
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 298
+    END
+
+    IDD_ITEMSUITTREE_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 352
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 335
+    END
+
+    IDD_ITEM_SEARCH_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 312
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 141
+    END
+
+    IDD_INPUTDATADLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 180
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 21
+    END
+
+    IDD_DIALOG_LOG1, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 293
+        TOPMARGIN, 7
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_KOR)
+LANGUAGE 18, 1
+#pragma code_page(949)
+#include "res\ItemEdit.rc2"  // Microsoft Visual C++에서 편집되지 않은 리소스
+#include "afxres.rc"         // 표준 구성 요소
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

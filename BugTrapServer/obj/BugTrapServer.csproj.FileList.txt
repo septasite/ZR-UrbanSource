@@ -1,0 +1,9 @@
+bin\Debug\BugTrapServer.exe.config
+bin\Debug\BugTrapServer.exe
+bin\Debug\BugTrapServer.pdb
+obj\Debug\ResolveAssemblyReference.cache
+obj\Debug\BugTrapServer.BugTrapService.resources
+obj\Debug\BugTrapServer.ProjectInstaller.resources
+obj\Debug\BugTrapServer.csproj.GenerateResource.Cache
+obj\Debug\BugTrapServer.exe
+obj\Debug\BugTrapServer.pdb

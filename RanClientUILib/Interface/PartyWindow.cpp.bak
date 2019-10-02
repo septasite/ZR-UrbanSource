@@ -1,0 +1,439 @@
+#include "StdAfx.h"
+#include "PartyWindow.h"
+#include "../EngineUILib/GUInterface/BasicTextBox.h"
+#include "../EngineLib/DxCommon/DxFontMan.h"
+#include "GameTextControl.h"
+#include "UITextControl.h"
+#include "PartySlot.h"
+#include "MiniMap.h"
+#include "InnerInterface.h"
+
+#include "GLGaeaClient.h"
+#include "GLPartyClient.h"
+#include "../EngineUILib/GUInterface/BasicButton.h"
+#include "../Interface/BasicTextButton.h"
+#include "BasicLineBox.h"
+#include "PartyDisplay.h"
+
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
+CPartyWindow::CPartyWindow () :
+	m_pConditionTextBox ( NULL )
+{
+	for ( int i = 0; i < MAXPARTY; i++ )
+	{
+		m_pPartySlot[i] = NULL;
+	}
+}
+
+CPartyWindow::~CPartyWindow ()
+{
+}
+CBasicTextButton*  CPartyWindow::CreateTextButton23 ( const char* szButton, UIGUID ControlID, const char* szText )
+{
+	const int nBUTTONSIZE = CBasicTextButton::SIZE23;
+	CBasicTextButton* pTextButton = new CBasicTextButton;
+	pTextButton->CreateSub ( this, "BASIC_TEXT_BUTTON23", UI_FLAG_XSIZE|UI_FLAG_YSIZE, ControlID );
+	pTextButton->CreateBaseButtonEx ( szButton, nBUTTONSIZE, CBasicButton::RADIO_FLIP, szText, _DEFAULT_FONT_SHADOW_FLAG );
+	RegisterControl ( pTextButton );
+	return pTextButton;
+}
+void CPartyWindow::CreateSubControl ()
+{	
+	int nTextAlign = TEXT_ALIGN_LEFT;
+	D3DCOLOR dwFontColor = NS_UITEXTCOLOR::DEFAULT;
+	CD3DFontPar* pFont = DxFontMan::GetInstance().LoadDxFont ( _DEFAULT_FONT, 9, _DEFAULT_FONT_FLAG );
+
+	{
+		m_bg_white = new CUIControl;
+		m_bg_white->CreateSub ( this, "RNPARTY_WINDOW_REGION", UI_FLAG_DEFAULT);	
+		m_bg_white->SetVisibleSingle ( TRUE );
+		RegisterControl ( m_bg_white );
+	}
+
+	{
+		m_pBackLine1 = new CBasicLineBox;
+		m_pBackLine1->CreateSub ( this, "BASIC_LINE_BOX_SKILL", UI_FLAG_XSIZE | UI_FLAG_YSIZE );
+		m_pBackLine1->CreateBaseBoxSkill ( "RNPARTY_WINDOW_OPTION_REGION" );
+		RegisterControl ( m_pBackLine1 );
+
+		m_pBackLine2 = new CBasicLineBox;
+		m_pBackLine2->CreateSub ( this, "BASIC_LINE_BOX_SKILL", UI_FLAG_XSIZE | UI_FLAG_YSIZE );
+		m_pBackLine2->CreateBaseBoxSkill ( "RNPARTY_WINDOW_SLOT_REGION" );
+		RegisterControl ( m_pBackLine2 );
+	}
+
+	CBasicTextBox* pTextBox = NULL;
+	
+	{
+		pTextBox = CreateStaticControl ( "PARTY_CHECK_TEXT",pFont, dwFontColor, nTextAlign );
+		m_pCheckTextBox = pTextBox;
+		m_pCheckTextBox->AddText ( "Check", NS_UITEXTCOLOR::WHITE );
+	}
+
+	{
+		pTextBox = CreateStaticControl ( "PARTY_MEMBER_TEXT",pFont, dwFontColor, nTextAlign );
+		m_pMemberTextBox = pTextBox;
+		m_pMemberTextBox->AddText ( "Member", NS_UITEXTCOLOR::WHITE );
+	}
+
+	{
+		pTextBox = CreateStaticControl ( "PARTY_SLOT_CONDITION_TEXT", pFont, dwFontColor, nTextAlign );
+		m_pConditionTextBox = pTextBox;
+		//m_pConditionTextBox->AddText ( "- 라운드 로빈 방식 아이템 분배", NS_UITEXTCOLOR::PARTYNAME );
+		//m_pConditionTextBox->AddText ( "- 먼저 묵는놈이 임자방식 돈 분배", NS_UITEXTCOLOR::PRIVATE );
+	}
+
+	CString strMemberKeyword[MAXPARTY] = 
+	{
+		"PARTY_INFO_SLOT0",
+		"PARTY_INFO_SLOT1",
+		"PARTY_INFO_SLOT2",
+		"PARTY_INFO_SLOT3",
+		"PARTY_INFO_SLOT4",
+		"PARTY_INFO_SLOT5",
+		"PARTY_INFO_SLOT6",
+		"PARTY_INFO_SLOT7",
+	};
+
+	{
+		pTextBox = CreateStaticControl ( "PARTY_NO_PARTY", pFont, dwFontColor, nTextAlign );
+		pTextBox->AddText ( "No Party Joined.", NS_UITEXTCOLOR::WHITE );
+		m_pNoParty = pTextBox;
+	}
+
+	for ( int i = 0; i < MAXPARTY; i++ )
+	{
+		CPartySlot* pPartySlot = new CPartySlot;
+		pPartySlot->CreateSub ( this, strMemberKeyword[i].GetString (), UI_FLAG_DEFAULT, PARTY_SLOT_MEMBER0 + i );
+		pPartySlot->CreateSubControl ();
+		RegisterControl ( pPartySlot );
+		m_pPartySlot[i] = pPartySlot;
+	}
+	
+	CBasicButton* m_pPageButton = NULL;
+
+	m_pPageButton = CreateTextButton23 ( "RNPARTY_BUTTON", RNPARTY_BUTTON_TAP + i, "Party" );
+	m_pPageButton->SetFlip ( TRUE );
+
+	{
+		pButtonCheck = CreateControl ( "CHECK_BUTTON", CHECK_BUTTON );
+		pButtonCheckOver = CreateControl ( "CHECK_BUTTON_OVER");
+		pButtonCheckOver->SetVisibleSingle ( FALSE );
+	}
+
+	{
+		pButtonMember = CreateControl ( "MEMBER_BUTTON", MEMBER_BUTTON );
+		pButtonMemberOver = CreateControl ( "MEMBER_BUTTON_OVER");
+		pButtonMemberOver->SetVisibleSingle ( TRUE );
+	}
+}
+
+void CPartyWindow::SetSlotMember ( CPartySlot* pPartySlot, GLPARTY_CLIENT *pMember, BOOL bSameMap, BOOL bQuitEnable, BOOL bAuthEnable, const int nPartySlotID )
+{
+	if ( !pPartySlot )
+	{
+		GASSERT ( 0 && "ÆAÆ¼ ½½·OAI ¾ø½A´I´U. - ¸ÞAI" );
+		return ;
+	}
+	if ( !pMember )
+	{
+		GASSERT ( 0 && "¸a¹o°¡ ¾ø½A´I´U. - ¸ÞAI" );
+		return ;
+	}
+	
+	const CString strMapName = GLGaeaClient::GetInstance().GetMapName ( pMember->m_sMapID );
+	if ( bSameMap )
+	{
+		int nPosX(0), nPosY(0);
+		PLANDMANCLIENT pLandClient = GLGaeaClient::GetInstance().GetActiveMap();
+		const CString strMapName = GLGaeaClient::GetInstance().GetMapName ( pMember->m_sMapID );
+		GLMapAxisInfo &sMapAxisInfo = pLandClient->GetMapAxisInfo();
+		sMapAxisInfo.Convert2MapPos ( pMember->m_vPos.x, pMember->m_vPos.z, nPosX, nPosY );
+
+		CString strPos;
+		strPos.Format ( "%d/%d", nPosX, nPosY );
+
+		pPartySlot->SetPlayerPos ( strPos );
+
+		float fHPPercent = 0.0f;
+		if ( pMember->m_sHP.dwMax )
+			fHPPercent = float(pMember->m_sHP.dwNow) / float(pMember->m_sHP.dwMax);
+		pPartySlot->SetHP ( fHPPercent );
+		pPartySlot->SetMapName ( strMapName );
+	}
+	else
+	{
+		pPartySlot->SetMapName ( strMapName );
+	}
+
+	pPartySlot->SetSameMap ( bSameMap );
+
+	const int nClassType = CharClassToIndex ( pMember->m_emClass );	
+	const CString strName = pMember->m_szName;
+
+	//pPartySlot->SetPlayerLvl ( pMember->m_wLevel );
+	pPartySlot->SetSchool ( pMember->m_wSchool );
+	pPartySlot->SetClass ( nClassType );
+	pPartySlot->SetPlayerName ( strName );		
+	pPartySlot->SetNumber( nPartySlotID );
+	pPartySlot->SetVisibleQuitButton ( bQuitEnable );	
+	pPartySlot->SetVisibleAuthButton( bAuthEnable );
+
+	pPartySlot->SetVisibleSingle ( TRUE );
+}
+
+void CPartyWindow::Update ( int x, int y, BYTE LB, BYTE MB, BYTE RB, int nScroll, float fElapsedTime, BOOL bFirstControl )
+{
+	CUIWindowEx::Update ( x, y, LB, MB, RB, nScroll, fElapsedTime, bFirstControl );
+		
+	if ( !m_pPartySlot[0]->IsVisible () )
+	{
+		m_pNoParty->SetVisibleSingle ( TRUE );
+	}
+	else
+	{
+		m_pNoParty->SetVisibleSingle ( FALSE );
+	}
+
+	for ( int i = 0; i < MAXPARTY; i++ ) m_pPartySlot[i]->SetVisibleSingle ( FALSE );
+	if ( m_pConditionTextBox ) m_pConditionTextBox->SetVisibleSingle ( FALSE );
+
+	GLPARTY_CLIENT *pMaster = GLPartyClient::GetInstance().GetMaster();
+	if ( pMaster )
+	{
+		GLPARTY_CLIENT *pSelf = FindSelfClient ();
+		//	NOTE
+		//		만약, 자신을 찾지 못하면
+		//		이 아래로의 작업은 아무것도 진행하지 않습니다.
+		if ( !pSelf ) return ;
+
+		const BOOL bMaster = pMaster->ISONESELF ();
+		SetSlotMember ( m_pPartySlot[0], pMaster, IsSameMap ( pSelf, pMaster ), bMaster, FALSE, 0 );
+		m_pPartySlot[0]->SetMaster ( bMaster );
+
+		DWORD nMEMBER_NUM = GLPartyClient::GetInstance().GetMemberNum();
+		if( nMEMBER_NUM > 1 )
+		{
+			nMEMBER_NUM -= 1; // Note : 마스터는 제외
+			for ( DWORD i = 0; i < nMEMBER_NUM; i++ )
+			{
+				GLPARTY_CLIENT *pMember = GLPartyClient::GetInstance().GetMember ( i );			
+				if ( pMember )
+				{				
+					const BOOL bONESELF = pMember->ISONESELF ();
+					const BOOL bEnableQuitButton = (bMaster || bONESELF);
+
+					//	마스터가 아님 '탈퇴'라는 메시지로 적용
+					m_pPartySlot[i+1]->SetMaster ( FALSE );
+
+					SetSlotMember ( m_pPartySlot[i+1], pMember, IsSameMap ( pSelf, pMember ), bEnableQuitButton, bMaster, i + 1 );
+				}
+			}
+		}
+
+		if ( m_pConditionTextBox )
+		{
+			const SPARTY_OPT& sPartyOption = GLPartyClient::GetInstance().GetOption ();
+
+			if ( m_sPartyOption != sPartyOption )
+			{
+				m_pConditionTextBox->ClearText ();
+
+				CString strCombine;
+				CString strLeft, strRight;
+
+				strLeft = ID2GAMEWORD("PARTY_MODAL_CONDITION",0);
+				strRight = ID2GAMEWORD("PARTY_MODAL_ITEM_OPTION",sPartyOption.emGET_ITEM);
+				strCombine.Format ( "%s : %s", strLeft, strRight );
+				m_pConditionTextBox->AddText ( strCombine, NS_UITEXTCOLOR::PARTYNAME );
+
+				strLeft = ID2GAMEWORD("PARTY_MODAL_CONDITION",1);
+				strRight = ID2GAMEWORD("PARTY_MODAL_MONEY_OPTION",sPartyOption.emGET_MONEY);
+				strCombine.Format ( "%s : %s", strLeft, strRight );
+				m_pConditionTextBox->AddText ( strCombine, NS_UITEXTCOLOR::PRIVATE );				
+
+				m_sPartyOption = sPartyOption;
+			}
+
+			m_pConditionTextBox->SetVisibleSingle ( TRUE );
+		}
+	}	
+}
+
+
+BOOL CPartyWindow::IsSameMap ( GLPARTY_CLIENT *pSelf, GLPARTY_CLIENT *pMember )
+{
+	if ( !pSelf || !pMember )
+	{
+		GASSERT ( 0 && "잘못된 데이타입니다." );
+		return FALSE;
+	}
+	
+	return pSelf->m_sMapID.dwID == pMember->m_sMapID.dwID;
+}
+
+GLPARTY_CLIENT*	CPartyWindow::FindSelfClient ()
+{
+	GLPARTY_CLIENT *pMaster = GLPartyClient::GetInstance().GetMaster();
+	if ( pMaster && pMaster->ISONESELF() )
+	{
+		return pMaster;
+	}
+	else
+	{
+		//	자기찾기
+		for ( int i = 0; i < 7; i++ )
+		{
+			GLPARTY_CLIENT *pMember = GLPartyClient::GetInstance().GetMember( i );
+			if ( pMember && pMember->ISONESELF () )
+			{
+				return pMember;				
+			}
+		}
+	}
+//	GASSERT ( 0 && "자신을 찾을 수 없습니다." );
+	return NULL;
+}
+
+void CPartyWindow::TranslateUIMessage ( UIGUID ControlID, DWORD dwMsg )
+{
+	CUIWindowEx::TranslateUIMessage ( ControlID, dwMsg );
+
+	switch ( ControlID )
+	{
+	case ET_CONTROL_TITLE:
+	case ET_CONTROL_TITLE_F:
+		{
+			if ( (dwMsg & UIMSG_LB_DUP) && CHECK_MOUSE_IN ( dwMsg ) )
+			{
+				CInnerInterface::GetInstance().SetDefaultPosInterface( PARTY_WINDOW );
+			}
+		}
+		break;
+	case PARTY_SLOT_MEMBER0:
+		{
+			//	NOTE
+			//		파티 해체
+			if ( dwMsg & UIMSG_MOUSEIN_LBUP_EVENT )
+			{
+				GLPartyClient::GetInstance().Dissolve ();
+			}
+
+			//	NOTE
+			//		힐
+			if ( dwMsg & UIMSG_MOUSEIN_RBUP_EVENT )
+			{
+				GLPARTY_CLIENT *pMaster = GLPartyClient::GetInstance().GetMaster();	//	마스터
+				if ( pMaster )
+				{
+					STARGETID sTARID(CROW_PC,pMaster->m_dwGaeaID);
+					GLGaeaClient::GetInstance().GetCharacter ()->ReqSkillReaction(sTARID);
+				}
+			}
+		}
+		break;
+
+	case PARTY_SLOT_MEMBER1:
+	case PARTY_SLOT_MEMBER2:
+	case PARTY_SLOT_MEMBER3:
+	case PARTY_SLOT_MEMBER4:
+	case PARTY_SLOT_MEMBER5:
+	case PARTY_SLOT_MEMBER6:
+	case PARTY_SLOT_MEMBER7:
+		{
+			//	NOTE
+			//		강퇴
+			if ( dwMsg & UIMSG_MOUSEIN_LBUP_EVENT )
+			{
+				int nIndex = ControlID - PARTY_SLOT_MEMBER1;
+				GLPartyClient::GetInstance().Secede ( nIndex );
+			}
+
+			if( dwMsg & UIMSG_MOUSEIN_LBUP_AUTH )
+			{
+				int nIndex = ControlID - PARTY_SLOT_MEMBER1;
+				GLPartyClient::GetInstance().Authority( nIndex );
+			}
+
+			//	NOTE
+			//		힐
+			if ( dwMsg & UIMSG_MOUSEIN_RBUP_EVENT )
+			{
+				int nIndex = ControlID - PARTY_SLOT_MEMBER1;
+
+				GLPARTY_CLIENT *pMaster = GLPartyClient::GetInstance().GetMaster();	//	마스터
+				if ( pMaster )
+				{
+					GLPARTY_CLIENT *pMember = GLPartyClient::GetInstance().GetMember( nIndex );
+					if ( pMember )
+					{
+						STARGETID sTARID(CROW_PC,pMember->m_dwGaeaID);
+						GLGaeaClient::GetInstance().GetCharacter ()->ReqSkillReaction(sTARID);
+					}
+				}
+			}
+		}
+		break;
+	case CHECK_BUTTON:
+		{
+			if ( CHECK_MOUSE_IN ( dwMsg ) )
+			{
+				CInnerInterface::GetInstance().SHOW_COMMON_LINEINFO( "Function Unavailable", NS_UITEXTCOLOR::WHITE  );	
+				if ( CHECK_LB_UP_LIKE( dwMsg ) )
+				{
+					if ( pButtonCheck->IsVisible () && !pButtonCheckOver->IsVisible () )
+					{
+						pButtonCheckOver->SetVisibleSingle ( TRUE );
+					}
+					else if ( pButtonCheck->IsVisible () && pButtonCheckOver->IsVisible () )
+					{
+						pButtonCheckOver->SetVisibleSingle ( FALSE );
+					}
+				}
+			}
+		}
+		break;
+	case MEMBER_BUTTON:
+        {
+            if ( CHECK_MOUSE_IN ( dwMsg ) )
+            {
+                if ( CHECK_LB_UP_LIKE( dwMsg ) )
+                {
+                    if ( pButtonMember->IsVisible () && !pButtonMemberOver->IsVisible () )
+                    {
+                        pButtonMemberOver->SetVisibleSingle ( TRUE );
+                        CInnerInterface::GetInstance().ShowGroupBottom ( PARTY_DISPLAY );
+                        //CInnerInterface::GetInstance().PartyDisplayOpen = TRUE;
+                    }
+                    else if ( pButtonMember->IsVisible () && pButtonMemberOver->IsVisible () )
+                    {
+                        pButtonMemberOver->SetVisibleSingle ( FALSE );
+                        CInnerInterface::GetInstance().HideGroup ( PARTY_DISPLAY );
+                       // CInnerInterface::GetInstance().PartyDisplayOpen = FALSE;
+                    }
+                }
+            }
+        }
+        break;  
+	}
+}
+
+void CPartyWindow::SetPartyInfo ( DWORD dwPartyID, DWORD dwMasterID )
+{
+	m_dwPartyID = dwPartyID;
+	m_dwMasterID = dwMasterID;
+}
+
+DWORD CPartyWindow::GetPartyID ()
+{
+	return m_dwPartyID;
+}
+
+DWORD CPartyWindow::GetMasterID()
+{
+	return m_dwMasterID;
+}
+

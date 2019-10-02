@@ -1,0 +1,1189 @@
+#ifndef GLCHARDATA_H_
+#define GLCHARDATA_H_
+
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
+
+#include <map>
+#include <hash_map>
+
+#include "./GLInventory.h"
+#include "./GLItem.h"
+#include "./GLQuestPlay.h"
+#include "./GLItemMan.h"
+#include "./GLSkill.h"
+#include "./GLVEHICLE.h"
+
+#include "../../EngineLib/Common/ByteStream.h"
+
+enum EMCHARDATA
+{
+	EMSKILLQUICK_VERSION	= 0x0101,
+	EMSKILLQUICK_SIZE		= 40, //roca added F4
+	EMACTIONQUICK_SIZE		= 6,
+
+	SKILLREALFACT_SIZE		= 14,
+	SKILLFACT_SIZE			= 14,
+
+	EMMAX_CLUB_NUM			= 100,
+
+	EMSTORAGE_CHANNEL				= 5,
+	
+	EMSTORAGE_CHANNEL_DEF			= 0,
+	EMSTORAGE_CHANNEL_DEF_SIZE		= 1,
+
+	EMSTORAGE_CHANNEL_SPAN			= 1,
+	EMSTORAGE_CHANNEL_SPAN_SIZE		= 3,
+
+	EMSTORAGE_CHANNEL_PREMIUM		= 4,
+	EMSTORAGE_CHANNEL_PREMIUM_SIZE	= 1,
+	
+	KILLFACT_SIZE	=	5,
+};
+
+enum EMGM_EVENT_TYPE
+{
+	EMGM_EVENT_NONE		= 0x00,	//	æ¯¿Ω.
+	EMGM_EVENT_SPEED	= 0x01,	//	¿Ãµøº”µµ.
+	EMGM_EVENT_ASPEED	= 0x02,	//	∞¯∞›º”µµ.
+	EMGM_EVENT_ATTACK	= 0x04,	//	∞¯∞›∑¬.
+};
+
+struct SCHARSKILL
+{
+	static DWORD VERSION;
+	static DWORD SIZE;
+
+	SNATIVEID	sNativeID;
+	WORD		wLevel;
+
+	SCHARSKILL () :
+		sNativeID(SNATIVEID::ID_NULL,SNATIVEID::ID_NULL),
+		wLevel(0)
+	{
+	}
+
+	SCHARSKILL ( const SNATIVEID &_sNID, const WORD _wLvl ) :
+		sNativeID(_sNID),
+		wLevel(_wLvl)
+	{
+	}
+};
+
+struct DAMAGE_SPEC
+{
+	float		m_fPsyDamageReduce;				// π∞∏Æ µ•πÃ¡ÅE»˙ÿˆ¿≤
+	float		m_fMagicDamageReduce;			// ∏∂π˝ µ•πÃ¡ÅE»˙ÿˆ¿≤
+	float		m_fPsyDamageReflection;			// π∞∏Æ µ•πÃ¡ÅEπ›ªÁ¿≤
+	float		m_fPsyDamageReflectionRate;		// π∞∏Æ µ•πÃ¡ÅEπ›ªÁ»Æ∑ÅE
+	float		m_fMagicDamageReflection;		// ∏∂π˝ µ•πÃ¡ÅEπ›ªÁ¿≤
+	float		m_fMagicDamageReflectionRate;	// ∏∂π˝ µ•πÃ¡ÅEπ›ªÁ»Æ∑ÅE
+
+	DAMAGE_SPEC()	:
+		m_fPsyDamageReduce(0.0f),
+		m_fMagicDamageReduce(0.0f),
+		m_fPsyDamageReflection(0.0f),
+		m_fPsyDamageReflectionRate(0.0f),
+		m_fMagicDamageReflection(0.0f),
+		m_fMagicDamageReflectionRate(0.0f)
+	{
+	}
+
+
+	void RESET()
+	{
+		*this = DAMAGE_SPEC();
+	}
+};
+
+struct DEFENSE_SKILL
+{
+
+	SNATIVEID	m_dwSkillID;					//	πﬂµø«ÅEΩ∫≈≥ MID/SID
+	WORD		m_wLevel;						//	πﬂµø«ÅEΩ∫≈≥ ∑π∫ß
+	float		m_fRate;						//	πﬂµø«ÅEΩ∫≈≥ MID/SID »Æ∑ÅE
+	bool		m_bActive;						//	πﬂµø«ÅEΩ∫≈≥ ±∏µøªÛ≈¬
+
+	DEFENSE_SKILL() 
+		: m_dwSkillID ( NATIVEID_NULL() )
+		, m_wLevel ( 0 )
+		, m_fRate ( 0.0f )
+		, m_bActive(false)
+	{
+	}
+
+	void RESET()
+	{
+		m_dwSkillID = NATIVEID_NULL();
+		m_wLevel = 0;
+		m_fRate = 0.0f;
+	}
+};
+
+enum EMACTION_SLOT
+{
+	EMACT_SLOT_NONE	= 0,
+	EMACT_SLOT_DRUG	= 1,
+};
+
+struct SACTION_SLOT
+{
+	enum { VERSION = 0x0100, };
+
+	WORD		wACT;
+	SNATIVEID	sNID;
+
+	SACTION_SLOT () :
+		wACT(EMACT_SLOT_NONE),
+		sNID(false)
+	{
+	}
+
+	bool VALID () const
+	{
+		return wACT!=EMACT_SLOT_NONE && sNID!=SNATIVEID(false);
+	}
+
+	void RESET ()
+	{
+		wACT = EMACT_SLOT_NONE;
+		sNID = SNATIVEID(false);
+	}
+};
+
+//	Note : ƒ…∏Ø≈Õ 1¬ÅE«◊∏ÅE
+//
+struct SCHARDATA
+{
+protected:
+	DWORD				m_dwUserID;
+public:
+	void SetUserID( DWORD dwUserID) { m_dwUserID = dwUserID; }
+	DWORD GetUserID() { return m_dwUserID; }
+
+public:
+	DWORD				m_dwUserLvl;				//	ªÁøÅE⁄ ±««— Level.
+	__time64_t			m_tPREMIUM;					//	«¡∏ÆπÃæÅE±‚«—.
+	bool				m_bPREMIUM;					//	«ˆ¡¶ «¡∏ÆπÃæÅEªÛ≈¬.
+	__time64_t			m_tCHATBLOCK;				//	±”∏ª ¬˜¥‹.
+
+	__time64_t			m_tSTORAGE[EMSTORAGE_CHANNEL_SPAN_SIZE];	//	√¢∞ÅE±‚«—.
+	bool				m_bSTORAGE[EMSTORAGE_CHANNEL_SPAN_SIZE];	//	√¢∞ÅE2 ªÁøÅE
+
+	WORD				m_wINVENLINE;				//	√ﬂ∞°µ» ¿Œ∫•≈‰∏Æ ¡ŸºÅE
+
+	DWORD				m_dwServerID;			
+	DWORD				m_dwCharID;
+
+	char				m_szName[CHAR_SZNAME];		//	¿Ã∏ß. (∞˙›§)
+
+	EMTRIBE				m_emTribe;					//	¡æ¡∑. (∞˙›§)
+	EMCHARCLASS			m_emClass;					//	¡˜æÅE (∞˙›§)
+	WORD				m_wSchool;					//	«–øÅE
+	WORD				m_wSex;						//	º∫∫∞.
+	WORD				m_wHair;					//	∏”∏ÆΩ∫≈∏¿œ.
+	WORD				m_wHairColor;				//	∏”∏ÆªˆªÅE
+	WORD				m_wFace;					//	æÛ±º∏æÅE
+
+	int					m_nBright;					//	º”º∫.
+	int					m_nLiving;					//	ª˝»∞.
+	int					m_nChaReborn;			// add reborn
+
+	DWORD				m_dwPkWin;		//add pk
+	DWORD				m_dwPkLoss;		//add pk
+	DWORD				m_dwPkStreak;	//add pk streak by njd
+	
+	WORD				m_wLevel;					//	∑π∫ß.
+	LONGLONG			m_lnMoney;					//	º“¡ˆ ±›æ◊.
+	LONGLONG			m_lnVoteP;		//add money 2
+	LONGLONG			m_lnPremP;		//add money 3
+	LONGLONG			m_lnContribP;	//add contributionpoint by CNDev
+
+	bool				m_bMoneyUpdate;				// µ∑¿Ã æ˜µ•¿Ã∆Æ µ«æ˙¥¬¡ÅEæ∆¥—¡ÅE
+	bool				m_bStorageMoneyUpdate;		// √¢∞ÅEµ∑¿Ã æ˜µ•¿Ã∆Æ µ«æ˙¥¬¡ÅEæ∆¥—¡ÅE
+	WORD				m_wTempLevel;				// ∫Ò±≥øÅE∑π∫ß ¿”Ω√ ∫ØºÅE
+	LONGLONG			m_lnTempMoney;				// ∫Ò±≥øÅEº“¡ÅE±›æ◊ ¿”Ω√ ∫ØºÅE
+	LONGLONG			m_lnTempStorageMoney;		// ∫Ò±≥øÅE√¢∞ÅE ±›æ◊ ¿”Ω√ ∫ØºÅE
+
+	LONGLONG			m_lVNGainSysMoney;			//  ∫£∆Æ≥≤ ≈Ω¥– πÊ¡ÅE¿˙¿ÅE±›æ◊
+
+	DWORD				m_dwGuild;					//	±ÊµÅEπ¯»£.
+	char				m_szNick[CHAR_SZNAME];		//	∫∞∏ÅE
+	__time64_t			m_tSECEDE;					//	≈ª≈Ω√∞£.
+
+	SCHARSTATS			m_sStats;					//	Stats.
+	WORD				m_wStatsPoint;				//	∞°øÅEstats ∆˜¿Œ∆Æ.
+
+	WORD				m_wAP;						//	±‚∫ª ∞¯∞›∑¬.
+	WORD				m_wDP;						//	±‚∫ª πÊæ˚”¬.
+
+	WORD				m_wPA;						//	∞›≈ıƒ°.
+	WORD				m_wSA;						//	ªÁ∞›ƒ°.
+	WORD				m_wMA;						//	∏∂∑¬ƒ°.
+
+	GLLLDATA			m_sExperience;				//	∞Ê«Ëƒ°. ( «ˆ¡¶/¥Ÿ¿Ω∑ππÅEµ¥ﬁ∞™ )
+	LONGLONG			m_lnReExp;					//  »∏∫π«“ºÅE¿÷¥¬ ∞Ê«Ëƒ°
+
+	DWORD				m_dwSkillPoint;				//	Skill Point.
+
+	LONGLONG			m_lVNGainSysExp;			// ∫£∆Æ≥≤ ≈Ω¥– πÊ¡ÅE¿˙¿ÅE∞Ê«Ëƒ°
+
+	GLPADATA			m_sHP;						//	ª˝∏˙”Æ. ( «ˆ¡¶/√÷¥ÅEÆ )
+	GLPADATA			m_sMP;						//	¡§Ω≈∑Æ. ( «ˆ¡¶/√÷¥ÅEÆ )
+	GLPADATA			m_sSP;						//	±Ÿ∑¬∑Æ.	( «ˆ¡¶/√÷¥ÅEÆ )
+	GLPADATA			m_sCP; //add cp
+
+	WORD				m_wPK;						//	√— PK »ΩºÅE
+
+	bool				m_bEventBuster;				//	¿Ã∫•∆Æ ¡ﬂ¿Œ¡ÅEæ∆¥—¡ÅE
+
+	__time64_t			m_tLoginTime;				//  ∑Œ±ÅEΩ√∞£¿Ã≥™ ¿Ã∫•∆Æ Ω√¿€Ω√∞£
+
+	int					m_EventStartLv;				//  ¿Ã∫•∆Æ √÷º“ ∑π∫ß
+	int					m_EventEndLv;				//  ¿Ã∫•∆Æ √÷¥ÅE∑π∫ß
+
+	int					m_RemainEventTime;			//  ¿Ã∫•∆Æ ¿˚øÅE˚›ÅE≥≤¿∫ Ω√∞£
+	int					m_RemainBusterTime;			//  ∫ŒΩ∫≈Õ ≥≤¿∫Ω√∞£
+
+	bool				m_bEventApply;				//  ¿Ã∫•∆Æ ¿˚øÅEÅEÅEø©∫Œ
+	bool				m_bEventStart;				//  ¿Ã∫•∆Æ Ω√¿€«ﬂ¥¬¡ÅEæ∆¥—¡ÅE ¿Ã∫•∆Æ ¥ÅEÛ¿Œ¡ÅE
+
+	int					m_EventStartTime;			//  ¿Ã∫•∆Æ ¿˚øÅEΩ√¿€ Ω√∞£
+	int					m_EventBusterTime;			//  ¿Ã∫•∆Æ ∫ŒΩ∫≈Õ ≈∏¿”
+
+
+	/// ∫£∆Æ≥≤ ≈Ω¥– πÊ¡ÅEΩ√Ω∫≈€ ∫ØºÅE
+	LONGLONG			m_VietnamGameTime;			//	¿˙¿Âµ» ¥©¿ÅEΩ√∞£
+	BYTE				m_dwVietnamGainType;		//  ∫£∆Æ≥≤ ≈Ω¥– πÊ¡ÅEΩ√Ω∫≈€ 
+	DWORD				m_dwVietnamInvenCount;		// ø≈±ÊºÅE¿÷¥¬ æ∆¿Ã≈€¿« ∞πºÅE
+
+    TCHAR				m_szPhoneNumber[SMS_RECEIVER]; // ƒ≥∏Ø≈Õ ∆ÅEπ¯»£
+	DWORD               m_dwTickCount; // 9/13/2016 - Anti  Auto Pots System - Eduj
+	float               m_fTickDelay; // 9/13/2016 - Anti  Auto Pots System - Eduj
+	WORD				m_sKILL;
+
+	//BOOL				m_bAllowBet;					// add duel bet
+	float				m_fGameTimer;
+
+	float				m_fIncR_MoveSpeed;
+	float				m_fIncR_AtkSpeed;
+
+	//add directval
+	int				m_nHP_Potion_Rate;
+	int				m_nMP_Potion_Rate;
+	int				m_nSP_Potion_Rate;
+
+	DWORD			m_dwPPoints;
+	DWORD			m_dwVPoints;
+	SCHARDATA () 
+		: m_dwUserID(0)
+		, m_dwUserLvl(0)
+		, m_tPREMIUM(0)
+		, m_bPREMIUM(false)
+		, m_tCHATBLOCK(0)
+		, m_wINVENLINE(0)
+		, m_dwServerID(0)
+		, m_dwCharID(0)
+		, m_emTribe(TRIBE_HUMAN)
+		, m_emClass(GLCC_FIGHTER_M)
+		, m_wSchool(0)
+		, m_wSex(0)
+		, m_wHair(0)
+		, m_wHairColor(0)
+		, m_wFace(0)
+		, m_nBright(1)
+		, m_nLiving(0)
+		, m_nChaReborn(0)
+		, m_wLevel(0)
+		, m_lnMoney(0)
+		, m_lnVoteP(0) //add money 2
+		, m_lnPremP(0) //add money 3
+		, m_lnContribP(0) //add contributionpoint by CNDev
+		, m_lVNGainSysMoney(0)
+		, m_bMoneyUpdate(FALSE)
+		, m_bStorageMoneyUpdate(FALSE)
+		, m_wTempLevel(0)
+		, m_lnTempMoney(0)
+		, m_lnTempStorageMoney(0)
+		, m_dwGuild(CLUB_NULL)
+		, m_tSECEDE(0)
+		, m_wStatsPoint(0)
+		, m_wAP(0)
+		, m_wDP(0)
+		, m_wPA(0)
+		, m_wSA(0)
+		, m_wMA(0)
+		, m_dwSkillPoint(0)
+		, m_wPK(0)
+		, m_EventStartTime(0)
+		, m_EventBusterTime(0)
+		, m_bEventBuster(FALSE)
+		, m_bEventStart(FALSE)
+		, m_tLoginTime(0)
+		, m_EventStartLv(0)
+		, m_EventEndLv(0)
+		, m_bEventApply(FALSE)
+		, m_RemainEventTime(0)
+		, m_RemainBusterTime(0)
+		, m_VietnamGameTime(0)
+		, m_dwVietnamGainType(0)
+		, m_lVNGainSysExp(0)
+		, m_dwVietnamInvenCount(0)
+		, m_lnReExp ( 0 )
+		, m_dwPkWin( 0 )		//add pk
+		, m_dwPkLoss ( 0 )		//add pk
+		, m_dwPkStreak ( 0 )	//add pk streak
+		//, m_bAllowBet(FALSE)	//add duel bet
+		, m_fGameTimer(0.0f)
+		, m_fIncR_MoveSpeed(0.0f) //add directval
+		, m_fIncR_AtkSpeed(0.0f)
+		, m_nHP_Potion_Rate(0) //add directval
+		, m_nMP_Potion_Rate(0)
+		, m_nSP_Potion_Rate(0)
+		, m_fTickDelay(0.0f) // 9/13/2016 - Anti  Auto Pots System - Eduj
+		, m_dwTickCount(0) // 9/13/2016 - Anti  Auto Pots System - Eduj
+		, m_dwPPoints(0)
+		, m_dwVPoints(0)
+
+	{
+		
+
+		memset(m_szName, 0, sizeof(char) * CHAR_SZNAME);
+		memset(m_szNick, 0, sizeof(char) * CHAR_SZNAME);
+		memset(m_szPhoneNumber, 0, sizeof(TCHAR) * SMS_RECEIVER);
+
+		for ( int i=0; i<EMSTORAGE_CHANNEL_SPAN_SIZE; ++i )	m_tSTORAGE[i] = 0;
+		for ( int i=0; i<EMSTORAGE_CHANNEL_SPAN_SIZE; ++i )	m_bSTORAGE[i] = false;
+	}
+
+	SCHARDATA &GETCHARDATA ()			{ return *this; }
+	EMCHARINDEX GETCHARINDEX () const	{ return CharClassToIndex ( m_emClass ); }
+
+	bool IsKEEP_STORAGE ( DWORD dwCHANNEL );	//	«ÿ¥ÅEπ¯»£¿« ∂Ùƒøø° π∞∞«¿ª ∏√±ÊºÅE¿÷¥¬¡ÅE∞ÀªÅE
+	CTime GetStorageTime (  DWORD dwCHANNEL );
+	WORD GetOnINVENLINE ();
+	void CalcPREMIUM ();
+};
+typedef SCHARDATA* PCHARDATA;
+
+
+typedef std::vector<ITEMSHOP>			VECITEMSHOP;
+
+typedef std::map<std::string,ITEMSHOP>		ITEMMAPSHOP;
+typedef ITEMMAPSHOP::iterator					ITEMMAPSHOP_ITER;
+
+typedef std::map<DWORD,std::string>			ITEMMAPSHOP_KEY;
+typedef ITEMMAPSHOP_KEY::iterator				ITEMMAPSHOP_KEY_ITER;
+
+typedef std::vector<SHOPPURCHASE>			VECSHOP;
+
+typedef std::map<std::string,SHOPPURCHASE>	MAPSHOP;
+typedef MAPSHOP::iterator					MAPSHOP_ITER;
+
+typedef std::map<DWORD,std::string>			MAPSHOP_KEY;
+typedef MAPSHOP_KEY::iterator				MAPSHOP_KEY_ITER;
+
+struct SCHARDATA2 : public SCHARDATA
+{
+	typedef stdext::hash_map<DWORD,SCHARSKILL>		SKILL_MAP;
+	typedef SKILL_MAP::iterator						SKILL_MAP_ITER;
+	typedef SKILL_MAP::const_iterator				SKILL_MAP_CITER;
+
+	char					m_szUID[USR_ID_LENGTH+1];
+
+	SKILL_MAP				m_ExpSkills;						//	ºˆ∑√ Ω∫≈≥ º”º∫.
+	SITEMCUSTOM				m_PutOnItems[SLOT_TSIZE];			//	¬¯øÅEItem.
+	
+	SITEMCUSTOM				m_pHoldArray[300];			//	¬¯øÎ Item.
+
+	WORD					m_wSKILLQUICK_ACT;					//	Ω∫≈≥ ƒÅEΩ∑‘¡ﬂ æ◊∆º∫ÅE» Ω∫≈≥.
+	SNATIVEID				m_sSKILLQUICK[EMSKILLQUICK_SIZE];	//	Ω∫≈≥ ƒÅEΩ∑‘.
+	SACTION_SLOT			m_sACTIONQUICK[EMACTIONQUICK_SIZE];	//	æ◊º« ƒÅEΩ∑‘.
+
+	GLInventory				m_cInventory;						//	¿Œ∫•≈‰∏Æ.
+
+	BOOL					m_bServerStorage;					//	√¢∞ÅE¿Ø»ø«‘. ( º≠πˆ√ÅE ) ( ªı∑Œ ª˝º∫µ«¥¬ ƒ≥∏Ø≈Õ¥¬ π´¡∂∞« ¿Ø»ø«œ∞‘ ª˝º∫Ω√ √º≈©«‘. - GLCHARLOGIC::INIT_DATA() )
+	LONGLONG				m_lnStorageMoney;					//	√¢∞ÅEº“¡ÅE±›æ◊.
+	BOOL					m_bStorage[EMSTORAGE_CHANNEL];		//	√¢∞ÅE¿Ø»ø«‘. ( ≈¨∂Û¿Ãæ∆Æ√ÅE )
+	GLInventory				m_cStorage[EMSTORAGE_CHANNEL];		//	√¢∞ÅE
+
+	GLQuestPlay				m_cQuestPlay;						//	ƒ˘Ω∫∆Æ.
+
+	//	º≠πÅE¿ÅEÅE
+	MAPSHOP					m_mapCharged;						//	±∏¿‘«— æ∆¿Ã≈€ ∏Ò∑œ.
+	
+	//	≈¨∂Û¿Ãæ∆Æ ¿ÅEÅE
+	GLInventory				m_cInvenCharged;					//	±∏¿‘«— æ∆¿Ã≈€ ¿Œ∫•.
+	MAPSHOP_KEY				m_mapChargedKey;					//	±∏¿‘«— æ∆¿Ã≈€ ¿Œ∫•¿« «ÿ¥ÅE¿ßƒ° purkey √£±ÅE
+	ITEMMAPSHOP				m_mapItemShop;						//	±∏¿‘«— æ∆¿Ã≈€ ∏Ò∑œ.
+	
+	GLInventory				m_cInvenItemShopVote[13];					//	±∏¿‘«— æ∆¿Ã≈€ ¿Œ∫•.
+	ITEMMAPSHOP_KEY			m_mapItemShopVoteKey[13];					//	±∏¿‘«— æ∆¿Ã≈€ ¿Œ∫•¿« «ÿ¥Á ¿ßƒ° purkey √£±‚.
+	
+	GLInventory				m_cInvenItemShopPremium[13];					//	±∏¿‘«— æ∆¿Ã≈€ ¿Œ∫•.
+	ITEMMAPSHOP_KEY			m_mapItemShopPremiumKey[13];					//	±∏¿‘«— æ∆¿Ã≈€ ¿Œ∫•¿« «ÿ¥Á ¿ßƒ° purkey √£±‚.
+
+	GLInventory				m_cInvenItemShop[13];					//	±∏¿‘«— æ∆¿Ã≈€ ¿Œ∫•.
+	ITEMMAPSHOP_KEY			m_mapItemShopKey[13];					//	±∏¿‘«— æ∆¿Ã≈€ ¿Œ∫•¿« «ÿ¥Á ¿ßƒ° purkey √£±‚.
+
+	//	Note : √ ±ÅEΩ√¿€µ… ∏ , ∏  ¿ßƒ°∞™.
+	//
+	SNATIVEID			m_sStartMapID;				//	√ ±ÅEΩ√¿€ ∏ .
+	DWORD				m_dwStartGate;				//	√ ±ÅEΩ√¿€ ∞≥¿Ã∆Æ.
+	D3DXVECTOR3			m_vStartPos;				//	√ ±ÅEΩ√¿€ ¿ßƒ°.
+
+	SNATIVEID			m_sSaveMapID;				//	¡æ∑ÅE∏ .
+	D3DXVECTOR3			m_vSavePos;					//	¡æ∑ÅE¿ßƒ°.
+
+	SNATIVEID			m_sLastCallMapID;			//	¡˜¿ÅEÕ»Ø ∏ .
+	D3DXVECTOR3			m_vLastCallPos;				//	¡˜¿ÅEÕ»Ø ¿ßƒ°.
+
+	INT					m_dwThaiCCafeClass;			// ≈¬±π ªÁ¿ÃπÅEƒ´∆ÅE
+	INT					m_nMyCCafeClass;			// ∏ª∑π¿ÃΩ√æ∆ PCπÅE¿Ã∫•∆Æ 
+	SChinaTime			m_sChinaTime;				// ¡ﬂ±π Ω√∞£∫∞ ºˆ¿Õ
+	SEventTime			m_sEventTime;				// ¿Ã∫•∆Æ Ω√∞£
+
+	SVietnamGainSystem  m_sVietnamSystem;			// ∫£∆Æ≥≤ ≈Ω¥–πÊ¡ÅEΩ√Ω∫≈€
+	GLInventory			m_cVietnamInventory;		// ∫£∆Æ≥≤ ¿˙¿Â«— ≈Ω¥– ¿Œ∫•≈‰∏Æ
+	bool				m_bVietnamLevelUp;			// ∫£∆Æ≥≤ ∞Ê«Ëƒ° »πµÅEæ∆¿Ã≈€ ªÁøÅE√ ø©∑Ø¥‹∞Ë¿« ∑π∫ß¿ª ¡ı∞°Ω√≈≥ ºÅE¿÷¥Ÿ.
+
+	// æ∆¿Ã≈€ ∞≥¡∂ ¡§∫∏	// ITEMREBUILD_MARK
+	BOOL				m_bRebuildOpen;
+	SINVEN_POS			m_sRebuildCardPos;
+	SINVEN_POS			m_sRebuildItem;
+	SINVEN_POS			m_sPreInventoryItem;
+	LONGLONG			m_i64RebuildCost;
+	LONGLONG			m_i64RebuildInput;
+
+	//sealed card NaJDeV
+	SINVEN_POS			m_sRebuildSeal; 
+	WORD				m_wSealType;
+
+	bool				m_bTracingUser;			// «ˆ¿ÅE√ﬂ¿˚¡ﬂ¿Œ ¿Ø¿˙¿Œ¡ÅEæ∆¥—¡ÅE
+
+
+	SNATIVEID			m_sSummonPosionID;		// º“»ØºÅE∆˜º« æ∆¿Ã≈€ æ∆¿ÃµÅE
+
+	typedef std::map<DWORD,ITEM_COOLTIME>	COOLTIME_MAP;
+	typedef COOLTIME_MAP::iterator			COOLTIME_MAP_ITER;
+	typedef COOLTIME_MAP::const_iterator	COOLTIME_MAP_CITER;
+
+	COOLTIME_MAP		m_mapCoolTimeType;		//	æ∆¿Ã≈€ ≈∏¿‘∫∞ ƒ≈∏¿”
+    COOLTIME_MAP		m_mapCoolTimeID;		//	æ∆¿Ã≈€ MID/SID∫∞ ƒ≈∏¿”
+
+	
+	SCHARDATA2();
+	void Assign ( SCHARDATA2 &CharData );
+
+	EMCHARINDEX GETCHARINDEX () const { return CharClassToIndex ( m_emClass ); }
+
+	BOOL SETEXPSKILLS_BYBUF ( CByteStream &ByteStream );
+	BOOL GETEXPSKILLS_BYBUF ( CByteStream &ByteStream ) const;
+
+	BOOL GETPUTONITEMS_BYBUF ( CByteStream &ByteStream ) const;
+	
+	BOOL SETSKILL_QUICKSLOT ( CByteStream &ByteStream );
+	BOOL GETSKILL_QUICKSLOT ( CByteStream &ByteStream ) const;
+
+	BOOL SETACTION_QUICKSLOT ( CByteStream &ByteStream );
+	BOOL GETACTION_QUICKSLOT ( CByteStream &ByteStream ) const;
+
+
+	BOOL SETINVENTORY_BYBUF ( CByteStream &ByteStream );
+	BOOL GETINVENTORYE_BYBUF ( CByteStream &ByteStream ) const;
+
+	BOOL SETSTORAGE_BYBUF ( CByteStream &ByteStream );
+	BOOL GETSTORAGE_BYBUF ( CByteStream &ByteStream ) const;
+
+	BOOL SETQUESTPLAY ( CByteStream &ByteStream );
+	BOOL GETQUESTPLAY ( CByteStream &ByteStream ) const;
+
+	BOOL SETSHOPPURCHASE ( VECSHOP &vecSHOP );
+	BOOL SETITEMSHOP ( VECITEMSHOP &vecSHOP );
+
+	// ∫£∆Æ≥≤ ≈Ω¥–πÊ¡ÅEΩ√Ω∫≈€ √ﬂ∞°ø° µ˚∏• ƒ≥∏Ø≈Õ √ﬂ∞° ¿Œ∫•≈‰∏Æ »Æ¿ÅE
+	BOOL SETVTADDINVENTORY_BYBUF ( CByteStream &ByteStream );
+	BOOL GETVTADDINVENTORYE_BYBUF ( CByteStream &ByteStream ) const;
+
+	BOOL SETITEMCOOLTIME_BYBUF( CByteStream &ByteStream ); 
+	BOOL GETITEMCOOLTIME_BYBUF( CByteStream &ByteStream ) const; 
+
+public: //sealed card 
+	const SITEMCUSTOM& GET_REBUILD_SEAL(); //sealed card
+	const WORD GET_SEAL_TYE() { return m_wSealType; }
+public:
+	BOOL LOADFILE ( const char* szFileName );
+
+public:
+	//	≈¨∂Û¿Ãæ∆Æ ¿ÅEÅE
+	BOOL ADDSHOPPURCHASE ( const char* szPurKey, SNATIVEID nidITEM );
+	// added by ejsayaaa ItemMall
+	BOOL ADDITEMSHOP ( const char* szPurKey,SNATIVEID nidITEM , const WORD wPrice , const WORD wStock ,WORD wItemCtg , WORD wCurrency );
+	BOOL DELSHOPPURCHASE ( const DWORD dwID );
+
+public:	// ITEMREBUILD_MARK
+	const SITEMCUSTOM& GET_REBUILD_ITEM();
+	const SITEMCUSTOM& GET_PREHOLD_ITEM();	// ¿”Ω√∑Œ µÈæ˚€√∏∞ æ∆¿Ã≈€
+
+public:	// ITEMREBUILD_MARK
+	VOID InitRebuildData();
+	VOID OpenRebuild()							{ m_bRebuildOpen = TRUE; }
+	VOID CloseRebuild()							{ m_bRebuildOpen = FALSE; }
+	const BOOL ValidRebuildOpen()				{ return m_bRebuildOpen; }
+	const LONGLONG GetRebuildCost()				{ return m_i64RebuildCost; }
+	const LONGLONG GetRebuildInput()			{ return m_i64RebuildInput; }
+
+private:
+	SCHARDATA2(const SCHARDATA2 &Inven )		{ GASSERT(0&&"π¨Ω√¿ÅE∫πªÅE∫“«ÅE"); }
+	SCHARDATA2& operator= ( SCHARDATA2 &Inven )	{ GASSERT(0&&"π¨Ω√¿ÅE∫πªÅE∫“«ÅE"); return *this; }
+};
+typedef SCHARDATA2* PCHARDATA2;
+
+
+struct SSTATEBLOW
+{
+	EMSTATE_BLOW	emBLOW;			//	ªÛ≈¬ ¿ÃªÅE¡æ∑ÅE
+	float			fAGE;			//	¿˚øÅEΩ√∞£.
+	float			fSTATE_VAR1;	//	¿˚øÅE∞™ 1.
+	float			fSTATE_VAR2;	//	¿˚øÅE∞™ 2.
+
+	SSTATEBLOW () :
+		emBLOW(EMBLOW_NONE),
+		fAGE(0),
+		fSTATE_VAR1(0),
+		fSTATE_VAR2(0)
+	{
+
+	}
+};
+
+struct SKILLFACT
+{
+	int		m_id;
+	std::string szKiller;
+	std::string szKilled;
+	DWORD	dwGaeaIDKilled;
+	DWORD	dwGaeaIDKiller;
+	WORD	wSchoolKiller;
+	WORD	wSchoolKilled;
+	DWORD	dwClassKiller;
+	DWORD	dwClassKilled;
+	float	fAGE;
+	SKILLFACT():
+	m_id(-1),
+	szKiller(""),
+	szKilled(""),
+	wSchoolKiller(-1),
+	wSchoolKilled(-1),
+	dwClassKiller(-1),
+	dwClassKilled(-1),
+	dwGaeaIDKilled(-1),
+	dwGaeaIDKiller(-1),
+	fAGE(0.0f)
+	{
+	}
+
+	void RESET();
+};
+
+struct SSKILLFACT
+{
+	SNATIVEID		sNATIVEID;		//	Ω∫≈≥ ID.
+	WORD			wLEVEL;			//	Ω∫≈≥ ∑π∫ß.
+	float			fAGE;			//	ª˝º∫»ƒ ≥≤¿∫ Ω√∞£.
+
+	SKILL::EMTYPES	emTYPE;			//	±‚∫ª ¡æ∑˘.
+	float			fMVAR;			//	±‚∫ª ºˆƒ°.
+
+	//dmk14 | 11-13-16 | SIMPACT_DESCRIPTOR
+	struct IMPACT_DESCRIPTOR {
+		EMIMPACT_ADDON	emADDON;
+		float			fADDON_VAR;
+		float			fADDON_VAR2;
+	
+		IMPACT_DESCRIPTOR() :
+			emADDON(EMIMPACTA_NONE),
+			fADDON_VAR(0),
+			fADDON_VAR2(0)
+		{}
+
+		void Assign( const SKILL::SIMPACT_DESCRIPTOR &d, WORD level);
+	};
+
+	struct SPEC_DESCRIPTOR {
+		EMSPEC_ADDON	emSPEC;
+		float			fSPECVAR1;
+		float			fSPECVAR2;
+		DWORD			dwSPECFLAG;
+		SNATIVEID		dwNativeID;
+
+		SPEC_DESCRIPTOR() :
+			emSPEC(EMSPECA_NULL),
+			fSPECVAR1(0),
+			fSPECVAR2(0),
+			dwSPECFLAG(NULL),
+			dwNativeID( NATIVEID_NULL() )
+		{}
+
+		void Assign( const SKILL::SSPEC_DESCRIPTOR &d, WORD level );
+	};
+	//dmk14 | 11-13-16 | SIMPACT_DESCRIPTOR
+	IMPACT_DESCRIPTOR adon[ SKILL::SAPPLY::MAX_DESCRIPTOR ];
+	SPEC_DESCRIPTOR spec[ SKILL::SAPPLY::MAX_DESCRIPTOR ];
+
+	DWORD			dwSpecialSkill;		  // ∆ØºˆΩ∫≈≥
+	bool			bRanderSpecialEffect; // ∆Øºˆ Ω∫≈≥ ªÁøÎΩ√ ¿Ã∆Â∆Æ∞° πﬂµøµ«æ˙¥¬¡ˆ ø©∫Œ
+
+	SSKILLFACT () :
+		sNATIVEID(NATIVEID_NULL()),
+		wLEVEL(0),
+		fAGE(0),
+
+		emTYPE(SKILL::EMFOR_VARHP),
+		fMVAR(0),
+
+		dwSpecialSkill(0),
+		bRanderSpecialEffect(FALSE)
+
+	{
+	}
+
+	BOOL IsSpecialSkill ( DWORD dwState )		 		{ return dwSpecialSkill == dwState ? TRUE : FALSE ; }
+	void SetSpecialSkill ( DWORD dwState )				{ dwSpecialSkill = dwState; }
+
+	//dmk14 | 11-13-16 | SIMPACT_DESCRIPTOR
+	const IMPACT_DESCRIPTOR *GetAdon( EMIMPACT_ADDON emADDON ) const;
+	const SPEC_DESCRIPTOR *GetSpec( EMSPEC_ADDON emSPEC ) const;
+
+	void RESET ();
+};
+
+
+struct SLANDEFFECT
+{
+	D3DXVECTOR2			vMinPos;
+	D3DXVECTOR2			vMaxPos;
+	EMLANDEFFECT_TYPE	emLandEffectType;
+	float				fValue;
+
+	SLANDEFFECT() :
+		vMinPos( 0.0f, 0.0f ),
+		vMaxPos( 0.0f, 0.0f ),
+		emLandEffectType(EMLANDEFFECT_ATK_SPEED),
+		fValue( 0.0f )
+	{
+	}
+
+	void Init()
+	{
+		vMinPos			 = D3DXVECTOR2( 0.0f, 0.0f );
+		vMaxPos			 = D3DXVECTOR2( 0.0f, 0.0f );
+		emLandEffectType = EMLANDEFFECT_ATK_SPEED;
+		fValue			 = 0.0f;
+	}
+
+	bool IsUse()
+	{
+		if( vMinPos		 	 == D3DXVECTOR2( 0.0f, 0.0f ) &&
+			vMaxPos			 == D3DXVECTOR2( 0.0f, 0.0f ) &&
+			emLandEffectType == EMLANDEFFECT_ATK_SPEED &&
+			fValue			 == 0.0f ) return FALSE;
+		return TRUE;
+	}
+
+	bool operator == ( const SLANDEFFECT &value )
+	{
+		if( vMaxPos			 != value.vMaxPos )			 return FALSE;
+		if( vMinPos			 != value.vMinPos )			 return FALSE;
+		if( emLandEffectType != value.emLandEffectType ) return FALSE;
+		if( fValue		     != value.fValue )			 return FALSE;
+
+		return TRUE;
+	}
+
+};
+
+typedef std::vector<SLANDEFFECT> VEC_LANDEFF;
+typedef VEC_LANDEFF::iterator	 VEC_LANDEFF_ITER;
+
+struct SPASSIVE_SKILL_DATA
+{
+	short	m_nHP;
+	short	m_nMP;
+	short	m_nSP;
+
+	short	m_nDAMAGE;
+	short	m_nDEFENSE;
+
+	short	m_nHIT;
+	short	m_nAVOID;
+
+	short	m_nPIERCE;
+	float	m_fTARRANGE;
+
+	float	m_fMOVEVELO;
+	float	m_fATTVELO;
+	float	m_fSKILLDELAY;
+
+	float	m_fINCR_HP;
+	float	m_fINCR_MP;
+	float	m_fINCR_SP;
+
+	float	m_fDAMAGE_RATE;
+	float	m_fDEFENSE_RATE;
+
+	DAMAGE_SPEC m_sDamageSpec;
+
+	short	m_nPA;
+	short	m_nSA;
+	short	m_nMA;
+
+	float	m_fHP_RATE;
+	float	m_fMP_RATE;
+	float	m_fSP_RATE;
+	float	m_fCrit_Dmg; //add skill critdmg
+	float	m_fBlow_Dmg; //add skill blowdmg
+	float	m_fCrit_Rate; //add skill critrate
+	float	m_fBlow_Rate; //add skill blowrate
+
+	float 	m_fIncR_MoveSpeed;
+	float	m_fIncR_AtkSpeed;
+
+	short	m_nCP_RATE;	//add cp
+	short	m_nCP_GAIN; //add cp
+
+	SRESIST	m_sSUMRESIST;					//	¿˙«◊∞™.
+
+	SPASSIVE_SKILL_DATA () :
+		m_nHP(0),
+		m_nMP(0),
+		m_nSP(0),
+
+		m_fINCR_HP(0),
+		m_fINCR_MP(0),
+		m_fINCR_SP(0),
+
+		m_nDAMAGE(0),
+		m_nDEFENSE(0),
+
+		m_nHIT(0),
+		m_nAVOID(0),
+
+		m_nPIERCE(0),
+		m_fTARRANGE(0),
+
+		m_fMOVEVELO(0),
+		m_fATTVELO(0),
+		m_fSKILLDELAY(0),
+
+		m_fDAMAGE_RATE(0),
+		m_fDEFENSE_RATE(0),
+
+		m_nPA(0),
+		m_nSA(0),
+		m_nMA(0),
+
+		m_fHP_RATE(0),
+		m_fMP_RATE(0),
+		m_fSP_RATE(0),
+		m_nCP_RATE(0),
+		m_nCP_GAIN(0),
+		m_fCrit_Dmg(0), //add skill critdmg
+		m_fBlow_Dmg(0), //add skill blowdmg
+		m_fCrit_Rate(0), //add skill critrate
+		m_fBlow_Rate(0), //add skill blowrate
+		m_fIncR_MoveSpeed(0),
+		m_fIncR_AtkSpeed(0)
+	{
+	}
+};
+
+struct SQITEM_FACT
+{
+	EMITEM_QUESTION	emType;
+	float			fTime;
+	WORD			wParam1;
+	WORD			wParam2;
+
+	SQITEM_FACT () :
+		emType(QUESTION_NONE),
+		fTime(0),
+		wParam1(0),
+		wParam2(0)
+	{
+	}
+
+	bool IsACTIVE ()
+	{
+		return emType!=QUESTION_NONE;
+	}
+
+	void RESET ()
+	{
+		emType = QUESTION_NONE;
+		fTime = 0;
+		wParam1 = 0;
+		wParam2 = 0;
+	};
+};
+
+struct SQPK_FACT
+{
+	EMPK_STREAK	emPKType;
+	//float			fTime;
+	//WORD			wParam1;
+	//WORD			wParam2;
+
+	SQPK_FACT () :
+		emPKType(PK_NONE)
+		//fTime(0)
+		//wParam1(0),
+		//wParam2(0)
+	{
+	}
+		bool IsPKACTIVE ()
+	{
+		return emPKType!=PK_NONE;
+	}
+
+	void PKRESET ()
+	{
+		emPKType = PK_NONE;
+		//fTime = 0;
+		//wParam1 = 0;
+		//wParam2 = 0;
+	};
+};
+
+
+
+struct SEventState
+{
+	float				fItemGainRate;		// ¿Ã∫•∆Æ Ω√ æÚ∞‘µ«¥¬ æ∆¿Ã≈€ µÂ∂¯¿≤
+	float				fExpGainRate;		// ¿Ã∫•∆Æ Ω√ æÚ∞‘µ«¥¬ ∞Ê«Èƒ° πË¿≤
+	int					MinEventLevel;		// ¿Ã∫•∆Æ √÷º“ ∑π∫ß
+	int					MaxEventLevel;		// ¿Ã∫•∆Æ √÷¥ÅE∑π∫ß
+	bool				bEventStart;		// ¿Ã∫•∆Æ∞° Ω√¿€µ∆¥¬¡ÅEæ∆¥—¡ÅE
+	int					EventPlayTime;		// ¿Ã∫•∆Æ∞° ¿˚øÅEµ«¥¬ «√∑π¿Ã Ω√∞£
+	int					EventBusterTime;	// ¿Ã∫•∆Æ∞° ¡ˆº”µ«¥¬ Ω√∞£
+	CTime				EventStartTime;		// ¿Ã∫•∆Æ∞° √÷√  Ω√¿€«— Ω√∞£
+	//add btg attack
+	float				fAttackGainRate;
+	DWORD				dwEventEndMinute;	// ¿Ã∫•∆Æ ¿˚øÅEΩ√∞£
+
+
+	SEventState()
+	{
+		Init();
+	}
+	void Init()
+	{
+		fItemGainRate    = 1.0f;
+		fExpGainRate     = 1.0f;
+		//add btg attack
+		fAttackGainRate    = 1.0f;
+		MinEventLevel    = 0;		// ¿Ã∫•∆Æ √÷º“ ∑π∫ß
+		MaxEventLevel    = 0;		// ¿Ã∫•∆Æ √÷¥ÅE∑π∫ß
+		bEventStart      = FALSE;			// ¿Ã∫•∆Æ∞° Ω√¿€µ∆¥¬¡ÅEæ∆¥—¡ÅE
+		EventPlayTime    = 0;		// ¿Ã∫•∆Æ∞° Ω√¿€ Ω√∞£
+		EventBusterTime  = 0;		// ¿Ã∫•∆Æ∞° ¡ˆº”µ«¥¬ Ω√∞£
+		EventStartTime   = 0;
+		dwEventEndMinute = 0;
+
+	}
+};
+
+struct SEVENT_FACT
+{
+	INT				nType;
+	WORD			wSpeed;
+	WORD			wASpeed;
+	WORD			wAttack;
+
+	SEVENT_FACT () 
+		: nType(EMGM_EVENT_NONE)
+		, wSpeed(0)
+		, wASpeed(0)
+		, wAttack(0)
+	{
+	}
+
+	bool IsACTIVE( EMGM_EVENT_TYPE emType )
+	{
+		return (nType&emType)!=EMGM_EVENT_NONE;
+	}
+
+	void SetEVENT( EMGM_EVENT_TYPE emType, WORD wValue )
+	{
+		nType |= emType;
+
+		switch( emType )
+		{
+		case EMGM_EVENT_SPEED:	wSpeed=wValue;	break;
+		case EMGM_EVENT_ASPEED:	wASpeed=wValue;	break;
+		case EMGM_EVENT_ATTACK:	wAttack=wValue;	break;
+		}
+	}
+
+	void ResetEVENT( EMGM_EVENT_TYPE emType )
+	{
+		nType &= ~emType;
+	}
+};
+
+struct SDROP_STATEBLOW
+{
+	EMSTATE_BLOW	emBLOW;			//	ªÛ≈¬ ¿ÃªÅE¡æ∑ÅE
+	float			fAGE;			//	¿˚øÅEΩ√∞£.
+	float			fSTATE_VAR1;	//	¿˚øÅE∞™ 1.
+	float			fSTATE_VAR2;	//	¿˚øÅE∞™ 2.
+
+	SDROP_STATEBLOW () 
+		: emBLOW(EMBLOW_NONE)
+		, fAGE(0)
+		, fSTATE_VAR1(0)
+		, fSTATE_VAR2(0)
+	{
+	}
+
+	SDROP_STATEBLOW& operator= ( SSTATEBLOW &sblow )
+	{
+		emBLOW = sblow.emBLOW;
+		fAGE = sblow.fAGE;
+		fSTATE_VAR1 = sblow.fSTATE_VAR1;
+		fSTATE_VAR2 = sblow.fSTATE_VAR2;
+
+		return *this;
+	}
+};
+
+struct SDROP_SKILLFACT
+{
+	SNATIVEID		sNATIVEID;		//	Ω∫≈≥ ID.
+	WORD			wSLOT;			//	ΩΩ∑‘ ¿ßƒ°.
+	WORD			wLEVEL;			//	Ω∫≈≥ LEVEL.
+	float			fAGE;			//	ª˝º∫»ƒ ≥≤¿∫ Ω√∞£.
+
+	SDROP_SKILLFACT () 
+		: sNATIVEID(NATIVEID_NULL())
+		, wSLOT(0)
+		, wLEVEL(0)
+		, fAGE(0)
+	{
+	}
+
+	void Assign ( SSKILLFACT &sfact, WORD _wSLOT )
+	{
+		wSLOT = _wSLOT;
+		sNATIVEID = sfact.sNATIVEID;
+		wLEVEL = sfact.wLEVEL;
+		fAGE = sfact.fAGE;
+	}
+};
+
+struct SDROP_KILLFACT
+{
+	int		m_id;
+	std::string szKiller;
+	std::string szKilled;
+	DWORD	dwGaeaIDKilled;
+	DWORD	dwGaeaIDKiller;
+	WORD	wSchoolKiller;
+	WORD	wSchoolKilled;
+	DWORD	dwClassKiller;
+	DWORD	dwClassKilled;
+	float	fAGE;
+	WORD	wSLOT;
+
+	SDROP_KILLFACT () 
+		: m_id(0),
+		szKiller(""),
+		szKilled(""),
+		wSchoolKiller(-1),
+		wSchoolKilled(-1),
+		dwGaeaIDKilled(0),
+		dwGaeaIDKiller(0),
+		dwClassKiller(0),
+		dwClassKilled(0),
+		fAGE(0),
+		wSLOT(0)
+	{
+	}
+
+	void Assign ( SKILLFACT &sfact, WORD _wSLOT )
+	{
+		wSLOT = _wSLOT;
+		m_id = 0;
+		szKiller = sfact.szKiller;
+		szKilled = sfact.szKilled;
+		dwGaeaIDKilled = sfact.dwGaeaIDKilled;
+		dwGaeaIDKiller = sfact.dwGaeaIDKiller;
+		wSchoolKiller = sfact.wSchoolKiller;
+		wSchoolKilled = sfact.wSchoolKiller;
+		
+		dwClassKiller = sfact.dwClassKiller;
+		dwClassKilled = sfact.dwClassKilled;
+		fAGE = sfact.fAGE;
+	}
+};
+
+struct SDROP_CHAR
+{
+	enum
+	{
+		CHAR_GEN	= 0x001,
+		CLUB_CD		= 0x002
+	};
+
+	char			szName[CHAR_SZNAME];		//	¿Ã∏ß.
+	EMTRIBE			emTribe;					//	¡æ¡∑.
+	EMCHARCLASS		emClass;					//	¡˜æÅE
+	WORD			wSchool;					//	«–øÅE
+	WORD			wHair;						//	∏”∏Æƒ´∂ÅE
+	WORD			wHairColor;					//  ∏”∏Æƒ´∂ÅEƒ√∑Ø
+	WORD			wFace;						//	æÛ±º∏æÅE
+	WORD			wSex;						//  º∫∫∞
+
+	int				nBright;					//	º”º∫.
+	int				nChaReborn;
+
+	DWORD			dwCharID;					//	ƒ…∏Ø≈ÕID.
+	WORD			wLevel;						//	∑π∫ß.
+	DWORD			dwGuild;					//	±ÊµÅEπ¯»£.
+	DWORD			dwAlliance;					//	µø∏Õ π¯»£
+	char			szClubName[CHAR_SZNAME];	//	≈¨∑¥ ¿Ã∏ß.
+	DWORD			dwGuildMarkVer;				//	±ÊµÅE∏∂≈© π¯»£.
+	DWORD			dwGuildMaster;				//	±ÊµÅE∏∂Ω∫≈Õ.
+	char			szNick[CHAR_SZNAME];		//	∫∞∏ÅE
+	
+	DWORD			dwParty;					//	∆ƒ∆º π¯»£.
+	DWORD			dwPMasterID;				//	∆ƒ∆º ∏∂Ω∫≈Õ ID.
+
+	GLPADATA		sHP;						//	ª˝∏Ì∑Æ. ( «ˆ¡¶/√÷¥Î∑Æ )
+	GLPADATA		sMP;
+	GLPADATA		sSP;
+	SRESIST			sSUMRESIST_SKILL;
+
+	DWORD			dwGaeaID;					//	ª˝º∫ ∏ﬁ∏∏Æ ¿Œµ¶Ω∫øÅE
+	SNATIVEID		sMapID;						//	ª˝º∫ ∏  ID.
+	DWORD			dwCeID;						//	ºø ID.
+	D3DXVECTOR3		vPos;						//	¿ßƒ°.
+	D3DXVECTOR3		vDir;						//	¿ßƒ°.
+
+	EMACTIONTYPE	Action;						//	«ˆ¡¶ æ◊º«.
+	DWORD			dwActState;					//	«ˆ¡¶ æ◊º« «√∑°±◊.
+	D3DXVECTOR3		vTarPos;					//	«ˆ¡¶ ∏Ò«• ¿ßƒ°.
+
+	DWORD			dwSummonGUID;				//  º“»ØºÅEID
+
+	SDROP_SKILLFACT	sSKILLFACT[SKILLFACT_SIZE];
+	SDROP_STATEBLOW	sSTATEBLOWS[EMBLOW_MULTI];
+	int				nLandEffect[EMLANDEFFECT_MULTI];	//  ¡ˆ«ÅE¿ÃªÅE»ø∞˙µÅE
+
+	SDROP_KILLFACT	sKILLFACT[KILLFACT_SIZE];
+
+	SQITEM_FACT		sQITEMFACT;
+	SEVENT_FACT		sEVENTFACT;
+	SEventState		sEventState;
+	
+	SITEMCLIENT		m_PutOnItems[SLOT_NSIZE_S_2];	//	¬¯øÅEItem.
+	BOOL			m_bVehicle;
+	CLIENT_VEHICLE	m_sVehicle;
+
+	bool			m_bItemShopOpen;		// ItemShopOpen
+
+	BOOL			m_bUseArmSub;				// ±ÿ∞≠∫Œ∏¶ ¿ß«— ∫∏¡∂ π´±ÅEªÁøÅE©∫Œ
+
+	DWORD			dwFLAGS;					//	±‚≈∏ º”º∫.
+
+	SPASSIVE_SKILL_DATA	sPASSIVE_SKILL;			//	passive skill data.
+	
+	DWORD			m_dwANISUBTYPE;				//	æ÷¥œ∏ﬁ¿Ãº« º≠∫ÅE∏¿‘
+
+	DWORD			m_dwPkWin; //add pkrank
+	DWORD			m_dwPkStreak; //add pk streak
+	SCHARSTATS			m_sStats;
+	int					m_nSUM_HIT;
+	int					m_nSUM_AVOID;
+	GLPADATA			m_gdDAMAGE_PHYSIC;
+	int					m_nDEFENSE_SKILL;		
+
+	DWORD				m_wSUM_AP;						//	±‚∫ª ∞¯∞›∑¬.
+	DWORD				m_wSUM_DP;						//	±‚∫ª πÊæÓ∑¬.
+	DWORD				m_wSUM_PA;						//	∞›≈ıƒ°.
+	DWORD				m_wSUM_SA;						//	ªÁ∞›ƒ°.
+	DWORD				m_wSUM_MA;						//	∏∂π˝ƒ°.
+
+	DWORD				m_dwPkLoss;		//add pk
+
+	LONGLONG			m_lnMoney;					//	º“¡ˆ ±›æ◊.
+	LONGLONG			m_lnVoteP;		//add money 2
+	LONGLONG			m_lnPremP;		//add money 3
+	LONGLONG			m_lnContribP;	//add contributionpoint by CNDev
+
+	SDROP_CHAR () 
+		: emTribe(TRIBE_HUMAN)
+		, emClass(GLCC_FIGHTER_M)
+		, wSchool(0)
+		, wHairColor(0)
+		, wSex(0)
+		, wHair(0)
+		, wFace(0)
+		, nBright(0)
+		, nChaReborn(0)
+		, dwCharID(0)
+		, wLevel(1)
+		, dwGuild(CLUB_NULL)
+		, dwGuildMarkVer(0)
+		, dwGuildMaster(0)
+		, dwAlliance(0)
+		, dwParty(PARTY_NULL)
+		, dwPMasterID(GAEAID_NULL)
+		, dwGaeaID(0)
+		, dwCeID(0)
+		, vPos(0,0,0)
+		, vDir(0,0,-1)
+		, Action(GLAT_IDLE)
+		, dwActState(NULL)
+		, vTarPos(0,0,0)
+		, dwFLAGS(NULL)
+		, m_bUseArmSub(FALSE)
+		, m_bVehicle ( FALSE )
+		, m_bItemShopOpen( false )
+		, dwSummonGUID(GAEAID_NULL)
+		, m_dwANISUBTYPE( 0 )
+		, m_dwPkWin(0)
+		, m_dwPkStreak(0)
+		, m_nSUM_HIT(0)
+		, m_nSUM_AVOID(0)
+		, m_wSUM_AP(0)
+		, m_wSUM_DP(0)
+		, m_wSUM_PA(0)
+		, m_wSUM_SA(0)
+		, m_wSUM_MA(0)
+		, m_dwPkLoss(0)
+		, m_lnMoney(0)
+		, m_lnVoteP(0) //add money 2
+		, m_lnPremP(0) //add money 3
+		, m_lnContribP(0) //add contributionpoint by CNDev
+	{
+		for( int i=0; i < EMLANDEFFECT_MULTI; i++)
+		{
+			nLandEffect[i] = -1;
+		}
+		memset(szName, 0, sizeof(char) * CHAR_SZNAME);
+		memset(szNick, 0, sizeof(char) * CHAR_SZNAME);
+		memset(szClubName, 0, sizeof(char) * CHAR_SZNAME);
+	}
+
+public:
+	int GETHIT () const				{ return m_nSUM_HIT; }
+	int GETAVOID () const			{ return m_nSUM_AVOID; }
+	int GETFORCE_LOW () const		{ return m_gdDAMAGE_PHYSIC.dwLow; }
+	int GETFORCE_HIGH () const		{ return m_gdDAMAGE_PHYSIC.dwHigh; }
+	int GETDEFENSE () const			{ return m_nDEFENSE_SKILL; }
+
+};
+
+#endif // GLCHARDATA_H_

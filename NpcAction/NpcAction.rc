@@ -1,0 +1,810 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Thai resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_THA)
+#ifdef _WIN32
+LANGUAGE LANG_THAI, SUBLANG_DEFAULT
+#pragma code_page(874)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MENU1 MENU 
+BEGIN
+    POPUP "File"
+    BEGIN
+        MENUITEM "New",                         ID_MENUITEM_NEW
+        MENUITEM SEPARATOR
+        MENUITEM "Load",                        ID_MENUITEM_LOAD
+        MENUITEM "Save",                        ID_MENUITEM_SAVE
+        MENUITEM "All Text Export",             32776
+        MENUITEM "All Text Export2",            32777
+        MENUITEM SEPARATOR
+        MENUITEM "Exit",                        ID_MENUITEM_EXIT
+    END
+END
+
+#endif    // Thai resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Korean resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_KOR)
+#ifdef _WIN32
+LANGUAGE LANG_KOREAN, SUBLANG_DEFAULT
+#pragma code_page(949)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MENU1 MENU 
+BEGIN
+    POPUP "File"
+    BEGIN
+        MENUITEM "New",                         ID_MENUITEM_NEW
+        MENUITEM SEPARATOR
+        MENUITEM "Load",                        ID_MENUITEM_LOAD
+        MENUITEM "Save",                        ID_MENUITEM_SAVE
+        MENUITEM "All Text Export",             ID_FILE_ALLTEXTEXPORT
+        MENUITEM "All Text Export2",            ID_FILE_ALLTEXTEXPORT2
+        MENUITEM SEPARATOR
+        MENUITEM "Exit",                        ID_MENUITEM_EXIT
+    END
+END
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_KOR)\r\n"
+    "LANGUAGE 18, 1\r\n"
+    "#pragma code_page(949)\r\n"
+    "#include ""res\\NpcAction.rc2""  // Microsoft Visual C++¿¡¼­ ÆíÁýµÇÁö ¾ÊÀº ¸®¼Ò½º\r\n"
+    "#include ""afxres.rc""         // Ç¥ÁØ ±¸¼º ¿ä¼Ò\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "../res/basic_tool.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041203b5"
+        BEGIN
+            VALUE "CompanyName", "TODO: <È¸»ç ÀÌ¸§>"
+            VALUE "FileDescription", "TODO: <ÆÄÀÏ ¼³¸í>"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "InternalName", "NpcAction.exe"
+            VALUE "LegalCopyright", "TODO: (c) <È¸»ç ÀÌ¸§>.  All rights reserved."
+            VALUE "OriginalFilename", "NpcAction.exe"
+            VALUE "ProductName", "TODO: <Á¦Ç° ÀÌ¸§>"
+            VALUE "ProductVersion", "1.0.0.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x412, 949
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Toolbar
+//
+
+IDR_TOOLBAR1 TOOLBAR  16, 15
+BEGIN
+    BUTTON      ID_MENUITEM_NEW
+    SEPARATOR
+    BUTTON      ID_MENUITEM_LOAD
+    BUTTON      ID_MENUITEM_SAVE
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDR_TOOLBAR1            BITMAP                  "res\\toolbar2.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_ABOUTBOX            "NpcAction Info(&A)..."
+    IDS_PROPSHT_CAPTION     "Sheet"
+END
+
+#endif    // Korean resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Chinese (Taiwan) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHT)
+#ifdef _WIN32
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL
+#pragma code_page(950)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MENU1 MENU 
+BEGIN
+    POPUP "File"
+    BEGIN
+        MENUITEM "New",                         ID_MENUITEM_NEW
+        MENUITEM SEPARATOR
+        MENUITEM "Load",                        ID_MENUITEM_LOAD
+        MENUITEM "Save",                        ID_MENUITEM_SAVE
+        MENUITEM "All Text Export",             32776
+        MENUITEM "All Text Export2",            32777
+        MENUITEM SEPARATOR
+        MENUITEM "Exit",                        ID_MENUITEM_EXIT
+    END
+END
+
+#endif    // Chinese (Taiwan) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MENU1 MENU 
+BEGIN
+    POPUP "File"
+    BEGIN
+        MENUITEM "New",                         ID_MENUITEM_NEW
+        MENUITEM SEPARATOR
+        MENUITEM "Load",                        ID_MENUITEM_LOAD
+        MENUITEM "Save",                        ID_MENUITEM_SAVE
+        MENUITEM "All Text Export",             32776
+        MENUITEM "All Text Export2",            32777
+        MENUITEM SEPARATOR
+        MENUITEM "Exit",                        ID_MENUITEM_EXIT
+    END
+    MENUITEM "Npc Talk Editor JDEV ™",      0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_DIALOG_QUEST DIALOGEX 0, 0, 280, 305
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Quest ( English )"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,163,279,48,14
+    PUSHBUTTON      "Cancel",IDCANCEL,215,279,48,14
+    LISTBOX         IDC_LIST1,7,7,267,263,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | 
+                    WS_TABSTOP
+    PUSHBUTTON      "FIND",ID_BUTTON_FIND,107,279,49,14
+    EDITTEXT        IDC_EDIT_FINDID,14,279,87,13,ES_AUTOHSCROLL
+END
+
+IDD_HAVEITEMDIALOG DIALOGEX 0, 0, 291, 309
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Conversation Box ( English )"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    LISTBOX         IDC_LIST_ITEM,2,3,288,262,LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "OK",IDC_BUTTON_OK,178,275,50,14
+    PUSHBUTTON      "Cancel",IDC_BUTTON_CANCEL,233,275,50,14
+    PUSHBUTTON      "Find",IDC_BUTTON_FIND,110,275,49,14
+    EDITTEXT        IDC_EDIT_FINDMID,15,275,35,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_FINDSID,60,275,35,12,ES_AUTOHSCROLL
+END
+
+IDD_LEARNSKILLDIALOG DIALOGEX 0, 0, 311, 300
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Conversation Box ( English )"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    LISTBOX         IDC_LIST_SKILL,1,3,307,249,LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "OK",IDC_BUTTON_OK,258,261,50,14
+    PUSHBUTTON      "Cancel",IDC_BUTTON_CANCEL,258,280,50,14
+    COMBOBOX        IDC_COMBO_SKILL_LEVEL,176,280,69,105,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Request Level",IDC_STATIC,186,261,47,8
+    PUSHBUTTON      "Find",IDC_BUTTON_FIND,108,280,50,14
+    EDITTEXT        IDC_EDIT_FINDMID,5,280,42,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_FINDSID,54,280,42,12,ES_AUTOHSCROLL
+END
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 235, 55
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "NpcAction Info ( English )"
+FONT 9, "Arial", 400, 0, 0xA3
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
+    LTEXT           "NpcAction Version 1.0",IDC_STATIC,40,10,119,8,
+                    SS_NOPREFIX
+    LTEXT           "Copyright (C) 2003",IDC_STATIC,40,25,119,8
+    DEFPUSHBUTTON   "OK",IDOK,178,7,50,16,WS_GROUP
+END
+
+IDD_SIMPLEEDIT DIALOGEX 0, 0, 640, 401
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Simple Edit ( English )"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    CONTROL         "",IDC_BASIC_SLIDER,"msctls_trackbar32",TBS_AUTOTICKS | 
+                    TBS_BOTH | WS_TABSTOP,10,7,266,21
+    EDITTEXT        IDC_BASIC_EDIT,300,8,39,20,ES_AUTOHSCROLL | ES_NUMBER | 
+                    WS_DISABLED
+    EDITTEXT        IDC_BASICCONV_EDIT,77,33,552,43,ES_MULTILINE | 
+                    ES_WANTRETURN | WS_DISABLED | WS_VSCROLL | WS_HSCROLL
+    LTEXT           "        Basic\nConverstation:",IDC_STATIC,19,41,54,20
+    LTEXT           "ID:",IDC_STATIC,286,15,11,15
+    DEFPUSHBUTTON   "OK",IDOK,566,363,50,21
+    GROUPBOX        "Text Edit",IDC_STATIC,14,81,618,317
+    GROUPBOX        "Text ID Number",IDC_STATIC,19,92,599,34
+    EDITTEXT        IDC_BASICCONV_EDIT2,24,141,540,43,ES_MULTILINE | 
+                    ES_WANTRETURN | WS_VSCROLL | WS_HSCROLL
+    GROUPBOX        "Text Of Converstation",IDC_STATIC,19,130,600,62
+    CONTROL         "",IDC_ANSWER_LIST,"SysListView32",LVS_REPORT | 
+                    LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | 
+                    WS_TABSTOP,23,206,540,90
+    GROUPBOX        "Answer Edit",IDC_STATIC,19,195,600,196
+    GROUPBOX        "Answer Data",IDC_STATIC,23,299,539,87
+    EDITTEXT        IDC_ANSWERID_EDIT,59,312,86,14,ES_AUTOHSCROLL | 
+                    WS_DISABLED
+    LTEXT           "ID:",IDC_STATIC,28,313,11,10
+    LTEXT           "Answer:",IDC_STATIC,28,330,30,10
+    EDITTEXT        IDC_ANSWER_EDIT,59,329,490,14,ES_AUTOHSCROLL
+    LTEXT           "Type:",IDC_STATIC,28,348,30,10
+    LTEXT           "Data:",IDC_STATIC,28,365,30,10
+    EDITTEXT        IDC_ANSWERTYPE_EDIT,59,347,490,14,ES_AUTOHSCROLL | 
+                    WS_DISABLED
+    EDITTEXT        IDC_ANSWERDATA_EDIT,59,364,490,14,ES_AUTOHSCROLL | 
+                    WS_DISABLED
+    PUSHBUTTON      "AnswerEdit",IDC_ANSWERAPPLY_BUTTON,152,310,50,15
+    PUSHBUTTON      "Text   Apply",IDC_TEXTAPPLY_BUTTON,577,145,28,31,
+                    BS_MULTILINE
+    CONTROL         "",IDC_TEXT_SLIDER,"msctls_trackbar32",TBS_BOTH | 
+                    WS_TABSTOP,24,100,507,22
+    EDITTEXT        IDC_TEXT_EDIT,561,100,39,20,ES_AUTOHSCROLL | ES_NUMBER | 
+                    WS_DISABLED
+    LTEXT           "ID:",IDC_STATIC,543,107,11,15
+END
+
+IDD_FINDITEM DIALOGEX 0, 0, 147, 54
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "FIND_ITEM( English )"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    EDITTEXT        IDC_EDIT1,61,8,39,15,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT2,102,8,39,15,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,61,27,39,16
+    PUSHBUTTON      "CANCEL",IDCANCEL,102,28,39,14
+    CTEXT           "Item MID/SID",IDC_STATIC,7,10,52,11
+END
+
+IDD_DLGNPCTALK DIALOGEX 0, 0, 307, 301
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Select Talk"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,7,278,50,16
+    PUSHBUTTON      "CANCEL",IDCANCEL,250,278,50,16
+    LISTBOX         IDC_NPCTALK_LIST,7,6,293,267,LBS_SORT | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+END
+
+IDD_NPCTALKDIALOG DIALOGEX 0, 0, 650, 380
+STYLE DS_SETFONT | WS_CHILD | WS_SYSMENU
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    EDITTEXT        IDC_EDIT_TALKID,44,15,282,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    EDITTEXT        IDC_EDIT_TALK,44,35,282,12,ES_AUTOHSCROLL
+    COMBOBOX        IDC_COMBO_ACTION_TYPE,44,52,282,127,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_ACTION_DATA,44,73,282,101,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "OK",IDC_BUTTON_OK,561,352,70,21
+    PUSHBUTTON      "Cancel",IDC_BUTTON_CANCEL,481,352,70,21
+    LTEXT           "Des.",IDC_STATIC,11,35,19,12,SS_CENTERIMAGE
+    LTEXT           "Type",IDC_STATIC,11,52,18,13,SS_CENTERIMAGE
+    LTEXT           "Data",IDC_STATIC,11,72,17,15,SS_CENTERIMAGE
+    LTEXT           "ID",IDC_STATIC,11,14,11,13,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_CONDITION,382,15,240,130,ES_MULTILINE | 
+                    ES_READONLY | WS_VSCROLL
+    LTEXT           "Condition",IDC_STATIC,337,15,38,13,SS_CENTERIMAGE
+    PUSHBUTTON      "Set",IDC_BUTTON_CONDITON_SET,387,150,48,16
+    PUSHBUTTON      "Del",IDC_BUTTON_CONDITON_RESET,441,150,47,16
+    LTEXT           "",IDC_STATIC_QUEST_START,9,146,8,8,SS_CENTERIMAGE
+    COMBOBOX        IDC_COMBO_QUEST_START,70,115,254,101,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Start Quest",IDC_STATIC_QUEST_STEP3,24,115,44,11,
+                    SS_CENTERIMAGE
+    LTEXT           "Bus List",IDC_STATIC,11,95,30,12,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_BUS,44,94,216,15,ES_AUTOHSCROLL
+    PUSHBUTTON      "Open",IDC_BUTTON_BUS,263,93,62,16
+    COMBOBOX        IDC_COMBO_QUEST_START2,70,132,254,101,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_QUEST_START3,70,151,254,101,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_QUEST_START4,70,171,255,101,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_QUEST_START5,70,190,254,101,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    CONTROL         "",IDC_CHECK_QUEST_START2,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,50,131,8,15
+    CONTROL         "",IDC_CHECK_QUEST_START3,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,50,149,8,15
+    CONTROL         "",IDC_CHECK_QUEST_START4,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,50,170,8,15
+    CONTROL         "",IDC_CHECK_QUEST_START5,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,50,189,8,15
+    LTEXT           "Sec",IDC_TIME_STATIC,447,296,20,11,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_RANDOM_TIME,390,296,48,12,ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    COMBOBOX        IDC_COMBO_QUEST_PROG_STEP,70,232,254,101,
+                    CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Reset",IDC_RANDOM_RESET,572,295,41,14
+    PUSHBUTTON      "Delete",IDC_RANDOM_DELETE,524,295,43,14
+    PUSHBUTTON      "Insert",IDC_RANDOM_INSERT,475,295,44,14
+    EDITTEXT        IDC_EDIT_HAVE_ITEM5,51,317,104,14,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    EDITTEXT        IDC_EDIT_HAVE_ITEM4,51,301,104,14,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    EDITTEXT        IDC_EDIT_HAVE_ITEM3,51,286,104,14,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    CONTROL         "",IDC_LIST_CASE_RANDOM,"SysListView32",LVS_REPORT | 
+                    LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | 
+                    WS_TABSTOP,388,188,224,98
+    EDITTEXT        IDC_EDIT_HAVE_ITEM2,51,270,104,14,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    PUSHBUTTON      "X",IDC_BUTTON_TRADE_DEL,309,251,12,14
+    EDITTEXT        IDC_EDIT_TRADE_ITEM,224,251,83,14,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    PUSHBUTTON      "Exchange Item",IDC_BUTTON_TRADE_ITEM,165,251,56,14
+    EDITTEXT        IDC_EDIT_HAVE_ITEM1,51,253,104,14,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    COMBOBOX        IDC_COMBO_QUEST_PROG,70,211,254,101,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Random Talk",IDC_RANDOM_STATIC,383,173,239,142
+    LTEXT           "Quest Step",IDC_STATIC_QUEST_STEP2,23,235,46,8,
+                    SS_CENTERIMAGE
+    LTEXT           "Progress Quest",IDC_STATIC_QUEST_STEP,8,212,58,15,
+                    SS_CENTERIMAGE
+END
+
+IDD_NPCACTIONTABLE DIALOGEX 0, 0, 623, 380
+STYLE DS_SETFONT | WS_CHILD
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    CONTROL         "",IDC_LIST_ACTION,"SysListView32",LVS_REPORT | 
+                    LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | 
+                    WS_TABSTOP,9,11,585,302
+    PUSHBUTTON      "Add",IDC_BUTTON_INSERT,216,317,50,21
+    PUSHBUTTON      "Edit",IDC_BUTTON_MODIFY,156,317,50,21
+    PUSHBUTTON      "Del",IDC_BUTTON_DELETE,395,317,50,21
+    PUSHBUTTON      "Test",IDC_BUTTON_TEST,276,317,50,21,WS_DISABLED
+    PUSHBUTTON      "Copy",IDC_BUTTON_COPY,336,317,50,21
+END
+
+IDD_NPCACTIONPAGE DIALOGEX 0, 0, 650, 380
+STYLE DS_SETFONT | WS_CHILD
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    PUSHBUTTON      "Cancel",IDC_BUTTON_CANCEL,481,352,70,21
+    PUSHBUTTON      "OK",IDC_BUTTON_OK,561,352,70,21
+    EDITTEXT        IDC_EDIT_DIALOGUE_ID,100,10,60,14,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    LTEXT           "Branching Statement ID",IDC_STATIC,11,8,86,18,
+                    SS_CENTERIMAGE
+    PUSHBUTTON      "New",IDC_BUTTON_CASE_NEW,11,140,53,21
+    CONTROL         "",IDC_LIST_CASE_ANSWER,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | 
+                    WS_BORDER | WS_TABSTOP,11,246,620,93
+    EDITTEXT        IDC_EDIT_DIALOGUE_CASE,11,180,315,60,ES_MULTILINE | 
+                    ES_READONLY | ES_WANTRETURN | WS_VSCROLL
+    PUSHBUTTON      "Edit",IDC_BUTTON_CASE_EDIT,71,140,55,21
+    CONTROL         "",IDC_LIST_POSTIVE_ANSWER2,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | 
+                    WS_BORDER | WS_TABSTOP,11,27,560,108
+    PUSHBUTTON      "Delete",IDC_BUTTON_CASE_DEL,197,140,60,21
+    LTEXT           "Preview Branching Statement",IDC_STATIC,11,163,158,14,
+                    SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_DIALOGUE_CASE_CONDITION,339,180,291,60,
+                    ES_MULTILINE | ES_READONLY | ES_WANTRETURN | WS_VSCROLL
+    PUSHBUTTON      "UP",IDC_BUTTON_UP,575,39,34,25
+    PUSHBUTTON      "DN",IDC_BUTTON_DOWN,575,78,34,25
+    PUSHBUTTON      "Copy",IDC_BUTTON_CASE_COPY,135,140,55,21
+END
+
+IDD_NPCACTIONCONDITION DIALOGEX 0, 0, 650, 380
+STYLE DS_SETFONT | WS_POPUP
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    PUSHBUTTON      "OK",IDC_BUTTON_OK,561,352,70,21
+    PUSHBUTTON      "Cancel",IDC_BUTTON_CANCEL,481,352,70,21
+    EDITTEXT        IDC_EDIT_LEVEL,10,25,53,14,ES_AUTOHSCROLL
+    COMBOBOX        IDC_COMBO_LEVEL_SIGN,67,25,30,106,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Brawler [M]",IDC_CHECK_FIGHETER_M,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,12,95,62,10
+    CONTROL         "Shamman [W]",IDC_CHECK_SPIRIT_W,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,78,105,62,10
+    CONTROL         "Archer [W]",IDC_CHECK_ARCHER_W,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,12,150,62,10
+    CONTROL         "Swordsman [M]",IDC_CHECK_ARMS_M,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,12,116,62,10
+    GROUPBOX        "Level",IDC_STATIC,7,13,95,30
+    GROUPBOX        "Class",IDC_STATIC,8,83,198,93
+    EDITTEXT        IDC_EDIT_ELEMENTAL,116,26,52,14,ES_AUTOHSCROLL
+    COMBOBOX        IDC_COMBO_ELEMENTAL_SIGN,172,26,30,106,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Elemental",IDC_STATIC,112,13,95,34
+    EDITTEXT        IDC_EDIT_ACTIONPOINT,11,59,51,14,ES_AUTOHSCROLL
+    COMBOBOX        IDC_COMBO_ACTIONPOINT_SIGN,67,59,30,106,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Living Score",IDC_STATIC,8,47,94,31
+    CONTROL         "Use",IDC_CHECK_TIME,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,16,198,29,10
+    COMBOBOX        IDC_COMBO_TIME_BEGIN,85,195,40,106,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Time",IDC_STATIC,8,180,198,39
+    LTEXT           "Start",IDC_STATIC,60,195,21,11,SS_CENTERIMAGE
+    COMBOBOX        IDC_COMBO_TIME_END,154,195,40,106,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "End",IDC_STATIC,132,195,18,13,SS_CENTERIMAGE
+    GROUPBOX        "Quest",IDC_STATIC,8,224,198,53
+    GROUPBOX        "Request Item",IDC_STATIC,381,14,225,113
+    GROUPBOX        "Request Skill",IDC_STATIC,381,131,225,106
+    PUSHBUTTON      "Add",IDC_BUTTON_ITEM_ADD,483,108,31,14
+    PUSHBUTTON      "Add",IDC_BUTTON_SKILL_ADD,483,217,32,14
+    LISTBOX         IDC_LIST_SKILL,387,144,215,70,LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Del",IDC_BUTTON_ITEM_DEL,524,108,31,14
+    PUSHBUTTON      "Del",IDC_BUTTON_SKILL_DEL,524,217,33,14
+    PUSHBUTTON      "Del All",IDC_BUTTON_ITEM_DELALL,566,108,31,14
+    PUSHBUTTON      "Del All",IDC_BUTTON_SKILL_DELALL,566,217,33,14
+    PUSHBUTTON      "Select",IDC_BUTTON_ITEM_QUEST_SELECT,17,238,37,14
+    EDITTEXT        IDC_EDIT_QUEST,60,238,124,14,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    COMBOBOX        IDC_COMBO_QUEST_STEP,18,258,180,170,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Don't Gain Skill",IDC_STATIC,210,151,168,133
+    PUSHBUTTON      "Add",IDC_BUTTON_DIS_SKILL_ADD,344,263,22,14
+    LISTBOX         IDC_LIST_DIS_SKILL,217,164,155,95,LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Del",IDC_BUTTON_DIS_SKILL_DEL,311,263,22,14
+    GROUPBOX        "Don't Progress Quest",IDC_STATIC,210,14,168,130
+    PUSHBUTTON      "Add",IDC_BUTTON_DIS_QUEST_ADD,344,124,23,14
+    LISTBOX         IDC_LIST_DIS_QUEST,216,27,155,95,LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Del",IDC_BUTTON_DIS_QUEST_DEL,311,124,23,14
+    EDITTEXT        IDC_EDIT_MONEY,54,282,97,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_PARTY,88,300,63,14,ES_AUTOHSCROLL
+    LTEXT           "Min. Money",IDC_STATIC,8,282,41,14,SS_CENTERIMAGE
+    LTEXT           "Min. NumOfPartyMem.",IDC_STATIC,7,301,78,12,
+                    SS_CENTERIMAGE
+    PUSHBUTTON      "X",IDC_BUTTON_QUEST_DEL,187,238,12,14
+    GROUPBOX        "Completion Quest",IDC_STATIC,381,241,225,92
+    PUSHBUTTON      "Add",IDC_BUTTON_COMQUEST_ADD,483,315,33,14
+    LISTBOX         IDC_LIST_COMQUEST,387,253,215,59,LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Del",IDC_BUTTON_COMQUEST_DEL,524,315,33,14
+    PUSHBUTTON      "Del All",IDC_BUTTON_COMQUEST_DELALL,566,315,33,14
+    LTEXT           "School :",IDC_STATIC,112,59,39,12,SS_CENTERIMAGE
+    COMBOBOX        IDC_COMBO_SCHOOL,152,59,53,162,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Extreme [M]",IDC_CHECK_EXTREME_M,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,78,115,62,10
+    CONTROL         "Extreme [W]",IDC_CHECK_EXTREME_W,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,78,126,62,10
+    CONTROL         "Brawler [W]",IDC_CHECK_FIGHETER_W,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,12,105,62,10
+    CONTROL         "Shamman [M]",IDC_CHECK_SPIRIT_M,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,78,95,62,10
+    CONTROL         "Archer [M]",IDC_CHECK_ARCHER_M,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,12,138,62,10
+    CONTROL         "Swordsman [W]",IDC_CHECK_ARMS_W,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,12,127,62,10
+    CONTROL         "",IDC_LISTCONT_ITEM,"SysListView32",LVS_REPORT | 
+                    LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | 
+                    WS_TABSTOP,386,27,216,79
+    CONTROL         "ALL",IDC_RADIO_ALL,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,134,162,28,10
+    CONTROL         "M",IDC_RADIO_MAN,"Button",BS_AUTORADIOBUTTON,31,162,28,
+                    10
+    CONTROL         "W",IDC_RADIO_WOMAN,"Button",BS_AUTORADIOBUTTON,83,162,
+                    28,10
+    CONTROL         "Gunner[M]",IDC_CHECK_EXTREME_M2,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,78,138,62,10
+    CONTROL         "Assasin [M]",IDC_CHECK_EXTREME_M3,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,140,95,62,10
+    CONTROL         "Testing [M]",IDC_CHECK_EXTREME_M4,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,140,116,62,10
+    CONTROL         "Gunner [W]",IDC_CHECK_EXTREME_W2,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,78,150,62,10
+    CONTROL         "Assasin [W]",IDC_CHECK_EXTREME_W3,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,140,105,62,10
+    CONTROL         "Testing [W]",IDC_CHECK_EXTREME_W4,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,140,127,62,10
+END
+
+IDD_NPCACTIONANSWER DIALOGEX 0, 0, 650, 380
+STYLE DS_SETFONT | WS_CHILD
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    PUSHBUTTON      "OK",IDC_BUTTON_OK,561,352,70,21
+    PUSHBUTTON      "Cancel",IDC_BUTTON_CANCEL,481,352,70,21
+    CONTROL         "",IDC_LIST_ANSWER,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | 
+                    WS_BORDER | WS_TABSTOP,10,163,571,125
+    PUSHBUTTON      "Del",IDC_BUTTON_DEL,279,300,48,21
+    PUSHBUTTON      "Modify",IDC_BUTTON_MODIFY,69,300,54,21
+    PUSHBUTTON      "Add",IDC_BUTTON_ADD,9,300,54,21
+    LTEXT           "",IDC_STATIC_TYPE,6,6,8,8
+    EDITTEXT        IDC_EDIT_DIALOGUE_CONDITION,337,21,243,134,ES_MULTILINE | 
+                    ES_READONLY | ES_WANTRETURN | WS_VSCROLL
+    LTEXT           "Basic Conversation",IDC_STATIC,10,8,64,8
+    PUSHBUTTON      "Delete All",IDC_BUTTON_DELALL,224,300,49,21
+    EDITTEXT        IDC_EDIT_DIALOGUE_BASIC_TALK,9,21,321,112,ES_MULTILINE | 
+                    ES_WANTRETURN | WS_VSCROLL
+    PUSHBUTTON      "Edit",IDC_BUTTON_CONDITON_EDIT,9,140,60,16
+    PUSHBUTTON      "Del",IDC_BUTTON_CONDITON_DEL,73,140,59,16
+    PUSHBUTTON      "UP",IDC_BUTTON_UP,587,209,34,25
+    PUSHBUTTON      "DN",IDC_BUTTON_DOWN,587,242,34,25
+    PUSHBUTTON      "Copy",IDC_BUTTON_COPY,129,300,54,21
+END
+
+IDD_NPCACTION_DIALOG DIALOGEX 0, 0, 671, 426
+STYLE DS_SETFONT | DS_MODALFRAME | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | 
+    WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "NpcAction  ( English )"
+MENU IDR_MENU1
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    GROUPBOX        "Static",IDC_STATIC_CONTROL,7,24,650,380
+    PUSHBUTTON      "SimpleEdit",IDC_CSV_SAVE_BUTTON,7,6,47,15
+    PUSHBUTTON      "TextExport",IDC_TEXTEXPORT_BUTTON,63,6,47,15
+    PUSHBUTTON      "TextImport",IDC_TEXTIMPORT_BUTTON,113,6,47,15
+    PUSHBUTTON      "CSV Export",IDC_CSVEXPORT_BUTTON,165,6,42,15
+    PUSHBUTTON      "CSV Import",IDC_CSVIMPORT_BUTTON,209,6,42,15
+    PUSHBUTTON      "All Save",IDC_ALLSAVE_BUTTON,355,6,47,15
+    PUSHBUTTON      "CSV Export2",IDC_CSVEXPORT_BUTTON2,256,6,44,15
+    PUSHBUTTON      "CSV Import2",IDC_CSVIMPORT_BUTTON2,302,6,44,15
+    PUSHBUTTON      "Convert All .ntk to ALL CLASS",IDC_ALLCLASS,414,6,121,
+                    15
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_DIALOG_QUEST, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 274
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 297
+    END
+
+    IDD_HAVEITEMDIALOG, DIALOG
+    BEGIN
+        RIGHTMARGIN, 290
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 294
+    END
+
+    IDD_LEARNSKILLDIALOG, DIALOG
+    BEGIN
+        RIGHTMARGIN, 308
+        TOPMARGIN, 7
+    END
+
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 228
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 48
+    END
+
+    IDD_SIMPLEEDIT, DIALOG
+    BEGIN
+        RIGHTMARGIN, 437
+    END
+
+    IDD_FINDITEM, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 140
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 47
+    END
+
+    IDD_DLGNPCTALK, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 300
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 294
+    END
+
+    IDD_NPCTALKDIALOG, DIALOG
+    BEGIN
+        RIGHTMARGIN, 644
+        BOTTOMMARGIN, 373
+    END
+
+    IDD_NPCACTIONPAGE, DIALOG
+    BEGIN
+        RIGHTMARGIN, 645
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// RT_MANIFEST
+//
+
+1                       RT_MANIFEST             "res\\manifest.xml"
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Vietnamese resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_VIT)
+#ifdef _WIN32
+LANGUAGE LANG_VIETNAMESE, SUBLANG_DEFAULT
+#pragma code_page(1258)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MENU1 MENU 
+BEGIN
+    POPUP "File"
+    BEGIN
+        MENUITEM "New",                         ID_MENUITEM_NEW
+        MENUITEM SEPARATOR
+        MENUITEM "Load",                        ID_MENUITEM_LOAD
+        MENUITEM "Save",                        ID_MENUITEM_SAVE
+        MENUITEM "All Text Export",             32776
+        MENUITEM "All Text Export2",            32777
+        MENUITEM SEPARATOR
+        MENUITEM "Exit",                        ID_MENUITEM_EXIT
+    END
+END
+
+#endif    // Vietnamese resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_KOR)
+LANGUAGE 18, 1
+#pragma code_page(949)
+#include "res\NpcAction.rc2"  // Microsoft Visual C++¿¡¼­ ÆíÁýµÇÁö ¾ÊÀº ¸®¼Ò½º
+#include "afxres.rc"         // Ç¥ÁØ ±¸¼º ¿ä¼Ò
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

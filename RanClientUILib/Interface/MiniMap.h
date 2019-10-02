@@ -1,0 +1,199 @@
+#pragma once
+
+#include "../EngineUILib/GUInterface/UIGroup.h"
+#define ICMP_ECHOREPLY	0
+#define ICMP_ECHOREQ	8
+#include <winsock2.h>
+#include <winsock.h>
+#define WM_MSG_STATUS	WM_USER + 0x0100
+#define WM_PING_END		WM_USER + 0x0101
+
+class CBasicTextBox;
+class CBasicButton;
+class GLMapAxisInfo;
+class CBasicProgressBar;
+class CMiniMapInfo;
+
+const DWORD UIMSG_MOUSEIN_FULLSCREENBUTTON = UIMSG_USER1;
+
+class CMiniMap : public CUIGroup
+{
+private:
+static	const	int	nTIME_MINUTE;
+
+protected:
+	enum
+	{
+		MINIMAP_FULLSCREEN = NO_ID + 1,
+	};
+
+public:
+	CMiniMap();
+	virtual ~CMiniMap(void);
+public:
+	virtual void GetElapsed();
+	void UpdateData();
+	int     WaitForEchoReply(SOCKET s);
+	int		SendEchoRequest(SOCKET, LPSOCKADDR_IN);
+	DWORD	RecvEchoReply(SOCKET, LPSOCKADDR_IN, u_char *);
+	DWORD   dwTimeSent;
+	DWORD   dwReqTimeSent;
+	u_short in_cksum(u_short *addr, int len);
+	float   m_fFPS;
+
+protected:
+	SOCKADDR_IN	m_Addr;
+	SOCKADDR_IN m_cAddr;
+	SOCKADDR_IN m_gAddr;
+	SOCKET	m_sClient;
+	SOCKET	rawSocket;
+    DWORD dwElapsedTime;
+	BOOL  bRunService;
+	float fUpdateDelay;
+	float  CalcFPS();
+private:
+	CBasicTextBox*  m_pLatencyText;
+	CBasicTextBox*  m_pFPSText;
+protected:
+	void	RotateMap();
+	void	SetMapProperty();						// 맵 좌표 속성 줌 스텝
+	void	UpdateMapTexturePos();	
+	
+
+public:
+	void	CreateSubControl ();
+
+private:
+	void	CreateMap( char *MapPos);
+	void	CreateUserMark(char *keyvalue);
+	void	CreateZoomButton(char* InKeyvalue, char *InFlipvalue, char *OutKeyvalue, char*OutFlipvalue);
+	void	CreateTextBox(char *x_keyvalue, char *y_keyvalue);
+
+protected:
+	//	맵 정보 조절 함수
+	void	SetMapData ( const char *szMiniMapTex,UIRECT tPos );
+	void	SetMapSize ( int size_x, int size_y, int start_x, int start_y );
+
+public:
+	BOOL	LoadMapInfo(char *szMapInfo);
+	void	SetMapAxisInfo ( GLMapAxisInfo &sInfo, const CString & strMapName );
+
+	void	CalcMapPos ( int cur_x, int cur_y, int& MapX, int& MapY );
+
+	void	SetMapInfo ( int size_x, int size_y, const char *szMapName, int start_x, int start_y,UIRECT tMapPos );
+
+	void	UpdateClubTime( float fCLUBBATTLETime );
+	void	StartClubTime();
+	void	EndClubTime();
+
+	//void	CalcPing();
+	//float	m_fPing;
+
+	void	UpdateSchoolWarTime( float fSchoolWarsTime );
+	void	StartSchoolWarTime();
+	void	EndSchoolWarTime();
+	void	UpdateRoyalRumbleTime( float fRoyalRumbleTimeTime );
+	void	StartRoyalRumbleTime();
+	void	EndRoyalRumbleTime();
+
+public:
+	virtual HRESULT Render(LPDIRECT3DDEVICEQ pD3DDevice); // 렌더상태를 설정하고 뷰포트를 지우고 장면을 그리는 역할	
+
+public:
+	void UpdateTime ( float fElapsedTime );
+	virtual void Update ( int x, int y, BYTE LB, BYTE MB, BYTE RB, int nScroll, float fElapsedTime, BOOL bFirstControl );
+	virtual	void TranslateUIMessage ( UIGUID ControlID, DWORD dwMsg );
+
+
+private:
+	CUIControl*	m_pMap;
+	CUIControl* m_pUserMark;
+    CBasicTextBox*	m_pXPos;
+	CBasicTextBox*	m_pYPos;
+	CBasicTextBox*	m_pMiniMapName;
+	CBasicButton*	m_pZoomOut;
+	CBasicButton*	m_pZoomIn;
+
+	CUIControl*		m_pTime;
+	CBasicTextBox*	m_pTimeText;
+	//CBasicTextBox*	m_pServerTimeText;
+	CUIControl*		m_pDirection;
+	
+	CUIControl*		m_pArrowCountBack;
+	CBasicTextBox*	m_pArrowCountText;
+
+private:
+	int			m_nMap_X, m_nMap_Y;					//	전체 맵 사이즈
+	int			m_nMapSize;							//	맵사이즈
+	int			m_nStart_X, m_nStart_Y;				//	맵 시작 좌표
+
+	int			m_nMin_X, m_nMin_Y;					//	보여지는 맵 좌표
+
+
+	UIRECT		m_rcTexture_Pos;					//	텍스쳐 좌표
+
+private:
+	CBasicProgressBar* m_pPK_ATTACK;
+	CBasicProgressBar* m_pPK_DEFENSE;
+
+	CUIControl*		m_pFullScreenButton;
+	CUIControl*		m_pFullScreenButtonDummy;
+	CMiniMapInfo*	m_pMiniMapInfoDummy;
+	CMiniMapInfo*	m_pMiniMapInfoLeftDummy;
+
+	CMiniMapInfo * m_pMimiMapInfo; // 맵 정보 컨트롤 포인터
+
+private:
+	bool	m_bTEST;
+
+private:
+	WORD m_wAmmoCount;
+	CBasicTextBox*	m_pAmmoText;
+	CBasicTextBox*	m_pClubTimeText;
+	CBasicTextBox*	m_pSchoolWarTimeText;
+	CBasicTextBox*	m_pRoyalRumbleTimeText;
+
+	CUIControl* m_pCenterPoint;
+};
+#pragma pack(1)
+
+
+
+typedef struct tagIPHDR
+{
+	u_char  VIHL;			// Version and IHL
+	u_char	TOS;			// Type Of Service
+	short	TotLen;			// Total Length
+	short	ID;				// Identification
+	short	FlagOff;		// Flags and Fragment Offset
+	u_char	TTL;			// Time To Live
+	u_char	Protocol;		// Protocol
+	u_short	Checksum;		// Checksum
+	struct	in_addr iaSrc;	// Internet Address - Source
+	struct	in_addr iaDst;	// Internet Address - Destination
+}
+IPHDR, *PIPHDR;
+typedef struct tagICMPHDR
+{
+	u_char	Type;			// Type
+	u_char	Code;			// Code
+	u_short	Checksum;		// Checksum
+	u_short	ID;				// Identification
+	u_short	Seq;			// Sequence
+	char	Data;			// Data
+}
+ICMPHDR, *PICMPHDR;
+#define REQ_DATASIZE 32		// Echo Request Data size
+typedef struct tagECHOREQUEST
+{
+	ICMPHDR icmpHdr;
+	DWORD	dwTime;
+	char	cData[REQ_DATASIZE];
+}ECHOREQUEST, *PECHOREQUEST;
+typedef struct tagECHOREPLY
+{
+	IPHDR	ipHdr;
+	ECHOREQUEST	echoRequest;
+	char    cFiller[256];
+}ECHOREPLY, *PECHOREPLY;
+#pragma pack()

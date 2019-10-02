@@ -1,0 +1,836 @@
+#include "StdAfx.h"
+#include "minimap.h"
+#include "../EngineLib/DxCommon/TextureManager.h"
+#include "StringFile.h"
+#include "STRINGUTILS.h"
+#include "DXLandMan.h"
+#include "GLGaeaClient.h"
+#include "DxRenderStates.h"
+#include "DxViewPort.h"
+#include "../EngineUILib/GUInterface/InterfaceCfg.h"
+#include "UITextControl.h"
+#include "../EngineLib/DxCommon/DxFontMan.h"
+#include "GLMapAxisInfo.h"
+#include "GameTextControl.h"
+#include "d3dfont.h"
+#include "../EngineUILib/GUInterface/BasicButton.h"
+
+#include "RANPARAM.h"
+#include "DxGlobalStage.h"
+#include "../EngineUILib/GUInterface/BasicTextBox.h"
+#include "GLPeriod.h"
+#include "GLItemMan.h"
+#include "../EngineUILib/GUInterface/BasicProgressBar.h"
+#include "DxClubMan.h"
+#include "InnerInterface.h"
+
+#include "MiniMapInfo.h"
+
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
+const int CMiniMap::nTIME_MINUTE = 60;
+
+CMiniMap::CMiniMap()
+	: m_nMap_X(1)
+	, m_nMap_Y(1)
+	, m_nMapSize(1)
+	, m_nMin_X(1)
+	, m_nMin_Y(1)
+
+	, m_bTEST( true )
+	, m_wAmmoCount( 0 )
+
+	, m_pMimiMapInfo(NULL)
+	, m_pMiniMapInfoDummy(NULL)
+	, m_pMiniMapInfoLeftDummy(NULL)
+	, m_pMap(NULL)
+	, m_pUserMark(NULL)
+	, m_pXPos(NULL)
+	, m_pYPos(NULL)
+	, m_pMiniMapName(NULL)
+	, m_pZoomOut(NULL)
+	, m_pZoomIn(NULL)
+	, m_pTime(NULL)
+	, m_pTimeText(NULL)
+	//, m_pServerTimeText(NULL)
+	, m_pDirection(NULL)
+	, m_pArrowCountBack(NULL)
+	, m_pArrowCountText(NULL)
+	, m_pPK_ATTACK(NULL)
+	, m_pPK_DEFENSE(NULL)
+	, m_pFullScreenButton(NULL)
+	, m_pFullScreenButtonDummy(NULL)
+	, m_pAmmoText(NULL)
+	, m_pCenterPoint(NULL)
+	, m_pClubTimeText(NULL)
+	, m_pSchoolWarTimeText(NULL)
+	, m_pRoyalRumbleTimeText(NULL)
+  , dwElapsedTime ( 0 )
+	, bRunService ( FALSE )
+	, fUpdateDelay ( 0.0f )
+	, m_pFPSText(NULL)
+	, m_fFPS (0.0f)	
+{
+}
+
+CMiniMap::~CMiniMap(void)
+{
+}
+
+void CMiniMap::CreateSubControl ()
+{
+
+	CD3DFontPar* pFont = DxFontMan::GetInstance().LoadDxFont ( _DEFAULT_FONT, 9, TRUE, D3DFONT_SHADOW | D3DFONT_ASCII );
+
+	CBasicTextBox* pTimeText = new CBasicTextBox;
+	pTimeText->CreateSub ( this, "MINIMAP_TIME_TEXT" );
+	pTimeText->SetFont ( pFont );
+	pTimeText->SetTextAlign ( TEXT_ALIGN_CENTER_X );
+	RegisterControl ( pTimeText );
+	m_pTimeText = pTimeText;
+
+	CBasicTextBox* pLatencyText = new CBasicTextBox;
+	pLatencyText->CreateSub ( this, "MINIMAP_LATENCY_TEXT" );
+	pLatencyText->SetFont ( pFont );
+	pLatencyText->SetTextAlign ( TEXT_ALIGN_CENTER_X );
+	RegisterControl ( pLatencyText );
+	m_pLatencyText = pLatencyText;
+
+	CBasicTextBox* pFPSText = new CBasicTextBox;
+	pFPSText->CreateSub ( this, "MINIMAP_FPS_TEXT" );
+	pFPSText->SetFont ( pFont );
+	pFPSText->SetTextAlign ( TEXT_ALIGN_CENTER_X );
+	RegisterControl ( pFPSText );
+	m_pFPSText = pFPSText;
+
+	
+	/*CBasicTextBox* pServerTimeText = new CBasicTextBox;
+	pServerTimeText->CreateSub ( this, "MINIMAP_SERVER_TIME_TEXT" );
+	pServerTimeText->SetFont ( pFont );
+	pServerTimeText->SetTextAlign ( TEXT_ALIGN_RIGHT );
+	//{
+	//	pServerTimeText->SetUseRender( TRUE );
+	//	pServerTimeText->SetDiffuse( NS_UIDEBUGSET::PINK );
+	//}
+	RegisterControl ( pServerTimeText );
+	m_pServerTimeText = pServerTimeText;*/
+	
+
+	CBasicTextBox* pAmmoText = new CBasicTextBox;
+	pAmmoText->CreateSub ( this, "MINIMAP_AMMO_TEXT" );
+	pAmmoText->SetFont ( pFont );
+	pAmmoText->SetTextAlign ( TEXT_ALIGN_CENTER_X );
+	RegisterControl ( pAmmoText );
+	m_pAmmoText = pAmmoText;
+
+	CBasicTextBox* pClubTimeText = new CBasicTextBox;
+	pClubTimeText->CreateSub ( this, "MINIMAP_CLUB_TIME_TEXT" );
+	pClubTimeText->SetFont ( pFont );
+	pClubTimeText->SetTextAlign ( TEXT_ALIGN_CENTER_X );
+	RegisterControl ( pClubTimeText );
+	m_pClubTimeText = pClubTimeText;
+
+	CBasicTextBox* pSchoolWarTimeText = new CBasicTextBox;
+	pSchoolWarTimeText->CreateSub ( this, "MINIMAP_SCHOOLWAR_TIME_TEXT" );
+	pSchoolWarTimeText->SetFont ( pFont );
+	pSchoolWarTimeText->SetTextAlign ( TEXT_ALIGN_CENTER_X );
+	RegisterControl ( pSchoolWarTimeText );
+	m_pSchoolWarTimeText = pSchoolWarTimeText;
+
+	CBasicTextBox* pRoyalRumbleTimeText = new CBasicTextBox;
+	pRoyalRumbleTimeText->CreateSub ( this, "MINIMAP_ROYALRUMBLE_TIME_TEXT" );
+	pRoyalRumbleTimeText->SetFont ( pFont );
+	pRoyalRumbleTimeText->SetTextAlign ( TEXT_ALIGN_CENTER_X );
+	RegisterControl ( pRoyalRumbleTimeText );
+	m_pRoyalRumbleTimeText = pRoyalRumbleTimeText;
+
+	CUIControl* pBack = new CUIControl;
+	pBack->CreateSub ( this, "MINIMAP_BACK", UI_FLAG_RIGHT );
+	RegisterControl ( pBack );		
+
+	CUIControl* pDirection = new CUIControl;
+	pDirection->CreateSub ( this, "MINIMAP_DIRECTION", UI_FLAG_RIGHT );
+	RegisterControl ( pDirection );
+	m_pDirection = pDirection;
+
+	CUIControl* pCenterPoint = new CUIControl;
+	pCenterPoint->CreateSub ( this, "MINIMAP_CENTER_POINT", UI_FLAG_RIGHT );
+	RegisterControl ( pCenterPoint );
+	m_pCenterPoint = pCenterPoint;
+
+	CUIControl* pFullScreen = new CUIControl;
+	pFullScreen->CreateSub ( this, "MINIMAP_FULLSCREEN", UI_FLAG_RIGHT, MINIMAP_FULLSCREEN );
+	RegisterControl ( pFullScreen );
+	m_pFullScreenButton = pFullScreen;
+
+	CUIControl* pFullScreenDummy = new CUIControl;
+	pFullScreenDummy->CreateSub ( this, "MINIMAP_FULLSCREEN", UI_FLAG_RIGHT );
+	pFullScreenDummy->SetVisibleSingle ( FALSE );
+	RegisterControl ( pFullScreenDummy );
+	m_pFullScreenButtonDummy = pFullScreenDummy;
+
+	/////////////// 맴정보 컨트롤 생성 ////////////////
+	CMiniMapInfo* pMiniMapInfo = new CMiniMapInfo;
+	pMiniMapInfo->CreateSub( this, "MINIMAP_INFO" );
+	pMiniMapInfo->CreateSubControl();
+	pMiniMapInfo->SetVisibleSingle( TRUE );
+	RegisterControl( pMiniMapInfo );
+	m_pMimiMapInfo = pMiniMapInfo;
+
+	CMiniMapInfo* pMiniMapInfoDummy = new CMiniMapInfo;
+	pMiniMapInfoDummy->CreateSub ( this, "MINIMAP_INFO" );
+	pMiniMapInfoDummy->SetVisibleSingle ( FALSE );
+	RegisterControl ( pMiniMapInfoDummy );
+	m_pMiniMapInfoDummy = pMiniMapInfoDummy;
+
+	CMiniMapInfo* pMiniMapInfoLeftDummy = new CMiniMapInfo;
+	pMiniMapInfoLeftDummy->CreateSub ( this, "MINIMAP_INFO_LEFT" );
+	pMiniMapInfoLeftDummy->SetVisibleSingle ( FALSE );
+	RegisterControl ( pMiniMapInfoLeftDummy );
+	m_pMiniMapInfoLeftDummy = pMiniMapInfoLeftDummy;
+	///////////////////////////////////////////////////
+}
+void CMiniMap::GetElapsed()
+{
+	LPHOSTENT lpHost;
+	LPCTSTR lpGetHost = _T("162.251.166.202");
+	u_char    cTTL;
+	int nRet;
+	// Lookup host
+	lpHost = gethostbyname(lpGetHost);
+	if (lpHost == NULL) return;
+	if ( bRunService )
+	{
+      m_sClient = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
+	}
+    //creterawsocket
+    if ( !bRunService ){
+		m_sClient = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);		
+		if (m_sClient == SOCKET_ERROR) 
+		{
+			bRunService = FALSE;
+			return;
+		}
+		  bRunService = TRUE;	 
+ 	      m_Addr.sin_family = AF_INET;
+          m_Addr.sin_port = 0;
+	      m_Addr.sin_addr.s_addr = *((u_long FAR *) (lpHost->h_addr)); //ping google dns
+	}
+      //hold data
+	  m_gAddr = m_Addr;
+      rawSocket = m_sClient;
+	  //send echo
+	  SendEchoRequest(rawSocket, &m_gAddr);
+	  nRet = WaitForEchoReply( rawSocket );
+	  if ( !nRet )
+	  {
+		  dwElapsedTime -1;
+	  }else{
+	  //calcu delay
+	  dwTimeSent = RecvEchoReply(rawSocket, &m_cAddr, &cTTL);
+	  dwReqTimeSent = dwTimeSent;  
+	  dwElapsedTime = GetTickCount() - dwReqTimeSent;
+	  }
+	  //close rawsocket
+	  closesocket(rawSocket);
+}
+int CMiniMap::SendEchoRequest(SOCKET s,LPSOCKADDR_IN lpstToAddr) 
+{
+	static ECHOREQUEST echoReq;
+	static nId = 1;
+	static nSeq = 1;
+	int nRet;
+
+	// Fill in echo request
+	echoReq.icmpHdr.Type		= ICMP_ECHOREQ;
+	echoReq.icmpHdr.Code		= 0;
+	echoReq.icmpHdr.Checksum	= 0;
+	echoReq.icmpHdr.ID			= nId++;
+	echoReq.icmpHdr.Seq			= nSeq++;
+
+	// Fill in some data to send
+	for (nRet = 0; nRet < REQ_DATASIZE; nRet++)
+		echoReq.cData[nRet] = ' '+nRet;
+
+	// Save tick count when sent
+	echoReq.dwTime				= GetTickCount();
+
+	// Put data in packet and compute checksum
+	echoReq.icmpHdr.Checksum = in_cksum((u_short *)&echoReq, sizeof(ECHOREQUEST));
+
+	// Send the echo request  								  
+	nRet = sendto(s,						/* socket */
+				 (LPSTR)&echoReq,			/* buffer */
+				 sizeof(ECHOREQUEST),
+				 0,							/* flags */
+				 (LPSOCKADDR)lpstToAddr, /* destination */
+				 sizeof(SOCKADDR_IN));   /* address length */
+
+	return (nRet);
+}
+
+DWORD CMiniMap::RecvEchoReply(SOCKET s, LPSOCKADDR_IN lpsaFrom, u_char *pTTL) 
+{
+	int nRet;
+	ECHOREPLY echoReply;
+	int nAddrLen = sizeof(struct sockaddr_in);
+
+	// Receive the echo reply	
+	nRet = recvfrom(s,					// socket
+					(LPSTR)&echoReply,	// buffer
+					sizeof(ECHOREPLY),	// size of buffer
+					0,					// flags
+					(LPSOCKADDR)lpsaFrom,	// From address
+					&nAddrLen);			// pointer to address len
+
+	*pTTL = echoReply.ipHdr.TTL;
+
+	return(echoReply.echoRequest.dwTime);   		
+}
+int CMiniMap::WaitForEchoReply(SOCKET s)
+{
+	struct timeval Timeout;
+	fd_set readfds;
+
+	readfds.fd_count = 1;
+	readfds.fd_array[0] = s;
+	Timeout.tv_sec = 1;
+    Timeout.tv_usec = 0;
+
+	return(select(1, &readfds, NULL, NULL, &Timeout));
+}
+u_short CMiniMap::in_cksum(u_short *addr, int len)
+{
+	register int nleft = len;
+	register u_short *w = addr;
+	register u_short answer;
+	register int sum = 0;
+
+
+	while( nleft > 1 )  {
+		sum += *w++;
+		nleft -= 2;
+	}
+
+	if( nleft == 1 ) {
+		u_short	u = 0;
+
+		*(u_char *)(&u) = *(u_char *)w ;
+		sum += u;
+	}
+
+	/*
+	 * add back carry outs from top 16 bits to low 16 bits
+	 */
+	sum = (sum >> 16) + (sum & 0xffff);	/* add hi 16 to low 16 */
+	sum += (sum >> 16);			/* add carry */
+	answer = ~sum;				/* truncate to 16 bits */
+	return (answer);
+}
+void CMiniMap::UpdateData()
+{
+	if ( m_pLatencyText )
+	{
+		if ( bRunService )
+		{
+	      if ( dwElapsedTime < 1000 && dwElapsedTime > 400 )
+	      {
+	         CString strText;
+             strText.Format("Ping: %ldms",dwElapsedTime);
+            // m_pLatencyText->SetOneLineText(strText,NS_UITEXTCOLOR::RED);
+
+	      }
+	      else if ( dwElapsedTime < 400 && dwElapsedTime > 200  )
+	      {
+	        CString strText;
+            strText.Format("Ping: %ldms",dwElapsedTime);
+            //m_pLatencyText->SetOneLineText(strText,NS_UITEXTCOLOR::GREENYELLOW);	
+		  }
+		  else if ( dwElapsedTime < 200 && dwElapsedTime != -1 )
+			{
+	           CString strText;
+               strText.Format("Ping: %ldms",dwElapsedTime);
+              // m_pLatencyText->SetOneLineText(strText,NS_UITEXTCOLOR::PALEGREEN);	
+			}
+		  else
+		  {
+             // m_pLatencyText->SetOneLineText("Request time out",NS_UITEXTCOLOR::RED);
+		  }
+	   }else{
+				m_pLatencyText->SetOneLineText("Service():WSAError",NS_UITEXTCOLOR::RED);	
+		  }
+	 }	
+}
+void CMiniMap::SetMapAxisInfo ( GLMapAxisInfo &sInfo, const CString & strMapName )
+{
+	if( NULL == m_pMimiMapInfo ) return;
+
+	if ( m_pMimiMapInfo->GetMapName() != strMapName )
+	{
+		m_pMimiMapInfo->SetMapName( strMapName );
+		m_pMimiMapInfo->UpdatePostion ();
+	}
+}
+
+void CMiniMap::RotateMap()
+{
+	D3DXVECTOR3 vLookatPt = DxViewPort::GetInstance().GetLookatPt();
+	D3DXVECTOR3 vFromPt = DxViewPort::GetInstance().GetFromPt();
+	D3DXVECTOR3 vCameraDir = vLookatPt - vFromPt;
+
+	static	D3DXVECTOR3 vLookatPtBACK;
+	static	D3DXVECTOR3 vFromPtBACK;
+	static	D3DXVECTOR3 vCameraDirBACK;
+
+	if ( vLookatPtBACK == vLookatPt &&
+		vFromPtBACK == vFromPt &&
+		vCameraDirBACK == vCameraDir )
+	{
+		return ;
+	}
+
+	//	Note : 현제의 회전값.
+	//
+	float LengthXZ;
+	float thetaY;
+
+	LengthXZ = (float) sqrt ( vCameraDir.x*vCameraDir.x + vCameraDir.z*vCameraDir.z );
+	
+	//	Note : 수식의 특성상 LengthXZ가... 0가되면... 문제가 발생한다.
+	//
+	if ( LengthXZ == 0 )	LengthXZ = 0.001f;
+
+	thetaY = (float) acos ( vCameraDir.x / LengthXZ );
+	if ( vCameraDir.z>0 )	thetaY = -thetaY;
+
+	thetaY += D3DX_PI / 2.f;
+
+	{
+		UIRECT	rcGlobalPosDir = m_pDirection->GetGlobalPos();
+		D3DXVECTOR2	vCenterPos = D3DXVECTOR2( rcGlobalPosDir.left + (rcGlobalPosDir.right - rcGlobalPosDir.left)/2.f, rcGlobalPosDir.top + (rcGlobalPosDir.bottom - rcGlobalPosDir.top)/2.f );
+		
+		D3DXVECTOR2 vGlobalPosDir[4];
+		vGlobalPosDir[0].x = rcGlobalPosDir.left - vCenterPos.x;
+		vGlobalPosDir[0].y = rcGlobalPosDir.top - vCenterPos.y;
+		vGlobalPosDir[1].x = rcGlobalPosDir.right - vCenterPos.x;
+		vGlobalPosDir[1].y = rcGlobalPosDir.top - vCenterPos.y;
+		vGlobalPosDir[2].x = rcGlobalPosDir.right - vCenterPos.x;
+		vGlobalPosDir[2].y = rcGlobalPosDir.bottom - vCenterPos.y;
+		vGlobalPosDir[3].x = rcGlobalPosDir.left - vCenterPos.x;
+		vGlobalPosDir[3].y = rcGlobalPosDir.bottom - vCenterPos.y;
+
+		D3DXVECTOR2 vOutTexturePos[4];
+		for ( int i = 0; i < 4; i++ )
+		{
+			vOutTexturePos[i].x = (float) (cos(-thetaY)* vGlobalPosDir[i].x + sin(-thetaY)* vGlobalPosDir[i].y  ) + vCenterPos.x;
+			vOutTexturePos[i].y = (float) (-sin(-thetaY)* vGlobalPosDir[i].x + cos(-thetaY)* vGlobalPosDir[i].y)  + vCenterPos.y;
+			m_pDirection->SetGlobalPos(i , vOutTexturePos[i]);		
+		}		
+	}
+}
+
+void CMiniMap::TranslateUIMessage ( UIGUID ControlID, DWORD dwMsg )
+{
+	CUIGroup::TranslateUIMessage ( ControlID, dwMsg );
+
+	switch ( ControlID )
+	{
+	case MINIMAP_FULLSCREEN:
+		{
+			if ( CHECK_MOUSE_IN ( dwMsg ) )
+			{
+				AddMessageEx ( UIMSG_MOUSEIN_FULLSCREENBUTTON );
+
+				if ( CHECK_LB_DOWN_LIKE ( dwMsg ) )
+				{
+					const float fBUTTON_CLICK = CBasicButton::fBUTTON_CLICK;
+
+					const UIRECT& rcPos = m_pFullScreenButtonDummy->GetGlobalPos ();				
+					m_pFullScreenButton->SetGlobalPos ( D3DXVECTOR2 ( rcPos.left + fBUTTON_CLICK, rcPos.top + fBUTTON_CLICK ) );
+				}
+
+				if ( CHECK_LB_UP_LIKE ( dwMsg ) )
+				{					
+					//	함수 호출
+					DxGlobalStage::GetInstance().ChangeWndMode ();
+				}
+			}
+		}
+		break;
+	}
+}
+
+void CMiniMap::UpdateTime ( float fElapsedTime )
+{
+	const float fTextureSize = 512.0f;		//	텍스처 크기
+	const float fINTERPOLIATION = 0.5f;		//	12시간
+	const float fViewSize = 102.0f;			//	한번에 보여지는 사이즈
+	static const float fHalfUVRatio = (fViewSize / fTextureSize)/2;
+	static const float fOneDaySec = GLPeriod::DAY_HOUR * GLPeriod::TIME_SEC;	
+
+	const float fCurTime = (( GLPeriod::GetInstance().GetHour () * GLPeriod::TIME_SEC ) + 
+		GLPeriod::GetInstance().GetSecond()) / fOneDaySec;
+
+	UIRECT TextureRect = m_pTime->GetTexturePos();
+
+	TextureRect.left = fCurTime - fHalfUVRatio + fINTERPOLIATION;
+	TextureRect.right= fCurTime + fHalfUVRatio + fINTERPOLIATION;
+	TextureRect.sizeX = TextureRect.right - TextureRect.left;
+
+	m_pTime->SetTexturePos ( TextureRect );
+}
+/* disabled not finished code
+void CMiniMap::CalcPing()
+{
+	HANDLE hIcmpFile;
+	//unsigned long ipaddr = inet_addr("127.0.0.1");
+    unsigned long ipaddr = inet_addr("162.251.166.202");
+    DWORD dwRetVal = 0;
+    char SendData[32] = "Data Buffer";
+    LPVOID ReplyBuffer = NULL;
+    DWORD ReplySize = 0;
+
+	hIcmpFile = IcmpCreateFile();
+
+	ReplySize = sizeof(ICMP_ECHO_REPLY) + sizeof(SendData);
+    ReplyBuffer = (VOID*) malloc(ReplySize);
+
+	 dwRetVal = IcmpSendEcho(hIcmpFile, ipaddr, SendData, sizeof(SendData), 
+        NULL, ReplyBuffer, ReplySize, 1000);
+
+	 if (dwRetVal != 0) {
+        PICMP_ECHO_REPLY pEchoReply = (PICMP_ECHO_REPLY)ReplyBuffer;
+        struct in_addr ReplyAddr;
+        ReplyAddr.S_un.S_addr = pEchoReply->Address;
+        //printf("\t  Received from %s\n", inet_ntoa( ReplyAddr ) );
+		CString strCombine;
+		strCombine.Format ( "Ping: %ldms", pEchoReply->RoundTripTime );
+		m_pPingText->SetOneLineText( strCombine, NS_UITEXTCOLOR::RED );
+        /*printf("\t  Status = %ld\n", 
+            pEchoReply->Status);
+        printf("\t  Roundtrip time = %ld milliseconds\n", 
+            pEchoReply->RoundTripTime);
+    }
+}
+*/
+void CMiniMap::UpdateClubTime( float fCLUBBATTLETime )
+{
+	CString strCombine;
+	strCombine.Format ( "%s %02d:%02d", ID2GAMEWORD( "CLUB_BATTLE_TIME", 0 ), (DWORD)fCLUBBATTLETime/60, (DWORD)fCLUBBATTLETime%60 );
+	m_pClubTimeText->SetOneLineText( strCombine, NS_UITEXTCOLOR::RED );
+}
+
+void CMiniMap::StartClubTime()
+{
+	if( m_pClubTimeText ) m_pClubTimeText->SetVisibleSingle( TRUE );
+}
+
+void CMiniMap::EndClubTime()
+{
+	if( m_pClubTimeText ) m_pClubTimeText->SetVisibleSingle( FALSE );
+}
+
+void CMiniMap::UpdateSchoolWarTime( float fSchoolWarsTime )
+{
+	CString strCombine;
+	strCombine.Format ( "%s %02d:%02d", ID2GAMEWORD( "SCHOOL_WAR_BATTLE_TIME", 0 ), (DWORD)fSchoolWarsTime/60, (DWORD)fSchoolWarsTime%60 );
+	m_pSchoolWarTimeText->SetOneLineText( strCombine, NS_UITEXTCOLOR::RED );
+}
+
+void CMiniMap::StartSchoolWarTime()
+{
+	if( m_pSchoolWarTimeText ) m_pSchoolWarTimeText->SetVisibleSingle( TRUE );
+}
+
+void CMiniMap::EndSchoolWarTime()
+{
+	if( m_pSchoolWarTimeText ) m_pSchoolWarTimeText->SetVisibleSingle( FALSE );
+}
+
+void CMiniMap::UpdateRoyalRumbleTime( float fSchoolWarsTime )
+{
+	CString strCombine;
+	strCombine.Format ( "%s %02d:%02d", ID2GAMEWORD( "ROYAL_RUMBLE_BATTLE_TIME", 0 ), (DWORD)fSchoolWarsTime/60, (DWORD)fSchoolWarsTime%60 );
+	m_pRoyalRumbleTimeText->SetOneLineText( strCombine, NS_UITEXTCOLOR::RED );
+}
+void CMiniMap::StartRoyalRumbleTime()
+{
+	if( m_pRoyalRumbleTimeText ) m_pRoyalRumbleTimeText->SetVisibleSingle( TRUE );
+}
+
+void CMiniMap::EndRoyalRumbleTime()
+{
+	if( m_pRoyalRumbleTimeText ) m_pRoyalRumbleTimeText->SetVisibleSingle( FALSE );
+}
+inline float CMiniMap::CalcFPS()
+{
+		static FLOAT fLastTime = 0.0f;
+        static DWORD dwFrames  = 0L;
+        FLOAT fTime = DXUtil_Timer( TIMER_GETABSOLUTETIME );
+        ++dwFrames;
+
+        if( fTime - fLastTime > 1.0f )
+        {
+            m_fFPS    = dwFrames / (fTime - fLastTime);
+            fLastTime = fTime;
+            dwFrames  = 0L;
+		}
+	return m_fFPS;
+}
+void CMiniMap::Update ( int x, int y, BYTE LB, BYTE MB, BYTE RB, int nScroll, float fElapsedTime, BOOL bFirstControl )
+{	
+	if ( m_pFullScreenButton->IsVisible () )
+	{
+		const UIRECT& rcGlobalPos = m_pFullScreenButtonDummy->GetGlobalPos ();
+		m_pFullScreenButton->SetGlobalPos ( D3DXVECTOR2(rcGlobalPos.left,rcGlobalPos.top) );
+	}
+
+	CUIGroup::Update ( x, y, LB, MB, RB, nScroll, fElapsedTime, bFirstControl );
+	
+	RotateMap ();
+
+	if ( m_pTimeText )
+	{
+		CString strCombine;
+		const int nMonth = (int) GLPeriod::GetInstance().GetMonth ();
+		const int nDay = (int) GLPeriod::GetInstance().GetMonthToday ();
+		const int nHour = (int) GLPeriod::GetInstance().GetHour ();
+		const int nMinute = (int) (nTIME_MINUTE * GLPeriod::GetInstance().GetSecond() / GLPeriod::TIME_SEC);
+		static int nMinuteBACK;
+		if ( nMinute != nMinuteBACK )
+		{
+			nMinuteBACK = nMinute;
+
+			strCombine.Format ( "%02d/%02d %02d:%02d", nMonth, nDay, nHour, nMinute );
+			m_pTimeText->SetOneLineText ( strCombine, NS_UITEXTCOLOR::WHITE );
+		}
+	}
+	
+	
+	/*if ( m_pServerTimeText ) // Monster7j
+	{
+		CString strMonth, strTime;
+		CString strCombine;
+		{
+			int nMonth = (int) GLGaeaClient::GetInstance().GetCurrentTime().GetMonth ();
+			int nDay = (int) GLGaeaClient::GetInstance().GetCurrentTime().GetDay ();
+			int nYear = (int) GLGaeaClient::GetInstance().GetCurrentTime().GetYear ();
+			CString strMonthText;
+			switch(nMonth)
+			{
+			case 1: strMonthText = "January"; break;
+			case 2: strMonthText = "February"; break;
+			case 3: strMonthText = "March"; break;
+			case 4: strMonthText = "April"; break;
+			case 5: strMonthText = "May"; break;
+			case 6: strMonthText = "June"; break;
+			case 7: strMonthText = "July"; break;
+			case 8: strMonthText = "August"; break;
+			case 9: strMonthText = "September"; break;
+			case 10: strMonthText = "October"; break;
+			case 11: strMonthText = "November"; break;
+			case 12: strMonthText = "December"; break;
+			};
+
+			strMonth.Format ( "%s %d, %d", strMonthText, nDay, nYear );
+
+			int nHour = (int) GLGaeaClient::GetInstance().GetCurrentTime().GetHour ();
+			int nHour2;
+			CString strAMPM;
+			switch(nHour)
+			{
+			case 13: nHour2 = 1; break;
+			case 14: nHour2 = 2; break;
+			case 15: nHour2 = 3; break;
+			case 16: nHour2 = 4; break;
+			case 17: nHour2 = 5; break;
+			case 18: nHour2 = 6; break;
+			case 19: nHour2 = 7; break;
+			case 20: nHour2 = 8; break;
+			case 21: nHour2 = 9; break;
+			case 22: nHour2 = 10; break;
+			case 23: nHour2 = 11; break;
+			case 24: nHour2 = 12; break;
+			};
+			
+			int nMinute = (int) GLGaeaClient::GetInstance().GetCurrentTime().GetMinute();
+			static int nMinuteBACK;
+			if ( nMinute != nMinuteBACK )
+			{
+				nMinuteBACK = nMinute;
+				if ( nHour > 12 ) {
+					strAMPM = "PM";
+					strTime.Format ( "%02d:%02d %s", nHour2, nMinute, strAMPM );
+					strCombine.Format ("%s %s", strMonth, strTime );
+					m_pServerTimeText->SetOneLineText ( strCombine, NS_UITEXTCOLOR::WHITE );
+				} else {
+					strAMPM = "AM";
+					strTime.Format ( "%02d:%02d %s", nHour, nMinute, strAMPM );
+					strCombine.Format ("%s %s", strMonth, strTime );
+					m_pServerTimeText->SetOneLineText ( strCombine, NS_UITEXTCOLOR::WHITE );
+				}
+			}
+		}
+		/*CString strCombine;
+		const int nServerMonth = (int) GLGaeaClient::GetInstance().GetCurrentTime().GetMonth ();
+		const int nServerDay = (int) GLGaeaClient::GetInstance().GetCurrentTime().GetDay ();
+		const int nServerHour = (int) GLGaeaClient::GetInstance().GetCurrentTime().GetHour ();
+		const int nServerMinute = (int) GLGaeaClient::GetInstance().GetCurrentTime().GetMinute();
+		static int nServerMinuteBACK;
+		if ( nServerMinute != nServerMinuteBACK )
+		{
+			nServerMinuteBACK = nServerMinute;
+
+			strCombine.Format ( "%02d/%02d %02d:%02d", nServerMonth, nServerDay, nServerHour, nServerMinute );
+			m_pServerTimeText->SetOneLineText ( strCombine, NS_UITEXTCOLOR::WHITE );
+		}
+	}*/
+    m_pFPSText->SetVisibleSingle ( FALSE );
+	m_pLatencyText->SetVisibleSingle ( FALSE );	
+	if( RANPARAM::bFPSLATENCY )
+	{
+    fUpdateDelay += fElapsedTime;
+	if ( fUpdateDelay > 1.0f )
+	{
+	   //GetElapsed();
+	  // Sleep(100);
+	   fUpdateDelay = 0.0f;
+	}
+	  //UpdateData();*/
+	  CalcFPS();
+
+	if ( m_pFPSText )
+	{
+	      if ( m_fFPS < 20 && m_fFPS > 10  )
+	      {
+	         CString strText;
+             strText.Format("FPS: %.00f",m_fFPS);
+             m_pFPSText->SetOneLineText(strText,NS_UITEXTCOLOR::GOLD);
+	      }
+	      else if ( m_fFPS < 10 )
+	      {
+	        CString strText;
+            strText.Format("FPS: %.00f",m_fFPS);
+            m_pFPSText->SetOneLineText(strText,NS_UITEXTCOLOR::RED);		  
+	   }else{
+	        CString strText;
+            strText.Format("FPS: %.00f",m_fFPS);
+            m_pFPSText->SetOneLineText(strText,NS_UITEXTCOLOR::PALEGREEN);		  
+	     }
+	}
+	 m_pFPSText->SetVisibleSingle ( TRUE );
+	 //m_pLatencyText->SetVisibleSingle ( TRUE );
+	}
+	m_pAmmoText->SetVisibleSingle ( FALSE );
+
+	//	화살, 부적 업데이트
+	EMSLOT emLHand = GLGaeaClient::GetInstance().GetCharacter()->GetCurLHand();
+	if ( GLGaeaClient::GetInstance().GetCharacter()->VALID_SLOT_ITEM(emLHand) )
+	{
+		SITEMCUSTOM sItemCustom = GLGaeaClient::GetInstance().GetCharacter()->GET_SLOT_ITEM(emLHand);
+		SITEM* pItemData = GLItemMan::GetInstance().GetItem ( sItemCustom.sNativeID );
+
+		EMITEM_TYPE emItemType = pItemData->sBasicOp.emItemType;
+		if ( emItemType == ITEM_ARROW || emItemType == ITEM_CHARM || emItemType == ITEM_BULLET )
+		{
+			int nType;
+			if ( emItemType == ITEM_ARROW ){
+			nType = 0;
+			}else if ( emItemType == ITEM_CHARM ){
+			nType = 1;
+			}else if ( emItemType == ITEM_BULLET ){
+			nType = 2;
+			}
+			
+			if ( sItemCustom.wTurnNum != m_wAmmoCount )
+			{
+				CString strCombine;
+				strCombine.Format ( "%s : %d", ID2GAMEWORD("ARROW_TYPE",nType), sItemCustom.wTurnNum );
+
+                DWORD ArrowColor = NS_UITEXTCOLOR::WHITE;
+				if ( sItemCustom.wTurnNum < 10 ) ArrowColor = NS_UITEXTCOLOR::RED;
+				else if( sItemCustom.wTurnNum < 50 ) ArrowColor = NS_UITEXTCOLOR::YELLOW;
+
+				m_pAmmoText->SetText ( strCombine.GetString(), ArrowColor );
+
+				m_wAmmoCount = sItemCustom.wTurnNum;
+			}
+
+			m_pAmmoText->SetVisibleSingle ( TRUE );
+		}
+	}
+
+	bool bFULL_SCREEN_ON_WINDOW = RANPARAM::bScrWindowed && RANPARAM::bScrWndHalfSize;
+	if ( bFULL_SCREEN_ON_WINDOW )
+	{
+		const UIRECT& rcGlobalPosDummy = m_pMiniMapInfoLeftDummy->GetGlobalPos ();
+		const UIRECT& rcGlobalPos = m_pMimiMapInfo->GetGlobalPos ();
+		if ( rcGlobalPosDummy.left != rcGlobalPos.left || rcGlobalPosDummy.top != rcGlobalPos.top )
+		{
+			m_pMimiMapInfo->SetGlobalPos ( rcGlobalPosDummy );
+		}
+
+		m_pFullScreenButton->SetVisibleSingle ( TRUE );
+	}
+	else
+	{
+		const UIRECT& rcGlobalPosDummy = m_pMiniMapInfoDummy->GetGlobalPos ();
+		const UIRECT& rcGlobalPos = m_pMimiMapInfo->GetGlobalPos ();
+		if ( rcGlobalPosDummy.left != rcGlobalPos.left || rcGlobalPosDummy.top != rcGlobalPos.top )
+		{
+			m_pMimiMapInfo->SetGlobalPos ( rcGlobalPosDummy );
+		}
+
+		m_pFullScreenButton->SetVisibleSingle ( FALSE );
+	}
+
+	if ( m_pMimiMapInfo/* && m_pServerTimeText */)
+	{
+		//lol hack the fuck up
+		//D3DXVECTOR2 vPOS;
+		//vPOS.x = m_pMimiMapInfo->GetGlobalPos().left - m_pServerTimeText->GetGlobalPos().sizeX;
+		//vPOS.y = m_pMimiMapInfo->GetGlobalPos().top;
+		//m_pServerTimeText->SetGlobalPos( vPOS );
+	}
+}
+
+HRESULT CMiniMap::Render ( LPDIRECT3DDEVICEQ pd3dDevice )
+{
+	HRESULT hr = S_OK;
+
+	m_pCenterPoint->SetVisibleSingle ( FALSE );
+	m_pDirection->SetVisibleSingle ( FALSE );
+
+	hr = CUIGroup::Render ( pd3dDevice );
+	if ( FAILED ( hr ) ) return hr;
+
+	m_pDirection->SetVisibleSingle ( FALSE );
+	m_pCenterPoint->SetVisibleSingle ( FALSE );
+
+	{
+		//	NOTE
+		//		RENDER STATES BEGIN
+		DWORD dwMinFilter, dwMagFilter, dwMipFilter;
+		pd3dDevice->GetSamplerState( 0, D3DSAMP_MINFILTER, &dwMinFilter );
+		pd3dDevice->GetSamplerState( 0, D3DSAMP_MAGFILTER, &dwMagFilter );
+		pd3dDevice->GetSamplerState( 0, D3DSAMP_MIPFILTER, &dwMipFilter );
+
+		pd3dDevice->SetSamplerState( 0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR );
+		pd3dDevice->SetSamplerState( 0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR );
+		pd3dDevice->SetSamplerState( 0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR );
+
+		hr = m_pDirection->Render ( pd3dDevice );
+
+		//	NOTE
+		//		RENDER STATES END
+		pd3dDevice->SetSamplerState( 0, D3DSAMP_MINFILTER, dwMinFilter );
+		pd3dDevice->SetSamplerState( 0, D3DSAMP_MAGFILTER, dwMagFilter );
+		pd3dDevice->SetSamplerState( 0, D3DSAMP_MIPFILTER, dwMipFilter );
+
+		if ( FAILED ( hr ) )	return hr;
+	}     
+
+	return m_pCenterPoint->Render ( pd3dDevice );
+}

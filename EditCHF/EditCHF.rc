@@ -1,0 +1,275 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#include ""res\\EditCHF.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "../res/basic_tool.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 235, 55
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "About EditCHF"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
+    LTEXT           "EditCHF Version 1.0",IDC_STATIC,40,10,119,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) 2012",IDC_STATIC,40,25,119,8
+    DEFPUSHBUTTON   "OK",IDOK,178,7,50,16,WS_GROUP
+END
+
+IDD_CHF_DIALOG DIALOGEX 0, 0, 540, 402
+STYLE DS_SETFONT | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "CHFEdit (IamDJDRB)"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    GROUPBOX        "CPS",IDC_STATIC,251,26,282,238
+    EDITTEXT        IDC_EDIT_HEAD,313,40,200,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_BODY,313,57,200,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_PANT,313,74,200,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_GLOVE,313,108,200,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_RHAND,313,125,200,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_LHAND,313,142,200,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_FOOT,313,91,200,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_HAIR,313,159,200,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_ACC,313,176,200,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_VEHICLE,313,193,200,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_WING,313,210,200,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Head",IDC_BUTTON_HEAD,259,40,50,14
+    PUSHBUTTON      "Body",IDC_BUTTON_BODY,259,57,50,14
+    PUSHBUTTON      "Pant",IDC_BUTTON_PANT,259,74,50,14
+    PUSHBUTTON      "Glove",IDC_BUTTON_GLOVE,259,108,50,14
+    PUSHBUTTON      "RHand",IDC_BUTTON_RHAND,259,125,50,14
+    PUSHBUTTON      "LHand",IDC_BUTTON_LHAND,259,142,50,14
+    PUSHBUTTON      "Foot",IDC_BUTTON_FOOT,259,91,50,14
+    PUSHBUTTON      "Hair",IDC_BUTTON_HAIR,259,159,50,14
+    PUSHBUTTON      "Acc",IDC_BUTTON_ACC,259,176,50,14
+    PUSHBUTTON      "Vehicle",IDC_BUTTON_VEHICLE,259,193,50,14
+    PUSHBUTTON      "Wing",IDC_BUTTON_WING,259,210,50,14
+    GROUPBOX        "Animation List",IDC_STATIC,7,81,235,314
+    GROUPBOX        "Bone List",IDC_STATIC,245,268,288,127
+    CONTROL         "",IDC_LIST_ANI,"SysListView32",LVS_REPORT | 
+                    LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | 
+                    WS_TABSTOP,14,93,223,262
+    PUSHBUTTON      "ADD",IDC_BUTTON_ANILIST_ADD,186,358,50,14
+    PUSHBUTTON      "DELETE",IDC_BUTTON_ANILIST_DELETE,128,358,50,14
+    EDITTEXT        IDC_EDIT_ANILIST_NAME,12,376,173,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Edit",IDC_BUTTON_ANILIST_EDIT,70,358,50,14
+    PUSHBUTTON      "OK",IDC_BUTTON_ANILIST_OK,188,376,50,14
+    CONTROL         "",IDC_LIST_BONE,"SysListView32",LVS_REPORT | 
+                    LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | 
+                    WS_TABSTOP,249,281,227,74
+    PUSHBUTTON      "ADD",IDC_BUTTON_BONELIST_ADD,479,290,50,20
+    PUSHBUTTON      "DELETE LAST",IDC_BUTTON_BONELIST_DEL,479,313,50,20
+    LTEXT           "Bone 1",IDC_STATIC,257,379,23,8
+    LTEXT           "Bone 2",IDC_STATIC,328,379,23,8
+    LTEXT           "Bone 3",IDC_STATIC,402,379,23,8
+    LTEXT           "Bone Name",IDC_STATIC,257,361,37,8
+    EDITTEXT        IDC_EDIT_BONE1,283,377,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_BONE2,355,377,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_BONE3,429,377,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_BONE_NAME,297,359,165,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Edit",IDC_BUTTON_BONELIST_EDIT,479,377,50,14
+    PUSHBUTTON      "OK",IDC_BUTTON_BONELIST_OK,479,359,50,14
+    LTEXT           "Skeleton File",IDC_STATIC,15,12,41,8
+    LTEXT           "Scale",IDC_STATIC,15,29,18,8
+    LTEXT           "Height",IDC_STATIC,15,47,22,8
+    LTEXT           "Radius",IDC_STATIC,15,65,22,8
+    LTEXT           "Min X",IDC_STATIC,98,29,18,8
+    LTEXT           "Min Y",IDC_STATIC,98,47,18,8
+    LTEXT           "Min Z",IDC_STATIC,98,65,18,8
+    LTEXT           "Max X",IDC_STATIC,173,29,20,8
+    LTEXT           "Max Y",IDC_STATIC,173,47,20,8
+    LTEXT           "Max Z",IDC_STATIC,173,65,20,8
+    EDITTEXT        IDC_EDIT_BONE_FILE,63,9,143,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_SCALE,43,27,50,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_HEIGHT,43,45,50,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_RADIUS,43,63,50,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_MIN_X,119,27,50,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_MIN_Y,119,45,50,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_MIN_Z,119,63,50,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_MAX_X,196,27,50,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_MAX_Y,196,45,50,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_MAX_Z,196,63,50,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Save",IDC_BUTTON_CHF_SAVE,471,11,50,14
+    PUSHBUTTON      "Open",IDC_BUTTON_ANILIST_SEARCH,12,358,50,14
+    PUSHBUTTON      "Load",IDC_BUTTON_CHF_LOAD,417,11,50,14
+    CONTROL         "World OBJ",IDC_CHECK_BWO,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,213,12,49,10
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904e4"
+        BEGIN
+            VALUE "CompanyName", "TODO: <Company name>"
+            VALUE "FileDescription", "TODO: <File description>"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "InternalName", "EditCHF.exe"
+            VALUE "LegalCopyright", "TODO: (c) <Company name>.  All rights reserved."
+            VALUE "OriginalFilename", "EditCHF.exe"
+            VALUE "ProductName", "TODO: <Product name>"
+            VALUE "ProductVersion", "1.0.0.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 228
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 48
+    END
+
+    IDD_CHF_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 533
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 395
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// RT_MANIFEST
+//
+
+1                       RT_MANIFEST             "res\\manifest.xml"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_ABOUTBOX            "&About EditCHF..."
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#include "res\EditCHF.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

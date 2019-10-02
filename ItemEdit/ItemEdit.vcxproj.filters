@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="소스 파일">
+      <UniqueIdentifier>{98b2c193-48ef-4e88-9e20-f2170ed877ed}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm</Extensions>
+    </Filter>
+    <Filter Include="헤더 파일">
+      <UniqueIdentifier>{1dcda469-13b0-43d6-8237-a1d7951d6e5c}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc</Extensions>
+    </Filter>
+    <Filter Include="리소스 파일">
+      <UniqueIdentifier>{bc28aeb3-ea4c-47a3-9b47-46d40f0a906a}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;jpg;jpeg;jpe;manifest</Extensions>
+    </Filter>
+    <Filter Include="Edit Source Files">
+      <UniqueIdentifier>{d6ed8c7b-77fb-40c9-a073-c33867f74c0b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="DlgItem.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ExceptionAttacher.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="InputDataDlg.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ItemEdit.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ItemEditDlg.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="LogDialog.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ItemParent.cpp">
+      <Filter>Edit Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ItemSuit.cpp">
+      <Filter>Edit Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ItemSuitTree.cpp">
+      <Filter>Edit Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ItemSuitTreeEx.cpp">
+      <Filter>Edit Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SearchDialog.cpp">
+      <Filter>Edit Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SheetWithTab.cpp">
+      <Filter>Edit Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="DlgItem.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="InputDataDlg.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ItemEdit.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ItemEditDlg.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="LogDialog.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ItemParent.h">
+      <Filter>Edit Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ItemSuit.h">
+      <Filter>Edit Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ItemSuitTree.h">
+      <Filter>Edit Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SearchDialog.h">
+      <Filter>Edit Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SheetWithTab.h">
+      <Filter>Edit Source Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\ItemEdit.ico">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\ItemEdit.rc2">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\toolbar1.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="res\ItemEdit.manifest">
+      <Filter>리소스 파일</Filter>
+    </Manifest>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ItemEdit.rc">
+      <Filter>리소스 파일</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

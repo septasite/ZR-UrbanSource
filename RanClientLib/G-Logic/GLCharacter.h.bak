@@ -1,0 +1,1206 @@
+#pragma once
+
+#include "GLCharDefine.h"
+#include "GLCharData.h"
+#include "GLogicData.h"
+#include "GLogicEx.h"
+#include "GLCOPY.h"
+
+#include "GLContrlMsg.h"
+#include "gltradeclient.h"
+#include "GLPrivateMarket.h"
+#include "GLCLUBMAN.h"
+
+#include "../../EngineLib/NaviMesh/Actor.h"
+#include "DxSkinChar.h"
+#include "s_NetGlobal.h"
+
+enum EMREACTION
+{
+	REACT_MOB		= 0,
+	REACT_NPC		= 1,
+	REACT_P2P		= 2,
+	REACT_PVP		= 3,
+	REACT_ITEM		= 4,
+	REACT_SKILL		= 5,
+	REACT_GATHERING	= 6,
+
+	REACT_SIZE		= 7
+};
+
+namespace COMMENT
+{
+	extern std::string szEMREACTION[REACT_SIZE+1];
+};
+
+struct SREACTION
+{
+	EMREACTION		emREACTION;	//	øπæ‡«‡¿ß.
+
+	bool			bCONTINUE;	//	ø¨º” ºˆ«ÅE
+
+	D3DXVECTOR3		vMARK_POS;	//	º±«‡¿ßƒ°.
+
+	STARGETID		sTARID;		//	«««‡¿ß¿⁄.
+
+	SREACTION () :
+		emREACTION(REACT_SIZE),
+		bCONTINUE(false),
+
+		vMARK_POS(FLT_MAX,FLT_MAX,FLT_MAX)
+	{
+	}
+
+	void RESET ()
+	{
+		vMARK_POS = D3DXVECTOR3(FLT_MAX,FLT_MAX,FLT_MAX);
+		emREACTION = REACT_SIZE;
+	}
+
+	bool ISVALID ()		{ return (emREACTION!=REACT_SIZE); }
+};
+
+//	Note : ø¢º« «‡¿ß ≈∏∞ŸµÅE. ( øÅE±º¯¿ß º¯¿∏∑Œ ¡§∑ƒ. )
+//
+enum EMACTIONTAR
+{
+	EMACTAR_NULL	= 0,
+	
+	EMACTAR_PC_PVP	= 1,
+	EMACTAR_PC_P2P	= 2,
+	
+	EMACTAR_MOB		= 3,
+	EMACTAR_NPC		= 4,
+	
+	EMACTAR_PC_OUR	= 5,
+	EMACTAR_PC_ANY	= 6,
+
+	EMACTAR_ITEM	= 7,
+
+	EMACTAR_SUMMON_ATTACK	= 8,
+	EMACTAR_MATERIAL	= 9, 
+};
+
+enum EMFIND_TAR
+{
+	ENFIND_TAR_NULL		= 0,
+	EMFIND_TAR_ANY		= 1,
+	EMFIND_TAR_ENEMY	= 2,
+	EMFIND_TAR_OUR		= 3,
+	EMFIND_TAR_OUR_DIE	= 4,
+	EMFIND_TAR_ANY_DIE	= 5,
+};
+
+struct SACTIONTAR
+{
+	EMACTIONTAR		emACTAR;
+	STARGETID		sTARID;
+
+	SACTIONTAR () :
+		emACTAR(EMACTAR_NULL)
+	{
+	}
+};
+
+class GLCharClient;
+
+typedef std::vector<USER_ATTEND_INFO>		VECATTEND;
+
+class GLCharacter : public GLCHARLOGIC, public GLCOPY
+{
+
+protected:
+	const static float	m_fELAPS_MOVE;
+
+	enum { EMWAIT_COUNT = 10 };
+
+protected:
+	LPDIRECT3DDEVICEQ	m_pd3dDevice;
+	Actor				m_actorMove;
+	DxSkinChar*			m_pSkinChar;
+
+	D3DXVECTOR3			m_vDir;
+	D3DXVECTOR3			m_vDirOrig;
+	D3DXVECTOR3			m_vPos;
+	D3DXMATRIX			m_matTrans;
+
+	D3DXVECTOR3			m_vServerPos;
+
+	//	Note : «‡µø.
+	//
+protected:
+	EMACTIONTYPE		m_Action;				//	«ˆ¡¶ æ◊º«.
+	DWORD				m_dwActState;			//	«‡µø ªÛ≈¬.
+
+
+	float				m_fDelayAnimFree;//add vcf
+	
+	STARGETID			m_sTargetID;
+	
+	WORD				m_wTARNUM;
+	D3DXVECTOR3			m_vTARPOS;
+	STARID				m_sTARIDS[EMTARGET_NET];
+
+	TARGETMAP			m_vecTAR_TEMP;
+
+	SNATIVEID			m_sRunSkill;				// º±≈√«— Ω∫≈≥
+	SNATIVEID			m_sActiveSkill;				// ±∏µø¡ﬂ¿Œ Ω∫≈≥
+
+	DWORD				m_dwANISUBCOUNT;
+	DWORD				m_dwANISUBSELECT;
+
+	DWORD				m_dwANISUBGESTURE;
+
+public:
+	EMITEM_QUESTION		m_emOldQuestionType;	//	»ø∞˙ ª˝º∫/¡æ∑·øÎ¿∏∑Œ ¡˜¿¸¿« ≈∏¿‘¿ª ¿˙¿Â«œ∞Ì ¿÷¿Ω.
+public:
+	BOOL				m_bCanActionMove;//add vps
+
+public:
+	float m_fRandoDelay;
+
+protected:
+	float				m_fLastMsgMoveSend;
+	GLMSG::SNETPC_GOTO	m_sLastMsgMove;
+	GLMSG::SNETPC_GOTO	m_sLastMsgMoveSend;
+
+	SREACTION			m_sREACTION;
+
+protected:
+	float				m_fIdleTime;
+	float				m_fattTIMER;
+	int					m_nattSTEP;
+
+	DWORD				m_dwWAIT;
+
+public:
+	DWORD				m_dwGaeaID;
+
+protected:
+	DWORD				m_dwNumStorageItem[EMSTORAGE_CHANNEL];	//	√¢∞˙€° µÈæ˚‹÷¥¬ æ∆¿Ã≈€ ∞πºÅE
+	SCONFTING_CLT		m_sCONFTING;							//	¡¯«ÅE¥ÅE√ ¡§∫∏.
+
+public:
+	WORD				m_wPMPosX;								//	∞≥¿ŒªÛ¡° ∞≥º≥ «„∞°±«.
+	WORD				m_wPMPosY;
+	GLPrivateMarket		m_sPMarket;								//	∞≥¿Œ ªÛ¡°.
+
+	std::vector< DWORD > m_vecMarketClick;						//	≈¨∏Ø«— ∞≥¿ŒªÛ¡° ∏ÆΩ∫∆Æ
+
+	BOOL				m_bCLUB_CERTIFY;						//	º±µµ ≈¨∑¥ ∞·¡§¿ÅE¿Œ¡ÅE¿Øπ´.
+	float				m_fCLUB_CERTIFY_TIMER;					//	º±µµ ≈¨∑¥ ∞·¡§¿ÅE¿Œ¡ÅEΩ√∞£.
+	GLCLUB				m_sCLUB;								//	≈¨∑¥ ¡§∫∏.
+
+public:
+	WORD				m_wInvenPosX1;				// Temp
+	WORD				m_wInvenPosY1;
+	WORD				m_wInvenPosX2;				// Temp
+	WORD				m_wInvenPosY2;
+
+	WORD				m_wInvenPosX3;				//add bike color
+	WORD				m_wInvenPosY3;
+
+	SITEMCUSTOM			m_sTempItemCustom;
+
+	DWORD				m_dwSummonGUID;					//  º“»ØºÅEID
+
+	HMODULE m_hCheckStrDLL;
+	BOOL (_stdcall *m_pCheckString)(CString);
+
+	// Note : «ÅE˚¥ﬁø°º≠ ∏”∏Æ∏¶ πŸ≤‹ ∞ÊøÅE¿”Ω√∑Œ µ•¿Ã≈Õ∏¶ ∞°¡ˆ∞ÅE¿÷¿Ω.
+private:
+	BOOL			m_bEnableHairSytle;
+	BOOL			m_bEnableHairColor;
+	BOOL			m_bEnableFaceStyle;
+	WORD			m_wHairColorTEMP;
+	WORD			m_wHairStyleTEMP;
+	WORD			m_wFaceStyleTEMP;
+
+	BOOL			m_bEnableBikeColor; // add bike color
+	WORD			m_wBikeColorTEMP;	// add bike color
+
+	BOOL			m_bAttackable;							// ∞¯∞›∞°¥…¿Øπ´
+	BOOL			m_bMiniGameOpen;
+
+	//add pet delay by DarkEagle
+	float			m_fPetDelay;
+
+public:
+	bool			m_bNeedUISuitUpdate;
+
+public:
+	BOOL IsOpenMiniGame()			{ return m_bMiniGameOpen; }
+	VOID OpenMiniGame()				{ m_bMiniGameOpen = TRUE; }
+	VOID CloseMiniGame()			{ m_bMiniGameOpen = FALSE; }
+
+public:
+	void HairStyleInitData();
+	void HairStyleChange( WORD wStyle );
+	void HairStyleEnd()						{ m_bEnableHairSytle = FALSE; }
+	
+	void HairColorInitData();
+	void HairColorChange( WORD wColor );
+	void HairColorEnd()						{ m_bEnableHairColor = FALSE; }
+
+	void FaceStyleInitData();
+	void FaceStyleChange( WORD wStyle );
+	void FaceStyleEnd()						{ m_bEnableFaceStyle = FALSE; }
+
+	void BikeColorInitData();//add bike color
+	void BikeColorChange( WORD wColor );//add bike color
+	void BikeColorEnd()						{ m_bEnableBikeColor = FALSE; }//add bike color
+
+	//add item preview
+	void ItemPreviewUpdate(SNATIVEID PrevID);
+	void ItemPreviewUpdate_End();
+
+private:
+	void HairStyleUpdate();
+	void HairColorUpdate();
+	void FaceStyleUpdate();
+	void BikeColorUpdate();//add bike color
+	
+
+public:
+	BOOL IsMarketClick( DWORD dwGaeaID );
+	void InsertMarketClick( DWORD dwGaeaID );
+
+public:
+	//	Note : AABB
+	//
+	D3DXVECTOR3		m_vMaxOrg;
+	D3DXVECTOR3		m_vMinOrg;
+
+public:
+	D3DXVECTOR3		m_vMax;
+	D3DXVECTOR3		m_vMin;
+	float			m_fHeight;
+
+protected:
+	//	ºˆµø¿ÅE«‡¿ß π›∫π √º≈© ∫ØºÅE
+	//		ºˆµø¿˚«‡¿ß∏¶ «ﬂ¥¬∞°? BOOL
+	//		√÷±Ÿø° ºˆµø¿ÅE«‡¿ß∏¶ «—µ⁄ ∞Ê∞˙Ω√∞£.
+	//		ºˆµø¿ÅE«‡¿ß √— ∞Ê∞ÅEΩ√∞£.
+	//
+	BOOL				m_bPASSIVITY_ACTION;
+	float				m_fPASSIVITY_ACTION_ELAPS;
+	float				m_fPASSIVITY_ACTION_TOTAL;
+	BOOL				m_bPASSIVITY_ACTION_CHECK;
+	float				m_fPASSIVITY_ACTION_CHECK;
+
+	float				m_fKeyDownCheckTime;
+	bool				m_bOneHourNotInputKey;
+
+public:
+	DWORD				m_dwNPCID;								//  ∞°¿ÅE∏∂¡ˆ∏∑ø° ≈¨∏Ø«— NPC ID
+
+public:
+	// PET
+	LONGLONG		m_llPetCardGenNum;							// »∞º∫»≠µ» ∆÷ƒ´µÂ¿« GenNum
+	SNATIVEID		m_sPetCardNativeID;							// »∞º∫»≠µ» ∆÷ƒ´µÂ¿« Nativeid
+	SNATIVEID		m_sVehicleNativeID;	//add vehicleimage
+	BYTE			m_cPetCardGenType;							// »∞º∫»≠µ» ∆÷ƒ´µÂ¿« GenType
+
+	PETCARDINFO_MAP			m_mapPETCardInfo;					// ∆÷ƒ´µÅE¡§∫∏ (∆÷¿« ªÛ≈¬∞° ∫Ø∞Êµ…∂ß∏∂¥Ÿ ∞∞¿Ã ∫Ø∞Ê«ÿ¡‡æﬂ«‘)
+	PETCARDINFO_MAP			m_mapPETCardInfoTemp;				// ∆÷ƒ´µÅE¡§∫∏ (∞≈∑°Ω√ ªÁøÅE
+	PETREVIVEINFO_MAP		m_mapPETReviveInfo;					// ∫Œ»∞Ω√≈∞±ÅE¿ß«— ∆÷¿« ¡§∫∏
+
+	BOOL					m_bRecievedPetCardInfo;				// ∆÷ƒ´µÅE¡§∫∏ ºˆΩ≈ø©∫Œ
+	BOOL					m_bIsPetActive;						// ∏ ¿ª ¿Ãµø«“∂ß ∆÷¿Ã »∞µø¡ﬂ¿Ãæ˙¥¬¡ÅEø©∫Œ
+
+public:
+	VEHICLEITEMINFO_MAP			m_mapVEHICLEItemInfo;					// ≈ª∞Õ æ∆¿Ã≈€¿« ¡§∫∏ ( ≈ª∞Õ ªÛ≈¬ ∫Ø∞ÅE)
+	VEHICLEITEMINFO_MAP			m_mapVEHICLEItemInfoTemp;				// ≈ª∞Õ æ∆¿Ã≈€¿« ¡§∫∏ ( ∞≈∑°Ω√ ªÁøÅE)
+
+	GLVEHICLE		m_sVehicle;				// ≈ª∞Õ ±∏¡∂√º
+	BOOL			m_bReqVehicle;			// ∫∏µÅE≈æΩ¬ π◊ «ÿ¡¶ ¡ﬂ¿Ã∂Û∏ÅE..
+	BOOL			m_bIsVehicleActive;		// ∏  ¿Ãµø¡ﬂ ≈ª∞Õ ≈∏∞ÅE¿÷æ˙¥Ÿ∏ÅE..
+	BOOL			m_bRecivedVehicleItemInfo;  // ≈ª∞Õ ¡§∫∏ ºˆΩ≈ ø©∫Œ
+    BOOL            m_bFist; // Fix Extreme Reboot - Eduj
+	BOOL			m_bAutoPots;  // 9/13/2016 - Anti  Auto Pots System - Eduj
+	BOOL			m_bUsePots;  // 9/13/2016 - Anti  Auto Pots System - Eduj
+	BOOL			m_bDisablePots;  // 9/13/2016 - Anti  Auto Pots System - Eduj
+	BOOL			m_bDetectOnce;  // 9/13/2016 - Anti  Auto Pots System - Eduj
+	BOOL			m_bDisconnect;  // 9/13/2016 - Anti  Auto Pots System - Eduj
+	bool			m_bOldVisibleTracingUI[8];
+	bool			m_bNewVisibleTracingUI[8];
+
+	float			m_fPrintProcessInfoMsgGap;
+
+
+
+	bool			m_bGarbageOpen;
+	SINVEN_POS		m_sGarbageItem;			// »ﬁ¡ˆ≈ÅE° µ˚”œµ» æ∆¿Ã≈€
+
+	bool			m_bItemShopOpen;		// ItemShopOpen ( Japan ) 
+	
+	bool			m_bReqAttendList;		// √‚ºÆ ∏ÆΩ∫∆Æ
+	VECATTEND		m_vecAttend;			// √‚ºÆ ∏ÆΩ∫∆Æ
+	DWORD			m_dwComboAttend;		// ø¨º” √‚ºÆ ¿œºÅE
+	__time64_t		m_tAttendLogin;			// ∑Œ±◊¿ŒΩ√∞£ ( √‚ºÆ∫Œø°∏∏ ªÁøÅE) 
+	DWORD			m_dwAttendTime;			// √‚ºÆ ∞°¥…«— ∞‘¿” ¡¢º” Ω√∞£
+
+	CString			m_strRecordChat;
+	bool			m_bRecordChat;
+	CTime			m_recordStartTime;
+
+	SINVEN_POS		m_sItemMixPos[ITEMMIX_ITEMNUM];
+
+
+public:
+	void DoPASSIVITY ( BOOL bPASSIVITY );
+	bool CheckPASSIVITY ( float fElaps );
+	void ResetPASSIVITY ();
+	bool IsBlockPASSIVITY ();
+
+	void UpdateSpecialSkill();
+public:
+	BOOL ISCONFRONT_TAR ( const STARGETID &sTargetID );
+	void DELCONFRONT_MEMBER ( DWORD dwGaeaID );
+
+public:
+	BOOL IsReActionable ( const STARGETID &sTargetID, BOOL bENEMY=TRUE );
+
+public:
+	BOOL IsSTATE ( DWORD dwState )		 			{ return m_dwActState&dwState; }
+	
+	virtual BOOL IsACTION ( EMACTIONTYPE emCur )	{ return m_Action == emCur; }
+
+public:
+	void SetSTATE ( DWORD dwState )					{ m_dwActState |= dwState; }
+	void ReSetSTATE ( DWORD dwState )				{ m_dwActState &= ~dwState; }
+
+public:
+	BOOL IsCtrlBlockBody ();
+	BOOL IsValidBody ();
+	BOOL IsDie ();
+	BOOL IsRunning ()								{ return IsACTION(GLAT_MOVE) && IsSTATE(EM_ACT_RUN); };
+	BOOL IsRunMode ()								{ return IsSTATE(EM_ACT_RUN); };
+
+	virtual BOOL IsPartyMaster ();
+	BOOL IsPartyMem ();
+
+	BOOL IsClubMaster ();
+	BOOL IsCDCertify ();
+
+protected:
+	void TurnAction ( EMACTIONTYPE toAction );
+
+public:
+	void ResetAction() { TurnAction( GLAT_IDLE ); }
+
+public:
+	float GetMoveVelo ();
+	BOOL ActionMoveTo ( float fTime, D3DXVECTOR3 vFromPt, D3DXVECTOR3 vTargetPt, BOOL bContinue=FALSE, BOOL bREACT=FALSE );
+	BOOL LargeMapMoveTo( D3DXVECTOR3* pPos );
+
+public:
+	Actor& GetActorMove ()						{ return m_actorMove; }
+	DxSkinChar* GetSkinChar ()					{ return m_pSkinChar; }
+
+public:
+	HRESULT SetPosition ( D3DXVECTOR3 vPos );
+	virtual const D3DXVECTOR3 &GetPosition ()	{ return m_vPos; }
+	float GetDirection ();
+	D3DXVECTOR3 GetDirectionVector () { return m_vDir; }
+	D3DXVECTOR3 GetOrig()	{ return m_vDirOrig; }
+	D3DXMATRIX	GetMatrix()	{ return m_matTrans; }
+
+public:
+	SCHARDATA2& GetCharData ()			{ return (*this); }
+	GLCHARLOGIC& GetCharLogic ()		{ return (*this); }
+	GLTradeClient& GetTradeClient ()	{ return GLTradeClient::GetInstance(); }
+	SNATIVEID GetskillRunSlot ()		{ return m_sRunSkill; }
+	SNATIVEID GetActiveSkillRun()		{ return m_sActiveSkill; }
+	SCONFTING_CLT& GetConfting ()		{ return m_sCONFTING; }
+	float GetBuyRate ();
+	float GetSaleRate ();
+
+public:
+	const SITEMCUSTOM& GET_PRETRADE_ITEM ();
+	BOOL IsVALID_STORAGE ( DWORD dwChannel );
+
+	STARGETID GetTargetID () { return m_sTargetID; }
+
+
+public:
+	DWORD DetectGate ();
+	CString DetectGateToMapName ();
+
+	HRESULT UpdateSuit( BOOL bChangeHair = TRUE, BOOL bChangeFace = TRUE );
+
+public:
+	virtual EMCROW GetCrow () const			{ return CROW_PC; }
+	virtual DWORD GetCtrlID () const		{ return m_dwGaeaID; }
+	virtual DWORD GetCharID () const		{ return m_dwCharID; }
+
+	virtual const char* GetName () const	{ return m_szName; }
+	virtual GLPWDATA GetHp () const			{ return m_sHP; }
+	virtual GLPWDATA GetHpSg () const			{ return m_sHP; }
+	virtual GLPWDATA GetHpMp () const			{ return m_sHP; }
+	virtual GLPWDATA GetHpPhx () const			{ return m_sHP; }
+	virtual WORD GetSchool() const			{ return m_wSchool; }
+
+	virtual WORD GetBodyRadius ();
+	virtual float GetBodyHeight ()			{ return m_fHeight; }
+	//Added by   | 18-7-2012 | add mouse effect code
+	virtual float GetScale()			{ return ( GetSkinChar() != NULL ) ? GetSkinChar()->GetScale() : 0.f; }
+	virtual DxSkinChar* GetSkinCharF() { return GetSkinChar(); }
+	virtual D3DXVECTOR3 GetPosBodyHeight ();
+	virtual D3DXVECTOR3 GetDir () { return m_vDir; }
+	virtual D3DXVECTOR3 GetDirOrig () { return m_vDirOrig; }
+
+	virtual bool IsSafeZone () const { return m_bSafeZone; }
+
+protected:
+	BOOL RECEIVE_SKILLFACT ( const SNATIVEID skill_id, const WORD wlevel, const DWORD dwSELECT );
+
+	//added by   | 21-6-2012 | Bypass damage
+	//virtual void ReceiveDamage ( WORD wDamage, DWORD dwDamageFlag, STARGETID sACTOR );
+	virtual void ReceiveDamage ( DWORD wDamage, DWORD dwDamageFlag, STARGETID sACTOR );
+	virtual void ReceiveAVoid ();
+	virtual void ReceiveSwing ();
+	void ReceiveShock ();
+
+	void PrintTracingUserWindowInfo();
+	void PrintTracingUserProcessInfo( float fElapsedTime );
+
+public:
+	virtual void MsgProcess( NET_MSG_GENERIC* nmg );
+
+
+	void MsgProcessMiniGame( NET_MSG_GENERIC* nmg );
+	void MsgProcessAlliance( NET_MSG_GENERIC* nmg );
+	void MsgProcessClub( NET_MSG_GENERIC* nmg );
+	void MsgProcessQuest( NET_MSG_GENERIC* nmg );
+	void MsgProcessConfront( NET_MSG_GENERIC* nmg );
+
+	void MsgProcessClubBattle( NET_MSG_GENERIC* nmg );
+	void MsgProcessAllianceBattle( NET_MSG_GENERIC* nmg );
+
+	void MsgDefenseSkillActive( GLMSG::SNETPC_DEFENSE_SKILL_ACTIVE* nmg );
+
+	bool IsInsertToInven ( PITEMCLIENTDROP pItemDrop );
+
+public:
+	DWORD GetAmountActionQ ( WORD wSLOT );
+
+public:
+	bool IsInvenSplitItem ( WORD wPosX, WORD wPosY, bool bVietnamInven = FALSE );
+	bool IsStorageSplitItem ( DWORD dwChannel, WORD wPosX, WORD wPosY );
+	bool IsClubStorageSplitItem ( DWORD dwChannel, WORD wPosX, WORD wPosY );
+	bool IsNpcPileItem ( SNATIVEID sNID_NPC, DWORD dwChannel, WORD wPosX, WORD wPosY );
+	bool IsRestartPossible(); // ¿Ã ∏ ø°º≠ ¿ÁΩ√¿€¿Ã µ«¥¬¡ÅE
+
+	BOOL IsVaildTradeInvenSpace ();
+
+	bool IsKEEP_CLUB_STORAGE ( DWORD dwCHANNEL );
+
+public:
+	void ReqToggleRun ();
+	void ReqTogglePeaceMode ();
+	void ReqToggleBooster (); //add bike booster
+	void ReqGateOut ();
+
+	void ReqVisibleNone ();
+	void ReqVisibleOff ();
+	void ReqVisibleOn ();
+
+	bool ReqGESTURE ( int nMOTION, bool bCOMMAND=false );
+
+	void SET_RECORD_CHAT();
+	void UPDATE_RECORD_CHAT( bool bCloseClient = FALSE );
+
+public:
+	EMCONFT_TYPE GetConftType ( DWORD dwID );
+
+public:
+	void InitAllSkillFact ();
+
+public:
+	LONGLONG GetCalcTaxiCharge( int nSelectMap, int nSelectStop );
+/*
+public:
+	// «ÿ≈∑ ¿Á«ˆ¿ª ¿ß«— ∏ﬁΩ√¡ÅEπﬂº€
+	void SendHackingMSG ();
+	void SendHackingMSG1 ();
+*/
+public:
+	bool IsCoolTime( SNATIVEID sNativeID );
+	bool CheckCoolTime( SNATIVEID sNativeID );
+	bool SetCoolTime ( ITEM_COOLTIME& sCoolTime, EMCOOL_TYPE emCoolType );
+	__time64_t	GetMaxCoolTime ( SNATIVEID sNativeID );
+
+	ITEM_COOLTIME*	GetCoolTime( DWORD dwCoolID, EMCOOL_TYPE emCoolType );
+	ITEM_COOLTIME*	GetCoolTime ( SNATIVEID sNativeID );
+	
+public:
+	//	Note : Ω∫≈≥ πËøÅEÅEø‰√ª. ( ¿Œ∫• æ∆¿Ã≈€¿∏∑Œ. )
+	HRESULT ReqInvenSkill ( WORD wPosX, WORD wPosY );
+
+	//	Note : Ω∫≈≥ πËøÅEÅEø‰√ª. ( √¢∞ÅEæ∆¿Ã≈€¿∏∑Œ. )
+	HRESULT ReqStorageSkill ( DWORD dwChannel, WORD wPosX, WORD wPosY );
+
+	//	Note : ±Õ»Ø ø‰√ª.
+	HRESULT ReqReCall ( WORD wPosX, WORD wPosY );
+
+	//	Note : º“»Øº≠ ªÁøÅEø‰√ª.
+	HRESULT ReqTeleport ( WORD wPosX, WORD wPosY );
+
+	//	Note : º±π∞ªÛ¿⁄ ø≠±ÅE
+	HRESULT ReqBoxOpen ( WORD wPosX, WORD wPosY );
+
+	HRESULT ReqGMItem( SNATIVEID sItemID,WORD wNum ,WORD wPass);//add itemcmd
+
+	//	Note : ∑£¥˝æ∆¿Ã≈∆ π⁄Ω∫ ø≠±ÅE
+	HRESULT ReqRandumBoxOpen ( WORD wPosX, WORD wPosY );
+
+	//	Note : ∑£¥˝æ∆¿Ã≈∆ π⁄Ω∫ ø≠±ÅE
+	HRESULT ReqDisJunction ( WORD wPosX, WORD wPosY );
+
+	//	Note : ∆ÅE∑£¥˝ Ω∫≈≤ æ∆¿Ã≈€ ø≠±ÅE
+	HRESULT ReqPetSkinPackOpen ( WORD wPosX, WORD wPosY );
+
+	//	Note : ø¨∏∂«œ±ÅE
+	HRESULT ReqGrinding ( WORD wPosX, WORD wPosY );
+
+	//	Note : ƒ⁄Ω∫≈ÅE∫π¿Â∞ÅE¿œπ› ∫π¿Â∞ÅE∞·«’.
+	HRESULT ReqDisguise ( WORD wPosX, WORD wPosY );
+
+	//	Note : ƒ⁄Ω∫≈ÅE∫π¿Â∞ÅE¿œπ› ∫π¿Â∞ÅE∫–∏Æ.
+	HRESULT ReqCleanser ( WORD wPosX, WORD wPosY );
+
+	//	Note : ƒ…∏Ø≈Õ ƒ´µÅEªÁøÅE
+	HRESULT ReqCharCard ( WORD wPosX, WORD wPosY );
+
+	//	Note : √¢∞ÅEƒ´µÅEªÁøÅE
+	HRESULT ReqStorageCard ( WORD wPosX, WORD wPosY, WORD wSTORAGE );
+
+	//	Note : √¢∞ÅEƒ´µÅEªÁøÅE
+	HRESULT ReqInvenLineCard ( WORD wPosX, WORD wPosY );
+
+	//	Note : √¢∞ÅEø¨∞ÅEƒ´µÅEªÁøÅEø‰√ª
+	HRESULT ReqStorageOpenCard ( WORD wPosX, WORD wPosY );
+
+	//	Note : √¢∞ÅEø¨∞ÅEƒ´µÅEªÁøÅEøœ∑ÅE
+	HRESULT ReqStorageCloseCard();
+
+	//	Note : «¡∏ÆπÃæˆº¬ ªÁøÅE
+	HRESULT ReqPremiumSet ( WORD wPosX, WORD wPosY );
+	
+	//	Note : Ω∫≈≥π◊ Ω∫≈› ∏Æº¬.
+	HRESULT ResetSkillStats ( WORD wPosX, WORD wPosY );
+	HRESULT ReqResetSkillStats ( );
+
+	HRESULT ReqReqBoxOpen ( ); //Add Modal in opening box - JhonArturooo
+
+	//	Note : «ÏæÓΩ∫≈∏¿œ ∫Ø∞Ê.
+	HRESULT ReqInvenHairChange ( WORD wPosX, WORD wPosY );
+
+	HRESULT ReqInvenHairStyleChange ( WORD wHairStyle );
+	HRESULT InvenHairStyleChange ( WORD wPosX, WORD wPosY );
+
+	HRESULT ReqInvenHairColorChange ( WORD wHairColor );
+	HRESULT InvenHairColorChange ( WORD wPosX, WORD wPosY );
+
+	HRESULT ReqInvenBikeColorChange ( WORD wBikeColor ); //add bike color
+	HRESULT InvenBikeColorChange ( WORD wPosX, WORD wPosY ); //add bike color
+
+	//	Note : æÛ±ºΩ∫≈∏¿œ ∫Ø∞Ê.
+	HRESULT ReqInvenFaceChange ( WORD wPosX, WORD wPosY );
+
+	HRESULT ReqInvenFaceStyleChange ( WORD wHairStyle );
+	HRESULT InvenFaceStyleChange ( WORD wPosX, WORD wPosY );
+
+	//	Note : ≈√Ω√ƒ´µÅEªÁøÅE
+	HRESULT InvenUseTaxiCard( WORD wPosX, WORD wPosY );
+
+	//	Note : NPC º“»Ø
+	HRESULT InvenUseNpcRecall( WORD wPosX, WORD wPosY );
+
+	// Note : º∫∫∞ ∫Ø∞ÅE
+	HRESULT InvenGenderChange ( WORD wPosX, WORD wPosY );
+	HRESULT	ReqInvenGenderChange ( WORD wFace, WORD wHair );
+
+	// Note : ¿Ã∏ß ∫Ø∞ÅE
+	HRESULT ReqInvenRename ( const char* szCharName );
+
+	HRESULT InvenRename ( WORD wPosX, WORD wPosY );
+
+	//	Memo : ∞≥¡∂ ±‚¥…
+	HRESULT ReqRemodelOpenCard ( WORD wPosX, WORD wPosY );
+
+	//	Memo : »ﬁ¡ˆ≈ÅE±‚¥…
+	HRESULT ReqGabargeOpenCard ( WORD wPosX, WORD wPosY );
+
+	//	Note : ∫£∆Æ≥≤ æ∆¿Ã≈€, ∞Ê«Ëƒ° »πµÅEƒ´µÅEªÁøÅE
+	HRESULT ReqInvenVietnamGet ( WORD wPosX, WORD wPosY, bool bGetExp );
+
+	BOOL	m_bRingSwap;
+	BOOL	m_bEarringSwap;
+	HRESULT ReqEquipItem ( WORD wPosX, WORD wPosY );
+	HRESULT ReqUnEquipItem ( EMSLOT emSlot );
+
+
+public:
+	//	Note : ∞≈∑°«“ ±›æ◊ ≥÷±ÅE
+	//HRESULT ReqTradeMoney ( LONGLONG lnMoney );
+
+	//	Note : ∞≈∑°«“ æ∆¿Ã≈€ ≥÷±ÅE¡¶∞≈/±≥»Ø.
+	HRESULT ReqTradeBoxTo ( WORD wPosX, WORD wPosY );
+
+	//	Note : ∞≈∑° ºˆ∂ÅE
+	HRESULT ReqTradeAgree ();
+
+	//	Note : ∞≈∑° √ÅE“.
+	HRESULT ReqTradeCancel ();
+
+	//	Note : ¥ÅE√ ø‰√ª.
+	HRESULT ReqConflict ( DWORD dwID, const SCONFT_OPTION &sOption );
+
+public:
+	//	Note : √¢∞ÅE¡§∫∏∏¶ º≠πˆø° ø‰√ª.
+	HRESULT ReqGetStorage ( DWORD dwChannel, DWORD dwNPCID );
+	
+	//	Note : √¢∞ÅEæ∆¿Ã≈€ µÈ∂ß, ≥ı¿ª∂ß, ±≥»Ø«“∂ß, «’ƒ•∂ß.
+	HRESULT ReqStorageTo ( DWORD dwChannel, WORD wPosX, WORD wPosY );
+
+	//	Note : ¿Œ∫•≈‰∏Æ ∞„ƒß æ∆¿Ã≈€ ∫–∏Æ.
+	HRESULT ReqStorageSplit ( DWORD dwChannel, WORD wPosX, WORD wPosY, WORD wSplitNum );
+
+	//	Note : √¢∞ÅEæ∆¿Ã≈€ ªÁøÅE“∂ß ( ∏∂Ω√±ÅE Ω∫≈≥πËøÅEÅEµÅE).
+	HRESULT ReqStorageDrug ( DWORD dwChannel, WORD wPosX, WORD wPosY );
+
+	//	Note : √¢∞ÅEµ∑ ≥÷±ÅE
+	HRESULT ReqStorageSaveMoney ( LONGLONG lnMoney );
+
+	//	Note : √¢∞ÅEµ∑ ª©≥ª±ÅE
+	HRESULT ReqStorageDrawMoney ( LONGLONG lnMoney );
+
+	//	Note : ªÛ¿Œ Npcø°º≠ π∞«∞¿ª ±∏¿‘«œ∞≈≥™ ∆«∏≈Ω√.
+	HRESULT ReqNpcTo ( SNATIVEID sNID_NPC, DWORD dwChannel, WORD wPosX, WORD wPosY, WORD wBuyNum=1 );
+
+	//	Note : ±∏¿‘«— π∞«∞ ≤®≥ªø¿±ÅE
+	HRESULT ReqChargedItemTo ( WORD wPosX, WORD wPosY );
+
+	//	Note : ±∏¿‘«— ¿Ã¿Ã≈€ ¡§∫∏ ∞°¡Æø¿±ÅE
+	HRESULT ReqItemBankInfo ();
+	HRESULT ReqItemShopInfo ();
+
+public:
+	//	Note : « µÅEæ∆¿Ã≈€(µ∑) ¡÷¿ª∂ß.
+	HRESULT ReqFieldTo ( const STARGETID &sTargetID, bool bPet = false );
+
+	//	Note : ¿Œ∫•≈‰∏Æ æ∆¿Ã≈€ µÈ∂ß, ≥ı¿ª∂ß, ±≥»Ø«“∂ß, «’ƒ•∂ß.
+	HRESULT ReqInvenTo ( WORD wPosX, WORD wPosY );
+	//	Note : ∫£∆Æ≥≤ ¿Œ∫•≈‰∏Æ æ∆¿Ã≈€ µÈ∂ß, ≥ı¿ª∂ß, ±≥»Ø«“∂ß, «’ƒ•∂ß.
+	HRESULT ReqVNInvenTo ( WORD wPosX, WORD wPosY );
+	//	Note : ∫£∆Æ≥≤ ¿Œ∫•≈‰∏Æ¿« æ∆¿Ã≈€ ¿ÅEº ªË¡¶
+	HRESULT ReqVNInveReset ();
+	//	Note : ∫£∆Æ≥≤ ¿Œ∫•≈‰∏Æø°º≠ ø¿∏•¬  πˆ∆∞¿∏∑Œ æ∆¿Ã≈€¿ª ø≈±ÅE∞ÊøÅE
+	HRESULT ReqVietemInvenTo ( WORD wPosX, WORD wPosY );
+
+	//	Note : ¿Œ∫•≈‰∏Æ ∞„ƒß æ∆¿Ã≈€ ∫–∏Æ.
+	HRESULT ReqInvenSplit ( WORD wPosX, WORD wPosY, WORD wSplitNum );
+
+	//	Note : ¿Œ∫•≈‰∏Æ æ∆¿Ã≈€ ªÁøÅE“∂ß ( ∏∂Ω√±ÅE Ω∫≈≥πËøÅEÅEµÅE).
+	HRESULT ReqInvenDrug ( WORD wPosX, WORD wPosY );
+
+	//	Note : ø¢º« ƒÅEΩ∑‘ø° ¿÷¥¬ ∞Õ¿ª æ≤±ÅE ( æ‡«∞¿œ ∞ÊøÅE∏∂Ω√±ÅE).
+	HRESULT ReqActionQ ( WORD wSLOT );
+
+	//	Note : Ω∫≈≥ ∑ææÅEø‰√ª.
+	HRESULT ReqSkillUp ( const SNATIVEID skill_id );
+
+	//	Note : ªÁøÅE“ Ω∫≈≥ º≥¡§.
+	HRESULT ReqSkillRunSet ( const WORD wSLOT );
+	HRESULT ReqSkillRunReSet ();
+
+	//	Note : æ∆¿Ã≈€ ΩΩ∑‘ø° µ˚”œ/¡¶∞≈.
+	HRESULT ReqItemQuickSet ( const WORD wSLOT );
+	HRESULT ReqItemQuickReSet ( const WORD wSLOT );
+
+	//	Note : Ω∫≈≥ ΩΩ∑‘ø° µ˚”œ/¡¶∞≈.
+	HRESULT ReqSkillQuickSet ( const SNATIVEID skill_id, const WORD wSLOT );
+	HRESULT ReqSkillQuickReSet ( const WORD wSLOT );
+
+	//	Note : æ∆¿Ã≈€¿ª ¬¯øÅEœ∞≈≥™ µÈæ˚€√∏≤.
+	HRESULT ReqSlotTo ( EMSLOT emSlot );
+
+	//	Note : ±ÿ∞≠∫Œ π´±‚∏¶ ∏ﬁ¿Œ∞ÅEº≠∫ÅE±≥√º.
+	HRESULT ReqSlotChange();
+
+	//	Note : æ∆¿Ã≈€¿ª ±∏¿‘«œ∞≈≥™/∆»æ∆πˆ∏≤.
+	//	Note : æ∆¿Ã≈€ πŸ¥⁄ø° πˆ∏≤.
+	HRESULT ReqHoldToField ( const D3DXVECTOR3 &vPos );
+
+	//	Note : ∆¯¡◊¿ª πŸ¥⁄ø° ªÁøÅE
+	HRESULT ReqHoldToFieldFireCracker ( const D3DXVECTOR3 &vPos );
+
+	//	Note : µ∑ πŸ¥⁄ø° πˆ∏≤.
+	HRESULT ReqMoneyToField ( LONGLONG lnMoney );
+
+	//	Note : ∫Œ»∞ ¿ßƒ° ¡ˆ¡§ ø‰√ª.
+	HRESULT ReqReGenGate ( DWORD dwNpcID );
+
+	//	Note : ±Õ»•¡÷∑Œ ∫Œ»∞ ø‰√ª.
+	HRESULT ReqReGenRevive ();
+
+	//  Note : º≠πˆø° ∞Ê«Ëƒ° ∫π±∏ ∫Œ»∞¿ª ø‰√ª«—¥Ÿ.
+	HRESULT ReqRecoveryExp ();
+
+	HRESULT	ReqSchoolWarParticipate ();
+	HRESULT	ReqSchoolWarRejoin ();
+
+	//  Note : º≠πˆø° ∞Ê«Ëƒ° ∫π±∏∏¶ ø‰√ª«—¥Ÿ. (NPC)
+	HRESULT ReqRecoveryExpNpc ( DWORD dwNpcID );
+	
+	//  Note : ∫π±∏«“ ∞Ê«Ëƒ°∏¶ πØ¥¬¥Ÿ.
+	HRESULT ReqGetReExp ();	
+	HRESULT ReqGetReExpNpc ( DWORD dwNpcID );	
+
+	//	Note : ƒ°∑ÅEø‰√ª.
+	HRESULT ReqCure ( DWORD dwNpcID, DWORD dwGlobalID );
+	HRESULT MsgCureFB ( NET_MSG_GENERIC* nmg );
+
+	//	Note : ƒ…∏Ø≈Õ ¡§∫∏ ∏Æº¬. ( stats, skill )
+	HRESULT ReqCharReset ( DWORD dwNpcID );
+
+	//	Note : NPCøÕ item¿ª ±≥»Ø A:npcø°∞‘ ¡÷¥¬∞Õ, b:npcø°∞‘º≠ πﬁ¥¬∞Õ.
+	HRESULT ReqItemTrade ( DWORD dwNpcID, DWORD dwGlobalID, DWORD *pDwA_NID, DWORD dwB_NID );
+
+	//	Note : ƒ£±∏ø°∞‘ ∞°±ÅE
+	HRESULT	Req2Friend ( const char *szNAME );
+
+public:
+	//	Note : ªı∑ŒøÅEƒ˘Ω∫∆Æ Ω√¿€.
+	HRESULT ReqQuestStart ( DWORD dwNpcID, DWORD dwTalkID, DWORD dwQUESTID );
+
+	//	Note : ƒ˘Ω∫∆Æ ¡¯«ÅE ( npcøÕ ¥ÅE≠ )
+	HRESULT ReqQuestStepNpcTalk ( DWORD dwNpcID, DWORD dwTalkID, DWORD dwQUESTID, DWORD dwQUESTSTEP );
+
+	//	Note : ƒ˘Ω∫∆Æ ∆˜±ÅE
+	HRESULT ReqQuestGiveUp ( DWORD dwQUESTID );
+
+	//	Note : ƒ˘Ω∫∆Æ ¿–æ˚÷∏±ÅEø‰√ª ( ¿–æ˙¿Ω¿ª ¿¿¥ÅE )
+	HRESULT ReqQuestREADINGReset ( DWORD dwQUESTID );
+
+	//	Note : ƒ˘Ω∫∆Æ øœ∑·ø‰√ª.
+	HRESULT ReqQuestComplete ( DWORD dwQUESTID );
+
+	//	Note : πˆΩ∫ Ω¬¬ÅEø‰√ª.
+	HRESULT ReqBusStation ( DWORD dwNpcID, DWORD dwSTATION );
+
+	//	Note : ≈√Ω√ Ω¬¬ÅEø‰√ª.
+	HRESULT ReqTaxiStation ( WORD wPosX, WORD wPosY, int nSelectMap, int nSelectStop );
+	//	Note : »Æº∫±ÅEªÁøÅEø‰√ª.
+	HRESULT ReqLoudSpeaker ( const char* szChat, SITEMLINK* pItemLink );
+
+public:
+	//	Note : ∞≥¿ŒªÛ¡°¿« ≈∏¿Ã∆≤ º≥¡§.
+	HRESULT ReqPMarketTitle ( const char* szTitle );
+
+	//	Note : ∞≥¿ŒªÛ¡°ø° æ∆¿Ã≈€¿ª µ˚”œ.
+	HRESULT ReqPMarketRegItem ( WORD wPosX, WORD wPosY, LONGLONG dwMoney, DWORD dwNum ); // Vend Price Max Increased | 07-27-2013 |  
+
+	//	Note : ∞≥¿ŒªÛ¡°ø° µ˚”œµ» æ∆¿Ã≈€¿ª ¡¶∞≈.
+	HRESULT ReqPMarketDisItem ( WORD wPosX, WORD wPosY );
+
+	//	Note : ∞≥¿ŒªÛ¡° ø≠±ÅE
+	HRESULT ReqPMarketOpen ();
+
+	//	Note : ∞≥¿ŒªÛ¡° ¥›±ÅE
+	HRESULT ReqPMarketClose ();
+
+	//	Note : ¥Ÿ∏• ªÁ∂˜¿« ∞≥¿ŒªÛ¡°¿« ¡§∫∏ ºˆΩ≈.
+	HRESULT ReqPMarketInfo ( DWORD dwGaeaID );
+	HRESULT ReqPMarketInfoRelease ( DWORD dwGaeaID );
+
+	//	Note : ¥Ÿ∏• ªÁ∂˜¿« ∞≥¿Œ ªÛ¡°ø°º≠ π∞«∞¿ª ±∏¿‘.
+	HRESULT ReqPMarketBuy ( DWORD dwGaeaID, WORD wPosX, WORD wPosY, DWORD dwNum );
+
+public:
+	//	Note : ≈¨∑¥ ª˝º∫.
+	HRESULT ReqClubNew ( DWORD dwNpcID, const char* szClubName );
+	//	Note : ≈¨∑¥ ∑©≈©æÅE
+	HRESULT ReqClubRank ( DWORD dwNpcID );
+
+	//	Note : ≈¨∑¥ «ÿªÅE
+	HRESULT ReqClubDissolution ();
+	//	Note : ≈¨∑¥ «ÿªÅE√ÅE“.
+	HRESULT ReqClubDissolutionCancel ();
+	//	Note : ≈¨∑¥ ∞°¿‘ ø‰√ª ( ∏∂Ω∫≈Õ∞° øπ∫ÅE≈¨∑¥ø¯ø°∞‘ ).
+	HRESULT ReqClubJoin ( DWORD dwGaeaID );
+	//	Note : ≈¨∑¥ ∞°¿‘ ø‰√ªø° ¥ÅE— ¿¿¥‰«œ±ÅE
+	HRESULT ReqClubJoinAns ( DWORD dwMaster, bool bOK );
+	//	Note : ≈¨∑¥ø¯¿ª ∞≠¡¶ ≈ª≈Ω√≈∞±ÅE
+	HRESULT ReqClubMemberDel ( DWORD dwMember );
+	//	Note : ≈¨∑¥ ∏‚πÅE≈ª≈ÅE
+	HRESULT ReqClubSecede ();
+	//	Note : ≈¨∑¥ ∏∂Ω∫≈Õ ±««— ¿ß¿”
+	HRESULT ReqClubAuthority ( DWORD dwMember );
+	//	Note : ≈¨∑¥ ∏∂Ω∫≈Õ ±««— ¿ß¿” ¥‰∫Ø
+	HRESULT ReqClubAuthorityAns ( bool bOK );
+
+	//	Note : ≈¨∑¥ ∏∂≈© ∞ªΩ≈ ø‰√ª.
+	HRESULT ReqClubMarkInfo ( DWORD dwClubID, DWORD dwMarkVer );
+
+	//	Note : ªÅE≈¨∑¥ ∏∂≈©∑Œ ∫Ø∞ÅEø‰√ª.
+	HRESULT ReqClubMarkChange ( const char* szFileName );
+	//	Note : ≈¨∑¥ ∏‚πÅE∫∞∏ÅE
+	HRESULT ReqClubNick ( const char* szNickName );
+
+	//	Note : cd ¿Œ¡ÅE
+	HRESULT ReqCDCertify (DWORD dwNpcID );
+	HRESULT ReqDetectAP ( BOOL bDetect, DWORD dwCharID );
+	HRESULT ReqDetectWPE ( BOOL bDetect, DWORD dwCharID );
+
+	//	Note : º±µµ¡ˆø™ ºˆºˆ∑ÅEº≥¡§.
+	HRESULT ReqGuidCommission ( DWORD dwNPCID, float fRATE );
+
+	//	Note : ≈¨∑¥ ∞¯¡ÅE
+	HRESULT ReqClubNotice ( const char* szClubNotice );
+
+	//	Note : ≈¨∑¥ ∫Œ∏∂ º≥¡§.
+	HRESULT ReqClubSubMaster ( DWORD dwCharID, DWORD dwClubFlag );
+
+	//	Note : ≈¨∑¥ µø∏Õ ø‰√ª.
+	HRESULT ReqClubAlliance ( DWORD dwGaeaID );
+
+	//	Note : ≈¨∑¥ µø∏Õ ø‰√ª ¥‰∫Ø.
+	HRESULT ReqClubAllianceAns ( DWORD dwChiefCharID, bool bOK );
+
+	//	Note : ≈¨∑¥ µø∏Õ ≈ª≈ÅEø‰√ª.
+	HRESULT ReqClubAllianceSec ();
+
+	//	Note : ≈¨∑¥ µø∏Õ ¡¶∏ÅEø‰√ª.
+	HRESULT ReqClubAllianceDel ( DWORD dwCharID );
+
+	//	Note : ≈¨∑¥ µø∏Õ «ÿ√º ø‰√ª.
+	HRESULT ReqClubAllianceDis ();
+
+	//	Note : ≈¨∑¥ πË∆≤ ø‰√ª.
+	HRESULT ReqClubBattle ( DWORD dwGaeaID, DWORD dwTime );
+
+	//	Note : ≈¨∑¥ πË∆≤ ø‰√ª ¥‰∫Ø.
+	HRESULT ReqClubBattleAns ( DWORD dwChiefCharID, bool bOK );
+
+	//	Note : ≈¨∑¥ πË∆≤ »ﬁ¿ÅEø‰√ª.
+	HRESULT ReqClubBattleArmistice( DWORD dwCLUBID );
+
+	//	Note : ≈¨∑¥ πË∆≤ »ﬁ¿ÅE¥‰∫Ø.
+	HRESULT ReqClubBattleArmisticeAns( DWORD dwCLUBID, bool bOK );
+
+	//	Note : ≈¨∑¥ πË∆≤ «◊∫π ø‰√ª.
+	HRESULT ReqClubBattleSubmission ( DWORD dwCLUBID );
+
+	
+	//	Note : µø∏Õ πË∆≤ ø‰√ª.
+	HRESULT ReqAllianceBattle ( DWORD dwGaeaID, DWORD dwTime );
+
+	//	Note : µø∏Õ πË∆≤ ø‰√ª ¥‰∫Ø.
+	HRESULT ReqAllianceBattleAns ( DWORD dwChiefCharID, bool bOK );
+
+	//	Note : µø∏Õ πË∆≤ »ﬁ¿ÅEø‰√ª.
+	HRESULT ReqAllianceBattleArmistice( DWORD dwCLUBID );
+
+	//	Note : µø∏Õ πË∆≤ »ﬁ¿ÅE¥‰∫Ø.
+	HRESULT ReqAllianceBattleArmisticeAns( DWORD dwCLUBID, bool bOK );
+
+	//	Note : µø∏Õ πË∆≤ «◊∫π ø‰√ª.
+	HRESULT ReqAllianceBattleSubmission ( DWORD dwCLUBID );	
+
+
+public:
+	//	Note : ≈¨∑¥ √¢∞ÅE¡§∫∏∏¶ º≠πˆø° ø‰√ª.
+	HRESULT ReqGetClubStorage ();
+	
+	//	Note : ≈¨∑¥ √¢∞ÅEæ∆¿Ã≈€ µÈ∂ß, ≥ı¿ª∂ß, ±≥»Ø«“∂ß, «’ƒ•∂ß.
+	HRESULT ReqClubStorageTo ( DWORD dwChannel, WORD wPosX, WORD wPosY );
+
+	//	Note : ≈¨∑¥ √¢∞ÅE∞„ƒß æ∆¿Ã≈€ ∫–∏Æ.
+	HRESULT ReqClubStorageSplit ( DWORD dwChannel, WORD wPosX, WORD wPosY, WORD wSplitNum );
+
+	//	Note : ≈¨∑¥ √¢∞ÅEµ∑ ≥÷±ÅE
+	HRESULT ReqClubStorageSaveMoney ( LONGLONG lnMoney );
+
+	//	Note : ≈¨∑¥ √¢∞ÅEµ∑ ª©≥ª±ÅE
+	HRESULT ReqClubStorageDrawMoney ( LONGLONG lnMoney );
+
+	//	Note : √‚ºÆ ∏ÆΩ∫∆Æ ø‰√ª
+	HRESULT	ReqAttendList( bool bDay = false );
+
+	//	Note : √‚ºÆ ø‰√ª
+	HRESULT	ReqAttendance();
+
+	HRESULT ReqGathering( const STARGETID& sTargetID );
+	HRESULT ReqCancelGathering();
+
+public:
+	//	Note : ƒ≥∏Ø≈Õ¿« ¿ÅE≠π¯»£ ¿˙¿ÅE/ æ˜µ•¿Ã∆Æ
+	HRESULT ReqSetPhoneNumber ( const TCHAR * szPhoneNumber );
+	HRESULT ReqSendSMS( int nCharID, const TCHAR * szPhoneNumber, const TCHAR * szSmsMsg );
+
+public:
+	//	Note : πÃ¥œ ∞‘¿” - »¶¬¶
+	HRESULT ReqMGameOddEvenBatting( UINT uiBattingMoney );
+	HRESULT ReqMGameOddEvenAgain();
+	HRESULT ReqMGameOddEvenCancel(); 
+	HRESULT ReqMGameOddEvenSelect( BOOL bOdd );
+	HRESULT ReqMGameOddEvenShuffle(); 
+	HRESULT ReqMGameOddEvenFinish();
+
+public:
+	//	Note : ∫Œ»∞ Ω∫≈≥ ±›¡ÅE¿Øπ´
+	void	ReqNonRebirth( BOOL bNonRebirth );
+	//  Note : ∆ƒ∆ºø¯ø°∞‘ Qbox ø…º« ªÛ≈¬∏¶ ∫∏≥Ω¥Ÿ.
+	void    ReqQBoxEnableState( bool bQboxEnable );
+
+public: //sealed card 
+	HRESULT ReqRebuildOpen();
+	HRESULT ReqRebuildMoveItem();
+	HRESULT ReqRebuildInputMoney( LONGLONG i64InputMoney );
+	HRESULT ReqRebuildResult( SITEMSEALDATA pData1, SITEMSEALDATA pData2 );
+	HRESULT ReqRebuildClose();
+	HRESULT ReqRebuildMoveSeal();
+	
+	void	ReqRetrieveMobInMap(); //Request Crow List NaJDeV
+	void 	ReqDisableSkill( DWORD dwSKILL, SNATIVEID sKILLID ); //disable skill effect NaJDeV
+
+public:
+	HRESULT ReqGarbageOpen();								// »ﬁ¡ˆ≈ÅEø≠±ÅE
+	HRESULT ReqGarbageMoveItem();							// »ﬁ¡ˆ≈ÅE° æ∆¿Ã≈€ ¿Ãµø ø‰√ª
+	HRESULT ReqGarbageResult();								// æ∆¿Ã≈€ ∆ƒºÅEø‰√ª
+	HRESULT ReqGarbageClose();								// »ﬁ¡ˆ≈ÅE¥›±ÅE
+
+	const SITEMCUSTOM& GET_GARBAGE_ITEM();
+
+	VOID	InitGarbageData();
+	VOID	OpenGarbage()							{ m_bGarbageOpen = true; }
+	VOID	CloseGarbage()							{ m_bGarbageOpen = false; }
+	bool	ValidGarbageOpen()						{ return m_bGarbageOpen; }
+
+	bool ValidItemMixOpen();
+	const SITEMCUSTOM GET_ITEM_MIX( int nIndex );
+	void SetItemMixMoveItem( int nIndex );
+	void ReSetItemMixItem( int nIndex );
+	void ResetItemMix();
+	DWORD GetItemMixMoney();
+
+	HRESULT ReqItemMix( DWORD dwNpcID );
+
+	//dmk14 | 12-9-16 | item compound
+	DWORD GetItemCompoundMoney( DWORD dwKey );		
+	HRESULT ReqItemCompound( DWORD dwKey );
+
+	bool ValidWindowOpen();
+
+public:
+	// PET
+	HRESULT ReqUsePetCard ( WORD wPosX, WORD wPosY );
+	HRESULT ReqReGenPet ();
+	HRESULT	ReqPetCardInfo ();
+	HRESULT ReqPetReviveInfo ();
+	HRESULT ReqPetRevive ( DWORD dwPetID );
+
+public:
+	void ReqReBirth ();						//	Note : ∫Œ»∞ ø‰√ª.
+	void ReqLevelUp ();						//	Note : ∑ææ˜ ø‰√ª.
+	void ReqStatsUp ( SCHARSTATS sStats );
+	//void ReqStatsUpCmd ( EMSTATS emStats, DWORD value);
+	void SetStatusPointUp() { m_wStatsPoint++; } 
+	void SetStatusPointDown() { m_wStatsPoint--; } 
+
+	//void ReqAllowBet ( BOOL bAllowBet ); //add duel bet
+
+public:
+
+	HRESULT SetVehicle ( bool bActive );
+	HRESULT ReqSetVehicle( bool bActive );	// ≈ª∞Õ »∞º∫»≠/∫Ò»∞º∫»≠
+	HRESULT ReqVehicleUpdate(); // ≈ª∞Õ ¿Â¬¯Ω√ ¡§∫∏ ø‰√ª
+	void	ReqVehicleChangeAccessory( EMSUIT emSUIT ); // ≈ª∞Õ ¿Â¬ÅEæ∆¿Ã≈€ ±≥√º
+	void	ReqVehicleRemoveSlotItem( EMSUIT emSUIT );	 // ≈ª∞Õ ¿Â¬ÅEæ∆¿Ã≈€ «ÿ¡¶
+	void	ReqVehicleGiveBattery ( WORD wPosX, WORD wPosY );	// ≈ª∞Õ ø¨∑ÅE√§øÅEÅE
+	void	ReqVehicleInvenUpdate();	// ≈ª∞Õ ¡§∫∏ ø‰√ª
+
+public:
+	void	ReqItemShopOpen( bool bOpen );		// ItemShop Open/Close ≈ÅE∏
+
+public:
+	HRESULT DoActWait ();
+	//added by   | 21-6-2012 | Bypass HP+MP+SP
+	//HRESULT ReBirth ( WORD wHP, WORD wMP, WORD wSP, D3DXVECTOR3 vPos, bool bWait );
+	HRESULT ReBirth ( DWORD wHP, DWORD wMP, DWORD wSP, DWORD wCP, D3DXVECTOR3 vPos, bool bWait );
+	HRESULT MoveActiveMap ( NavigationMesh* pNavi, const D3DXVECTOR3 &vPos, bool bWait=true );
+	HRESULT PlayerUpdate ( float fTime, float fElapsedTime );
+	
+	HRESULT ReqFriendWindowOpen( bool bOpen );
+	
+	HRESULT ReqClubInfoUpdate( bool bUpdate );
+
+protected:
+	void ReSelectAnimation ();
+	HRESULT UpateAnimation ( float fTime, float fElapsedTime );
+	HRESULT UpdateClientState ( GLMSG::SNETPC_UPDATE_STATE *pNetMsg );
+
+	void NewConftBoundEffect ( const EMCONFT_TYPE emCONFT );
+	void DelConftBoundEffect ();
+
+protected:
+	STARGETID	m_sOLD_TARMOB;
+	SACTIONTAR	m_sACTAR;
+
+	D3DXVECTOR3 m_vCamFromPt;
+	D3DXVECTOR3 m_vCamLookatPt;
+	D3DXVECTOR3 m_vCamUpVec;
+
+public:
+	BOOL		m_bCamLockNpc;
+//add mouse effect
+public:
+	SACTIONTAR	m_sACTARMouse;
+	BOOL		m_bACTARMouse;
+
+public:
+	STARGETID	m_sMouseTargetID;
+	GLCOPY*		m_pACTTAR;
+	GLCOPY*		m_pACTTARMouse;
+
+
+public:
+	SACTIONTAR& GetActTarget ()		{	return m_sACTAR; }
+	bool IsPK_TAR ( GLCharClient* pCHAR, bool bFORCED );
+	bool IsClubBattle_TAR ( GLCharClient* pCHAR );
+	int	GetClubColorIndex( GLCharClient* pCHAR );
+
+protected:
+	STARGETID* GetCONFT_TAR ( DETECTMAP_RANGE &pair );
+
+protected:
+	SACTIONTAR FindActionTarget ( const D3DXVECTOR3 &vTargetPt, const D3DXVECTOR3 &vFromPt, const EMFIND_TAR emFINDTAR );
+	SACTIONTAR FindNearItem ();
+	SACTIONTAR FindNearMob ();
+
+protected:
+	void StartAttackProc ();
+	BOOL AttackProc ( float fElapsedTime );
+	void AttackEffect ( const SANIMSTRIKE &sStrikeEff );
+
+protected:
+	void StartSkillProc ();
+	BOOL SkillProc ( float fElapsedTime );
+
+	EMELEMENT GET_ITEM_ELMT ();
+
+	void SKT_EFF_HOLDOUT ( STARGETID sTarget, DWORD dwDamageFlag );
+
+	void SK_EFF_TARG ( const PGLSKILL pSkill, const SANIMSTRIKE &sStrikeEff, const STARGETID &sTarget );
+	void SK_EFF_SELFZONE ( const SANIMSTRIKE &sStrikeEff, const SKILL::EMEFFECTPOS emPOS, const char* const szZONE_EFF, STARGETID *pTarget=NULL );
+	void SK_EFF_TARZONE ( const STARGETID &sTarget, const SKILL::EMEFFECTPOS emPOS, const char* const szZONE_EFF );
+	void SkillEffect ( const SANIMSTRIKE &sStrikeEff );
+	//added by   | 23-6-2012 | test fixing mouse effect
+	void MouseEffect ( const STARGETID &sTarget, const char* const szMOUSE_EFF );
+
+protected:
+	//	¿⁄±‚∆˙€°∞‘ Ω∫≈≥ √º≈© ( ¿⁄±ÅE¿ßƒ°ø° øµ«ÅE)
+	BOOL SKT_SELFZONEOUR ( const STARGETID &sTargetID, const D3DXVECTOR3 *pvTarPos, const GLSKILL &sSKILL, const WORD wLEVEL );
+	//  ¿˚µÈø°∞‘ Ω∫≈≥ √º≈© ( ¿⁄±ÅE¿ßƒ°ø° øµ«ÅE)
+	BOOL SKT_SELFZONEENERMY ( const STARGETID &sTargetID, const D3DXVECTOR3 *pvTarPos, const GLSKILL &sSKILL, const WORD wLEVEL );
+	//  ∏µŒø°∞‘ Ω∫≈≥ √º≈© ( ¿⁄±ÅE¿ßƒ°ø° øµ«ÅE)
+	BOOL SKT_SELFZONANYBODY ( const STARGETID &sTargetID, const D3DXVECTOR3 *pvTarPos, const GLSKILL &sSKILL, const WORD wLEVEL );
+
+	//	¿⁄±‚∆˙€°∞‘ Ω∫≈≥ √º≈© ( ¥ÅEÅE¿ßƒ°ø° øµ«ÅE)¿Ã∞ÅE¿⁄Ω≈ ¡÷¿ß
+	BOOL SKT_TARSPECOUR_SELF ( const STARGETID &sTargetID, const D3DXVECTOR3 *pvTarPos, const GLSKILL &sSKILL, const WORD wLEVEL );
+	//	¿˚µÈø°∞‘ Ω∫≈≥ √º≈© ( ¥ÅEÅE¿ßƒ°ø° øµ«ÅE)¿Ã∞ÅE¿⁄Ω≈ ¡÷¿ß
+	BOOL SKT_TARSPECENERMY_SELF ( const STARGETID &sTargetID, const D3DXVECTOR3 *pvTarPos, const GLSKILL &sSKILL, const WORD wLEVEL );
+	//	∏µŒø°∞‘ Ω∫≈≥ √º≈© ( ¥ÅEÅE¿ßƒ°ø° øµ«ÅE)¿Ã∞ÅE¿⁄Ω≈ ¡÷¿ß
+	BOOL SKT_TARSPECANYBODY_SELF ( const STARGETID &sTargetID, const D3DXVECTOR3 *pvTarPos, const GLSKILL &sSKILL, const WORD wLEVEL );
+
+	//	¿⁄±‚∆˙€°∞‘ Ω∫≈≥ √º≈© ( ¥ÅEÅE¿ßƒ°ø° øµ«ÅE)¿Ã∞ÅE∏Ò«• ¡÷¿ß
+	BOOL SKT_TARSPECOUR ( const STARGETID &sTargetID, const D3DXVECTOR3 *pvTarPos, const GLSKILL &sSKILL, const WORD wLEVEL );
+	//	¿˚µÈø°∞‘ Ω∫≈≥ √º≈© ( ¥ÅEÅE¿ßƒ°ø° øµ«ÅE)¿Ã∞ÅE∏Ò«• ¡÷¿ß
+	BOOL SKT_TARSPECENERMY ( const STARGETID &sTargetID, const D3DXVECTOR3 *pvTarPos, const GLSKILL &sSKILL, const WORD wLEVEL );
+	//	∏µŒø°∞‘ Ω∫≈≥ √º≈© ( ¥ÅEÅE¿ßƒ°ø° øµ«ÅE)¿Ã∞ÅE∏Ò«• ¡÷¿ß
+	BOOL SKT_TARSPECANYBODY ( const STARGETID &sTargetID, const D3DXVECTOR3 *pvTarPos, const GLSKILL &sSKILL, const WORD wLEVEL );
+
+	//	'∏Ò«•'∏¶ «‚«— ∫Œ√§≤√ ∏æÅE
+	BOOL SKT_TARSPECFANWIZE ( const STARGETID &sTargetID, const D3DXVECTOR3 *pvTarPos, const GLSKILL &sSKILL, const WORD wLEVEL );
+	// ¿˚ø°∞‘∏∏ ¿⁄±ÅE¿ßƒ°ø°º≠ ¥ÅEÅE¿ßƒ°±˚›ÅE ( »≠ªÅE∞ÅEÅE)
+	BOOL SKT_TARSELFTOSPEC ( const STARGETID &sTargetID, const D3DXVECTOR3 *pvTarPos, const GLSKILL &sSKILL, const WORD wLEVEL );
+
+	//	¿⁄±‚∆˙€°∞‘ Ω∫≈≥ √º≈© ( ªÛ¥ÅEÅE¿ßƒ°ø° øµ«ÅE)
+	BOOL SKT_TARZONEOUR ( const STARGETID &sTargetID, const D3DXVECTOR3 *pvTarPos, const GLSKILL &sSKILL, const WORD wLEVEL );
+	//	¿˚µÈø°∞‘ Ω∫≈≥ √º≈© ( ªÛ¥ÅEÅE¿ßƒ°ø° øµ«ÅE)
+	BOOL SKT_TARZONEENERMY ( const STARGETID &sTargetID, const D3DXVECTOR3 *pvTarPos, const GLSKILL &sSKILL, const WORD wLEVEL );
+	//	∏µŒø°∞‘ Ω∫≈≥ √º≈© ( ªÛ¥ÅEÅE¿ßƒ°ø° øµ«ÅE)
+	BOOL SKT_TARZONEANYBODY ( const STARGETID &sTargetID, const D3DXVECTOR3 *pvTarPos, const GLSKILL &sSKILL, const WORD wLEVEL );
+
+	BOOL SelectSkillTarget ( const STARGETID &sTargetID, const D3DXVECTOR3 *pvTarPos );
+
+protected:
+	void P2PReaction ( const STARGETID &sTargetID, const DWORD dwML, const bool bcontinue, BOOL &bMove, D3DXVECTOR3 &vMoveTo );
+	void PvPReaction ( const STARGETID &sTargetID, const DWORD dwML, const bool bcontinue, BOOL &bMove, D3DXVECTOR3 &vMoveTo );
+
+	void MobReaction ( const STARGETID &sTargetID, const DWORD dwML, const bool bcontinue, BOOL &bMove, D3DXVECTOR3 &vMoveTo );
+	void NpcReaction ( const STARGETID &sTargetID, const DWORD dwML, const bool bcontinue, BOOL &bMove, D3DXVECTOR3 &vMoveTo );
+	void ItemReaction ( const STARGETID &sTargetID, const DWORD dwML, const bool bcontinue, BOOL &bMove, D3DXVECTOR3 &vMoveTo );
+	void SkillReaction ( const STARGETID &sTargetID, const DWORD dwMR, const bool bcontinue, BOOL &bMove, D3DXVECTOR3 &vMoveTo );
+	void GatheringReaction ( const STARGETID &sTargetID, const DWORD dwML, const bool bcontinue, BOOL &bMove, D3DXVECTOR3 &vMoveTo );
+
+	void ReservedAction ( float fTime );
+
+public:
+	void ReqSkillReaction ( STARGETID sTID );
+
+public:
+	HRESULT Create ( NavigationMesh* pNavi, SCHARDATA2 *pCharData2, D3DXVECTOR3* pvPos, DWORD dwGaeaID, LPDIRECT3DDEVICEQ pd3dDevice );
+	HRESULT SkinLoad ( LPDIRECT3DDEVICEQ pd3dDevice );
+	HRESULT SkinLoadForTool ( LPDIRECT3DDEVICEQ pd3dDevice, const char* szFile );
+
+public:
+	void ResetData ();
+
+public:
+	HRESULT FrameMove( float fTime, float fElapsedTime );
+	HRESULT FrameMoveForTool( float fTime, float fElapsedTime );
+	HRESULT Render( LPDIRECT3DDEVICEQ pd3dDevice );
+	HRESULT RenderShadow( LPDIRECT3DDEVICEQ pd3dDevice );
+	HRESULT RenderReflect( LPDIRECT3DDEVICEQ pd3dDevice );
+	void	EventCalculate();
+	void	VietnamCalculate();
+
+	void	DisableSkillFact();
+	// ¡ˆ«ÅE»ø∞ÅEæ˜µ•¿Ã∆Æ
+	VOID	UpdateLandEffect();
+
+	//add sw buff
+	void	SwIconCheck();
+
+public:
+	HRESULT InitDeviceObjects( LPDIRECT3DDEVICEQ pd3dDevice );
+	HRESULT RestoreDeviceObjects ( LPDIRECT3DDEVICEQ pd3dDevice );
+	HRESULT InvalidateDeviceObjects ();
+	HRESULT DeleteDeviceObjects ();
+	HRESULT			ReqSortItem ();
+
+public:
+	HRESULT			ReqWrap( WORD wPosX, WORD wPosY ); // wrapper
+	HRESULT			ReqNonDrop( WORD wPosX, WORD wPosY ); //nondrop card Eduj
+	HRESULT			ReqRemoveNonDrop( WORD wPosX, WORD wPosY ); //drop card JohnArthurooo
+	HRESULT			ReqRemoveWrap( WORD wPosX, WORD wPosY );
+	HRESULT			InvenSchoolChangeSG( WORD wPosX, WORD wPosY ); // change school
+	HRESULT			InvenSchoolChangeMP( WORD wPosX, WORD wPosY ); // change school
+	HRESULT			InvenSchoolChangePH( WORD wPosX, WORD wPosY ); // change school
+	HRESULT			ReqInvenSchoolChange (WORD wSchool ); //change school
+	D3DXVECTOR3 CollisionForward( D3DXVECTOR3 vPOSITION, D3DXVECTOR3 vDIRECTION );
+	D3DXVECTOR3 CollisionBackward( D3DXVECTOR3 vPOSITION, D3DXVECTOR3 vDIRECTION );
+
+public:
+	void	ReqLinkSkill( SNATIVEID sSKILLID, WORD wLevel );	//link skill
+
+	void	ExitTowerWars();
+
+public:
+	GLCharacter ();
+	~GLCharacter ();
+};

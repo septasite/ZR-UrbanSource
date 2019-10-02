@@ -1,0 +1,254 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#include ""res\\CHFEditor.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\CHFEditor.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 235, 86
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "CHFEditor"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,107,8,21,20
+    CTEXT           "CHFEditor Version 1.0",IDC_STATIC,16,32,204,8,
+                    SS_NOPREFIX
+    CTEXT           "Copyright (C) 2012 geger009 Development",IDC_STATIC,16,
+                    50,204,8
+    DEFPUSHBUTTON   "OK",IDOK,92,63,50,16,WS_GROUP
+    CTEXT           "This Program is TOTALY FREE please DON'T SALE THIS",
+                    IDC_STATIC,16,41,204,8
+END
+
+IDD_CHFEDITOR_DIALOG DIALOGEX 0, 0, 392, 343
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_POPUP | 
+    WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "CHFEdit"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    LTEXT           "Skeleton File",IDC_STATIC,14,25,41,8
+    LTEXT           "Scale",IDC_STATIC,14,42,18,8
+    LTEXT           "Height",IDC_STATIC,191,25,22,8
+    LTEXT           "Radius",IDC_STATIC,191,42,22,8
+    LTEXT           "Min X",IDC_STATIC,21,68,18,8
+    LTEXT           "Min Y",IDC_STATIC,142,68,18,8
+    LTEXT           "Min Z",IDC_STATIC,260,68,18,8
+    LTEXT           "Max X",IDC_STATIC,21,86,20,8
+    LTEXT           "Max Y",IDC_STATIC,142,86,20,8
+    LTEXT           "Max Z",IDC_STATIC,260,86,20,8
+    GROUPBOX        "",IDC_STATIC,14,55,363,47
+    GROUPBOX        "Cps File",IDC_STATIC,14,108,173,209
+    GROUPBOX        "Animation",IDC_STATIC,196,108,181,209
+    EDITTEXT        IDC_EDIT_BONE_FILE,60,23,105,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_SCALE,60,39,105,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_HEIGHT,219,23,105,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_RADIUS,219,39,105,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_MIN_X,50,64,62,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_MIN_Y,169,64,62,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_MIN_Z,288,64,62,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_MAX_X,50,83,62,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_MAX_Y,169,83,62,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_MAX_Z,288,83,62,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "HEAD",IDC_BUTTON_HEAD,18,124,50,14
+    EDITTEXT        IDC_EDIT_HEAD,71,124,110,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "BODY",IDC_BUTTON_BODY,18,143,50,14
+    EDITTEXT        IDC_EDIT_BODY,71,143,110,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "LEG",IDC_BUTTON_PANT,18,162,50,14
+    EDITTEXT        IDC_EDIT_PANT,71,162,110,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "GLOVE",IDC_BUTTON_GLOVE,18,181,50,14
+    EDITTEXT        IDC_EDIT_GLOVE,71,181,110,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "RHAND",IDC_BUTTON_RHAND,18,201,50,14
+    EDITTEXT        IDC_EDIT_RHAND,71,201,110,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "LHAND",IDC_BUTTON_LHAND,18,220,50,14
+    EDITTEXT        IDC_EDIT_LHAND,71,220,110,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "FOOT",IDC_BUTTON_FOOT,18,240,50,14
+    EDITTEXT        IDC_EDIT_FOOT,71,240,110,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "HAIR",IDC_BUTTON_HAIR,18,259,50,14
+    EDITTEXT        IDC_EDIT_HAIR,71,259,110,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "ACC",IDC_BUTTON_ACC,18,278,50,14
+    EDITTEXT        IDC_EDIT_ACC,71,278,110,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "VEHICLE",IDC_BUTTON_VEHICLE,18,297,50,14
+    EDITTEXT        IDC_EDIT_VEHICLE,71,297,110,14,ES_AUTOHSCROLL
+    CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | 
+                    WS_BORDER | WS_TABSTOP,201,118,171,123
+    PUSHBUTTON      "Add New",IDC_BUTTON_ANILIST_ADD,201,245,81,14
+    PUSHBUTTON      "Delete",IDC_BUTTON_ANILIST_DELETE,291,245,81,14
+    GROUPBOX        "Configuration",IDC_STATIC,201,262,170,48
+    EDITTEXT        IDC_EDIT_ANILIST_NAME,207,273,157,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Search File",IDC_BUTTON_ANILIST_SEARCH,207,291,74,14
+    PUSHBUTTON      "OK",IDC_BUTTON_ANILIST_EDIT,290,291,74,14
+    PUSHBUTTON      "OK",IDC_BUTTON_ANILIST_OK,290,291,74,14
+    PUSHBUTTON      "LOAD FILE",IDC_BUTTON_LOAD_CHF,14,4,364,14
+    PUSHBUTTON      "SAVE FILE",IDC_BUTTON_SAVE_CHF,14,322,364,14
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904e4"
+        BEGIN
+            VALUE "CompanyName", "TODO: <Company name>"
+            VALUE "FileDescription", "TODO: <File description>"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "InternalName", "CHFEditor.exe"
+            VALUE "LegalCopyright", "TODO: (c) <Company name>.  All rights reserved."
+            VALUE "OriginalFilename", "CHFEditor.exe"
+            VALUE "ProductName", "TODO: <Product name>"
+            VALUE "ProductVersion", "1.0.0.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 228
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 79
+    END
+
+    IDD_CHFEDITOR_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 385
+        TOPMARGIN, 4
+        BOTTOMMARGIN, 336
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_ABOUTBOX            "&About CHFEditor..."
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#include "res\CHFEditor.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

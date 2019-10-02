@@ -1,0 +1,1215 @@
+#ifndef GLOGIXEX_H_
+#define GLOGIXEX_H_
+
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
+
+// GLCHARLOGIC, GLCROWLOGIC
+//	µŒ ≈¨∑°Ω∫∞° ∞¯?E∏∑?∞°¡ˆ¥¬ «‘ºˆµÈ¿∫ µ•¿Ã≈Õ¿« ±Ÿ?E"ƒ…∏Ø≈Õ µ•¿Ã≈Õ", "NPC µ•¿Ã≈Õ" ø°º≠
+//	∞¢∞¢ πﬁæ∆º≠ ∞∞¿∫ ≥ª?E?«‘ºˆ∑Œ ¡¶¿€«œ∞‘µ . Ω«¡¶ «‘?E∫Œ∫–¿∫ ∞¢∞¢ µ˚∑Œ ¿÷¿Ω. ( µø¿€ »ø¿≤º∫ ∞˙”¡. )
+//	¥‹, «‘?E≥ª?E?µø¿œ«œ∞‘ ¿Ø?E ( ¥Ÿ∏• µ•¿Ã≈Õ ±Ÿø¯ø°º≠ ∞°¡Æø¿¥ı∂Ûµµ ¿Œ∂Û¿Œ «‘?E¡§¿«∏¶ µø¿œ«œ∞‘«œø© ∏¬?E )
+//
+//
+//
+//
+
+#include <hash_map>
+
+#include "./GLSKILL.h"
+#include "./GLCharData.h"
+#include "./GLCrowData.h"
+#include "./GLogicData.h"
+#include "./GLContrlMsg.h"
+
+#ifndef GLSKILL
+	struct GLSKILL;
+#endif //GLSKILL
+
+typedef stdext::hash_map<DWORD,float>	DELAY_MAP;
+typedef DELAY_MAP::iterator				DELAY_MAP_ITER;
+
+class STARDIST
+{
+public:
+	float		m_fDIST;
+	STARGETID	m_sTARGETID;
+
+public:
+	STARDIST () {}
+
+	STARDIST ( const float fDIST, const STARGETID &sTARID )
+	{
+		m_fDIST = fDIST;
+		m_sTARGETID = sTARID;
+	}
+
+	bool operator < ( const STARDIST &rvalue )
+	{
+		return m_fDIST < rvalue.m_fDIST;
+	}
+};
+
+typedef std::vector<STARDIST>			TARGETMAP;
+typedef TARGETMAP::iterator				TARGETMAP_ITER;
+
+typedef std::vector<STARGETID>						DETECTMAP;
+typedef DETECTMAP::iterator							DETECTMAP_ITER;
+typedef std::pair<DETECTMAP_ITER,DETECTMAP_ITER>	DETECTMAP_RANGE;
+
+class STAR_ORDER
+{
+public:
+	bool operator() ( const STARGETID &lvalue, const STARGETID &rvalue )
+	{
+		return lvalue.emCrow < rvalue.emCrow;
+	}
+
+	bool operator() ( const STARGETID &lvalue, const EMCROW emCROW )
+	{
+		return lvalue.emCrow < emCROW;
+	}
+
+	bool operator() ( const EMCROW emCROW, const STARGETID &rvalue )
+	{
+		return emCROW < rvalue.emCrow;
+	}
+};
+
+//	¿˚?E?
+struct SPLAYHOSTILE
+{
+	BOOL	bBAD;
+	float	fTIME;
+
+	SPLAYHOSTILE ()
+	{
+		bBAD     = FALSE;
+		fTIME    = 0;
+	}
+};
+
+typedef stdext::hash_map<DWORD,SPLAYHOSTILE*>	MAPPLAYHOSTILE;
+typedef MAPPLAYHOSTILE::iterator				MAPPLAYHOSTILE_ITER;
+
+struct SSUM_ITEM
+{
+	GLPADATA	gdDamage;
+	int			nDefense;
+
+	int			nAvoidRate;
+	int			nHitRate;
+
+	int			nHP;
+	int			nMP;
+	int			nSP;
+	int			nCP; //add cp
+
+
+	float		fIncR_HP;
+	float		fIncR_MP;
+	float		fIncR_SP;
+
+	float		fInc_HP;
+	float		fInc_MP;
+	float		fInc_SP;
+
+	float		fCP_GAIN; //add cp
+
+	SCHARSTATS	sStats;
+	SRESIST		sResist;
+
+	int			nPA;
+	int			nSA;
+	int			nMA;
+
+	float		fIncR_MoveSpeed;
+	float		fIncR_AtkSpeed;
+	float		fIncR_Critical;
+	float		fIncR_CrushingBlow;
+
+	float		fInc_MoveSpeed;
+	float		fInc_AtkSpeed;
+
+	float		fInc_Critical_Dmg;//add critdmg
+	float		fInc_CrushingBlow_Dmg;//add blowdmg
+
+	//add directval
+	int		nHP_Potion_Rate;
+	int		nMP_Potion_Rate;
+	int		nSP_Potion_Rate;
+
+	//add directval hitrate and avoidrate
+	float		fRateHit_Per;
+	float		fRateAvoid_Per;
+
+	SSUM_ITEM () :
+		nDefense(0),
+
+		nAvoidRate(0),
+		nHitRate(0),
+		nHP(0),
+		nMP(0),
+		nSP(0),
+		nCP(0), //add cp
+		fIncR_HP(0.0f),
+		fIncR_MP(0.0f),
+		fIncR_SP(0.0f),
+		fCP_GAIN(0.0f), //add cp
+
+		fInc_HP(0.0f),
+		fInc_MP(0.0f),
+		fInc_SP(0.0f),
+
+		nPA(0),
+		nSA(0),
+		nMA(0),
+		fIncR_MoveSpeed(0.0f),
+		fIncR_AtkSpeed(0.0f),
+		fIncR_Critical(0.0f),
+		fIncR_CrushingBlow(0.0f),
+		fInc_MoveSpeed(0.0f),
+		fInc_AtkSpeed(0.0f),
+		fInc_Critical_Dmg(0.0f),//add critdmg
+		fInc_CrushingBlow_Dmg(0.0f),//add blowdmg
+		nHP_Potion_Rate(0), //add directval
+		nMP_Potion_Rate(0),//add directval
+		nSP_Potion_Rate(0),//add directval
+		fRateHit_Per(0.0f), //add directval
+		fRateAvoid_Per(0.0f)//add directval
+	{
+	}
+
+	void RESET ()
+	{
+		*this = SSUM_ITEM();
+	}
+};
+
+namespace GLOGICEX
+{
+	EM_BRIGHT_FB GLSPACEGAP ( const EMBRIGHT emACTOR, const EMBRIGHT emRECEP, const EMBRIGHT emSPACE );
+
+	//	∞¯∞› º∫∞¯¿≤ ∞Ë?E
+	int GLHITRATE ( const int nHit, const int nAvoid, const EM_BRIGHT_FB bFB );
+
+	//	øœ?Eº˚·© »Æ¿≤.
+	BOOL CHECKSHOCK ( const int AttackerLev, const int DefenserLev, const int nDamage, const bool bCritical );
+
+	//	πÊæ˚”¬ ∞Ë?E
+	int GLDEFENSE ( const int nDEFENSE, const EMBRIGHT emACTOR, const EMBRIGHT emRecep, const EMBRIGHT emSPACE );
+
+	//	∞Ê«Ëƒ° »π?E( ≈∏∞›Ω√ )
+	int GLATTACKEXP ( int AttackerLev, int DefenserLev, DWORD dwDamage, DWORD wMaxHP, DWORD dwBonusExp=0 );
+
+	//	∞Ê«Ëƒ° »π?E( ¡¶∞≈Ω√ )
+	int	GLKILLEXP ( int AttackerLev, int DefenserLev, DWORD dwBonusExp=0 );
+
+	//	∞Ê«Ëƒ° »π?E( ≈∏∞›Ω√ )
+	int CALCATTACKEXP ( WORD wMYLEVEL, const STARGETID &cTargetID, const GLLandMan* pLandMan, DWORD dwDamage );
+	
+	//	∞Ê«Ëƒ° »π?E( ¡¶∞≈Ω√ )
+	int CALCKILLEXP ( WORD wMYLEVEL, const STARGETID &cTargetID, const GLLandMan* pLandMan );
+
+	int CALCKILLCP ( const STARGETID &cTargetID, const GLLandMan* pLandMan ); //add cp
+
+	//	¡◊æ˙¿ª∂ß ∞Ê«Ëƒ° ∞®º“.
+	float GLDIE_DECEXP ( WORD wACTLEV );
+
+	//	∞Ê«Ëƒ° ∫π±∏ ∫Ò¿≤
+	float GLDIE_RECOVERYEXP ( WORD wACTLEV );
+
+	//  ∞Ê«Ëƒ°1?Eµ∑
+	float GLDIE_EXPMONEY ( WORD wACTLEV );
+
+	//	LevelUp¿ª «œ?E¿ß«— ∞Ê«Ëƒ°
+	LONGLONG GLNEEDEXP ( WORD wLev );
+	LONGLONG GLNEEDEXP2 ( WORD wLev );
+
+	//	ªÛ≈¬¿Ã?Eπﬂª˝«“ ?E¿÷¥¬ »Æ¿≤ ?EÅE
+	BOOL CHECKSTATEBLOW ( float fACTRATE, WORD wACTLEVEL, WORD wLEVEL, WORD wRESIST );
+
+	//	Ω∫≈≥ µÙ∑π¿Ã ?EÅE
+	float SKILLDELAY ( DWORD dwSKILL_GRADE, WORD wSKILL_LEV, WORD wCHAR_LEVEL, float fDelay );
+
+	//	Note : ∆ƒ∂Û∏ﬁ≈∏ ∫Ø?E
+	//		∞Ë?E√ø°¥?int ?E∏∑?∞Ë?E?ºˆ«‡«œø© ø¨?E?º’Ω«¿ª ∏∑¥¬¥Ÿ.
+	//		∞™ ¿˚?E√ø°¥?WORD ?E∞™¿« øµø™ ¿Ã≥ª∑Œ ¡¶«—.
+	inline WORD VARIATION ( WORD &wNow, const WORD wMax, const int nValue )
+	{
+		int nOld = int(wNow);
+
+		int nNew = nOld + nValue;
+
+		//	WORD ?E∞™¿« øµø™ ¿Ã≥ª∑Œ ¡¶«—.
+		if ( nNew < 0 )					nNew = 0;
+		if ( nNew > USHRT_MAX )			nNew = USHRT_MAX;
+
+		wNow = nNew;
+		if ( wNow >= wMax )				wNow = wMax;
+
+		WORD wDX = (WORD) abs(nOld-int(wNow));
+		return wDX;
+	}
+
+	//	Note : ∆ƒ∂Û∏ﬁ≈∏ ∫Ø∞Ê.
+	//		∞ËªÍΩ√ø°¥¬ int «¸¿∏∑Œ ∞ËªÍ¿ª ºˆ«‡«œø© ø¨ªÍΩ√ º’Ω«¿ª ∏∑¥¬¥Ÿ.
+	//		∞™ ¿˚øÎΩ√ø°¥¬ WORD «¸ ∞™¿« øµø™ ¿Ã≥ª∑Œ ¡¶«—.
+	inline DWORD VARIATION ( DWORD &dwNow, const DWORD dwMax, const int nValue )
+	{
+		int nOld = int(dwNow);
+
+		int nNew = nOld + nValue;
+
+		//	WORD ?E∞™¿« øµø™ ¿Ã≥ª∑Œ ¡¶«—.
+		if ( nNew < 0 )					nNew = 0;
+
+		dwNow = nNew;
+		if ( dwNow >= dwMax )			dwNow = dwMax;
+
+		DWORD dwDX = (DWORD) abs(nOld-int(dwNow));
+		return dwDX;
+	}
+
+	//	≥ØææøÕ º”º∫∞£ ¡ı∆¯¿≤.
+	float WEATHER_ELEMENT_POW ( EMELEMENT emElement, DWORD dwWeather, BOOL bWeatherActive );
+
+	float WEATHER_BLOW_POW ( EMSTATE_BLOW emBlow, DWORD dwWeather, BOOL bWeatherActive );
+
+	//	Note : √º∑¬ ∞∞¿∫ ºˆƒ°µÈ¿ª ∫Ø»≠¿≤ø° µ˚?E∞ªΩ≈«ÿ¡ÿ¥Ÿ.
+	//		∞Ë?E√ø°¥?int ?E∏∑?∞Ë?E?ºˆ«‡«œø© ø¨?E?º’Ω«¿ª ∏∑¥¬¥Ÿ.
+	//		∞™ ¿˚?E√ø°¥?WORD ?E∞™¿« øµø™ ¿Ã≥ª∑Œ ¡¶«—.
+	inline void UPDATE_POINT ( GLPADATA &sPOINT, float &fELP_VAR, const float fVAR, const WORD wLOW_LMT )
+	{
+		fELP_VAR += fVAR;
+		int nNEWP = int(sPOINT.dwNow) + int(fELP_VAR);
+		fELP_VAR -= int(fELP_VAR);
+
+		//	WORD ?E∞™¿« øµø™ ¿Ã≥ª∑Œ ¡¶«—.
+		if ( nNEWP < 0 )			nNEWP = 0;
+		//if ( nNEWP > USHRT_MAX )	nNEWP = USHRT_MAX;
+
+		if ( nNEWP < wLOW_LMT )		nNEWP = wLOW_LMT;
+
+		sPOINT.dwNow = nNEWP;
+		sPOINT.LIMIT ();
+	}
+
+	//	Note : √º∑¬ ∞∞¿∫ ºˆƒ°µÈ¿ª ∫Ø»≠¿≤ø° µ˚?E∞ªΩ≈«ÿ¡ÿ¥Ÿ.
+	//		∞Ë?E√ø°¥?int ?E∏∑?∞Ë?E?ºˆ«‡«œø© ø¨?E?º’Ω«¿ª ∏∑¥¬¥Ÿ.
+	//		∞™ ¿˚?E√ø°¥?WORD ?E∞™¿« øµø™ ¿Ã≥ª∑Œ ¡¶«—.
+	inline void UPDATE_POINT ( DWORD &dwNowP, float &fELP_VAR, const DWORD MaxP, const float fVAR, const DWORD dwLOW_LMT )
+	{
+		fELP_VAR += fVAR;
+		int nNEWP = int(dwNowP) + int(fELP_VAR);
+		fELP_VAR -= int(fELP_VAR);
+
+		//	WORD ?E∞™¿« øµø™ ¿Ã≥ª∑Œ ¡¶«—.
+		if ( nNEWP < 0 )				nNEWP = 0;
+		if ( nNEWP < (int)dwLOW_LMT )	nNEWP = dwLOW_LMT;
+
+		dwNowP = nNEWP;
+		if ( dwNowP > MaxP )		dwNowP = MaxP;
+	}
+
+	inline void UPDATE_POINT ( WORD &wNowP, float &fELP_VAR, const WORD MaxP, const float fVAR, const WORD wLOW_LMT )
+	{
+		fELP_VAR += fVAR;
+		int nNEWP = int(wNowP) + int(fELP_VAR);
+		fELP_VAR -= int(fELP_VAR);
+
+		//	WORD ?E∞™¿« øµø™ ¿Ã≥ª∑Œ ¡¶«—.
+		if ( nNEWP < 0 )			nNEWP = 0;
+		if ( nNEWP > USHRT_MAX )	nNEWP = USHRT_MAX;
+
+		if ( nNEWP < wLOW_LMT )		nNEWP = wLOW_LMT;
+
+		wNowP = nNEWP;
+		if ( wNowP > MaxP )			wNowP = MaxP;
+	}
+};
+
+enum EMBEGINATTACK_FB
+{
+	EMBEGINA_OK		= 0,
+	EMBEGINA_SP		= 1,
+	EMBEGINA_ARROW	= 2,
+	EMBEGINA_BULLET	= 3,
+};
+
+
+//	Note : ∫Ø?E√ﬂ∞°Ω√ø°. RESET_DATA() «‘ºˆø° ∫Ø?E√ ±‚»≠ ≥÷æ˚⁄ﬂµ .
+//
+struct GLCHARLOGIC :public SCHARDATA2
+{	
+	EMCHARINDEX			m_CHARINDEX;
+	DELAY_MAP			m_SKILLDELAY;					//	ªÁ?E?Ω∫≈≥¿« µÙ∑°¿Ã.
+
+	SSKILLFACT			m_sSKILLFACT[SKILLFACT_SIZE];	//	Ω∫≈≥»ø∞˙?E
+	SSKILLFACT			m_sPETSKILLFACT[PETSLOT_SIZE];	//dmk14 | 11-21-16 | dual pet skill
+
+	SDROP_KILLFACT		m_sKILLFACT[KILLFACT_SIZE];
+
+	SLANDEFFECT			m_sLandEffect[EMLANDEFFECT_MULTI];	//  ¡ˆ?E¿Ã?E»ø∞˙?E
+    SLANDEFFECT			m_sLandEffectChar;	//  ¡ˆ«ÅE¿ÃªÅE»ø∞˙µÅE
+
+	DWORD				m_dwTransfromSkill;				//  ∫ØΩ≈ Ω∫≈≥ ≥—?E
+	//added by   | 24-6-2012 | add summon skill
+	DWORD				m_dwSummonSkill;
+	// Mike Panther | Reconfig - SeiferXIII /  
+	DWORD				m_dwTransfromCHF;	
+
+
+	float				m_fHP_RATE;						//	active Ω∫≈≥¿« HP ¡ı∆¯¿≤.
+	float				m_fMP_RATE;						//	active Ω∫≈≥¿« MP ¡ı∆¯¿≤.
+	float				m_fSP_RATE;						//	active Ω∫≈≥¿« SP ¡ı∆¯¿≤.
+	float				m_fCP_RATE;	
+	float				m_fCP_GAIN;		//add cp
+	float				m_fCP_SKILLGAIN;		//add cp
+
+	DWORD				m_dwHOLDBLOW;					//	ªÛ≈¬¿ÃªÛ¿Ã πÊ¡ˆµ .
+	BOOL				m_bSTATEBLOW;					//	ªÛ≈¬¿ÃªÛ¿Ã «œ≥™ ¿Ã?Eπﬂª˝«ﬂ¿ª∂ß.
+	SSTATEBLOW			m_sSTATEBLOWS[EMBLOW_MULTI];	//	ªÛ≈¬¿Ã?E
+	float				m_fSTATE_MOVE;					//	ªÛ≈¬ ¿Ã?E¿Ãµøº”µµ. ( 1.0f == 100% )
+	float				m_fSTATE_DELAY;					//	ªÛ≈¬ ¿Ã?EµÙ∑°¿Ã. ( 1.0f == 100% ) (+)
+	float				m_fSTATE_DAMAGE;				//	ªÛ≈¬ ¿Ã?E?EÃ¡ÅE¡ı∞°.
+
+	SQITEM_FACT			m_sQITEMFACT;					//	? æ∆¿Ã≈€ ¿˚?E?
+	SEVENT_FACT			m_sEVENTFACT;					//	¿Ã∫•∆Æ ? æ∆¿Ã≈€ ¿˚?E?
+	//SEventState			m_sEventState;
+
+
+	bool				m_bSTATE_PANT;					//	ªÛ≈¬¿Ã?E«Ê∂±¿”.
+	bool				m_bSTATE_STUN;					//	ªÛ≈¬¿Ã?E±‚¿˝.
+	bool				m_bINVISIBLE;					//	≈ı?E
+	bool				m_bRECVISIBLE;					//	≈ı?E»Æ¿Œ.
+
+
+
+	float				m_fSKILL_MOVE;					//	Ω∫≈≥ ¿Ãµøº”µµ.
+	float				m_fOPTION_MOVE;					//	√ﬂ∞°¿˚¿Œ ¿Ãµøº”µµ. ø˘µÂø°µ≈Õø°º≠ ªÁøÎ.
+	DEFENSE_SKILL		m_sDefenseSkill;				//  πﬂµø«¸ Ω∫≈≥
+	SCHARSTATS			m_sSUMSTATS;					//	«’ªÍ Stats.
+	DWORD				m_wSUM_AP;						//	±‚∫ª ∞¯∞›∑¬.
+	DWORD				m_wSUM_DP;						//	±‚∫ª πÊæÓ∑¬.
+	DWORD				m_wSUM_PA;						//	∞›≈ıƒ°.
+	DWORD				m_wSUM_SA;						//	ªÁ∞›ƒ°.
+	DWORD				m_wSUM_MA;						//	∏∂π˝ƒ°.
+	SRESIST				m_sSUMRESIST;					//	¿˙«◊∞™. ( æ∆¿Ã≈€ + ∆–Ω√∫Í )
+	SRESIST				m_sSUMRESIST_SKILL;				//  Ω∫≈≥ ¿˙«◊∞™ ( æ∆¿Ã≈€ + ∆–Ω√∫Í + πˆ«¡ ) 
+	SSUM_ITEM			m_sSUMITEM;						//	æ∆¿Ã≈€ ∞°ªÍ∞™.
+	SPASSIVE_SKILL_DATA	m_sSUM_PASSIVE;					//	∆‰Ω√∫Í ∞°ªÍ∞™.
+	int					m_nSUM_PIERCE;					//	∞¸≈Î ¡§µµ «’ªÍ.
+	float				m_fSUM_TARRANGE;				//	∞¯∞› ∞°¥…∞≈∏Æ «’ªÍ.
+	DWORD				m_wACCEPTP;						//	π´±‚ æ∆¿Ã≈€ø° ¥…∑¬¡¶«— «„øÎ ºˆƒ°.
+	WORD				m_wSUM_DisSP;					//	º“∏ SP «’ªÍ.
+	int					m_nHIT;							//	∏Ì¡ﬂ¿≤.
+	int					m_nSUM_HIT;						//	∏Ì¡ﬂ¿≤ + Ω∫≈≥»ø∞˙.
+	int					m_nAVOID;						//	»∏««¿≤.
+	int					m_nSUM_AVOID;					//	»∏««¿≤ + Ω∫≈≥»ø∞˙.
+	int					m_nDEFENSE_BODY;				//	πÊæÓ∑¬ ( DP + DEX+∞Ëºˆ ).
+	int					m_nDEFENSE;						//	πÊæÓ∑¬ ( DP + DEX*∞Ëºˆ + ITEM_DEF ) * ∞¯∞£¿˚¿¿ ∫∏¡§.
+	int					m_nDEFENSE_SKILL;				//	πÊæÓ∑¬ ( DP + DEX*∞Ëºˆ + ITEM_DEF ) * ∞¯∞£¿˚¿¿ ∫∏¡§ + Ω∫≈≥.
+	GLPADATA			m_gdDAMAGE;						//	±‚∫ª ∞¯∞›∑¬. ( AP + ∆‰Ω√∫Í Ω∫≈≥∑Œ ∞°ªÍµ» ∞¯æ˜ )
+	GLPADATA			m_gdDAMAGE_SKILL;				//	±‚∫ª ∞¯∞›∑¬ + temp Ω∫≈≥»ø∞˙.
+	GLPADATA			m_gdDAMAGE_PHYSIC;				//	±‚∫ª ∞¯∞›∑¬ + π´±‚∞¯æ˜ + (∞›≈ıƒ°orªÁ∞›ƒ°).
+
+	float				m_fDamageRate;					//	∞¯∞›∑¬ ∫Ø»≠¿≤.
+	float				m_fDefenseRate;					//	πÊæÓ∑¬ ∫Ø»≠¿≤.
+	DAMAGE_SPEC			m_sDamageSpec;					//	µ•πÃ¡ˆ »Ìºˆ π◊ π›ªÁ
+	float				m_fINCR_HP;						//	HP »∏∫π¿≤.
+	float				m_fINCR_MP;						//	MP »∏∫π¿≤.
+	float				m_fINCR_SP;						//	SP »∏∫π¿≤.
+
+	float				m_fATTVELO;						//	Ω∫≈≥ ∞¯∞›º”µµ ∫Ø»≠.
+	WORD				m_wATTRANGE;					//	∞¯∞› ∞°¥… ∞≈∏Æ.
+	WORD				m_wSUM_ATTRANGE;				//	∞¯∞› ∞°¥… ∞≈∏Æ.
+	GLITEM_ATT			m_emITEM_ATT;					//	æ∆¿Ã≈∆ ∞¯∞› º”º∫.
+
+	float				m_fSKILLDELAY;
+
+	float				m_fEXP_RATE;					//	∞Ê«Ëƒ° ºˆΩ≈¿≤.
+	float				m_fGEN_RATE;					//	æ∆¿Ã≈€ πﬂª˝¿≤.
+	EMANI_SUBTYPE		m_emANISUBTYPE;					//	Item ¬¯øÎø° µ˚∏• ø°¥œ∏ﬁ¿Ãº« ¡æ∑˘.
+	SNATIVEID			m_idACTIVESKILL;				//	«ˆ¡¶ æ◊∆º∫Íµ» Ω∫≈≥.
+	EMANI_MAINTYPE		m_emANIMAINSKILL;				//	Ω∫≈≥ø° µ˚∏• ø°¥œ∏ﬁ¿Ãº«.
+	EMANI_SUBTYPE		m_emANISUBSKILL;				//	Ω∫≈≥ø° µ˚∏• ø°¥œ∏ﬁ¿Ãº«.
+
+	SITEM*				m_pITEMS[SLOT_TSIZE];
+
+	BOOL				m_bUseArmSub;					// ±ÿ∞≠∫Œ∏¶ ¿ß«— ∫∏¡∂ π´?EªÁ?E©∫?
+
+	//	Note : »∏∫πµ«¥¬ ºˆƒ° ?E‚øÅE¿”Ω√ ∫Ø?E
+	float				m_fIncHP;
+	float				m_fIncMP;
+	float				m_fIncSP;
+
+	MAPPLAYHOSTILE		m_mapPlayHostile;				//	¿˚?E«‡¿ß¿⁄. ( Ω÷?E)
+
+//	≈ª∞Õ √ﬂ∞°
+	BOOL				m_bVehicle;						//  ≈ª∞Õ »∞º∫»≠ ø©∫Œ
+	float				m_fVehicleSpeedRate;
+	float				m_fVehicleSpeedVol;
+	
+	bool				m_bSafeZone;
+	bool				m_bBTGactivated; //add btg attack
+	float				m_fBTGAttackRate; //add btg attack
+
+	bool				m_bAntiPot; //add antipot
+	bool				m_bAntiSkill; //add antiskill
+
+	float				m_fCrit_Dmg;//add critdmg
+	float				m_fBlow_Dmg;//add blowdmg
+	float				m_fCrit_Dmg_Skill;//add critdmgskill
+	float				m_fBlow_Dmg_Skill;//add blowdmgskill
+	float				m_fCrit_Rate;//add critrate
+	float				m_fCrit_Rate_Skill;//add critrateskill
+	float				m_fBlow_Rate;//add blowrate
+	float				m_fBlow_Rate_Skill;//add blowrateskill
+
+	float				m_fIncR_MoveSpeed;
+	float				m_fIncR_AtkSpeed;
+
+	float				m_fInc_MoveSpeed;
+	float				m_fInc_AtkSpeed;
+
+	float				m_fPkTimer;	
+
+	typedef std::map<DWORD,BOOL>			CHECKSET;
+	typedef std::map<DWORD,BOOL>::iterator	CHECKSET_ITER;
+	CHECKSET			m_mapCheckSet;//add ÆM∏À®t≤Œ
+	bool				m_bTyrannyEvent;
+
+	float				m_fLandBonusMSpeed;
+
+	bool				m_bImmune;
+
+	GLCHARLOGIC () :
+		m_CHARINDEX(GLCI_FIGHTER_M),
+
+		m_dwHOLDBLOW(NULL),
+		m_bSTATEBLOW(FALSE),
+		m_fSTATE_MOVE(1.0f),
+		m_fSTATE_DELAY(1.0f),
+		m_fSTATE_DAMAGE(1.0f),
+		
+		m_bSTATE_PANT(false),
+		m_bSTATE_STUN(false),
+		m_bINVISIBLE(false),
+		m_bRECVISIBLE(false),
+
+		m_fHP_RATE(0),
+		m_fMP_RATE(0),
+		m_fSP_RATE(0),
+		m_fCP_GAIN(1), //add cp
+		m_fCP_SKILLGAIN(0), //add cp
+		m_fCP_RATE(0), //add cp
+
+		m_fSKILL_MOVE(0.0f),
+		m_fOPTION_MOVE(0.0f),
+
+		m_wSUM_AP(0),
+		m_wSUM_DP(0),
+		m_wSUM_PA(0),
+		m_wSUM_SA(0),
+		m_wSUM_MA(0),
+
+		m_nSUM_PIERCE(0),
+		m_fSUM_TARRANGE(0),
+
+		m_nHIT(0),
+		m_nSUM_HIT(0),
+		m_nAVOID(0),
+		m_nSUM_AVOID(0),
+
+		m_wACCEPTP(0),
+		m_wSUM_DisSP(0),
+
+		m_nDEFENSE(0),
+
+		m_fDamageRate(1.0f),
+		m_fDefenseRate(1.0f),
+
+		m_fINCR_HP(0.0f),
+		m_fINCR_MP(0.0f),
+		m_fINCR_SP(0.0f),
+
+		m_fIncHP(0.0f),
+		m_fIncMP(0.0f),
+		m_fIncSP(0.0f),
+
+		m_fATTVELO(0.0f),
+		m_wATTRANGE(4),
+		m_wSUM_ATTRANGE(4),
+
+		m_fSKILLDELAY(0.0f),
+
+		m_fEXP_RATE(1),
+		m_fGEN_RATE(1),
+
+		m_emITEM_ATT(ITEMATT_NOTHING),
+
+		m_emANISUBTYPE(AN_SUB_NONE),
+
+		m_idACTIVESKILL(NATIVEID_NULL()),
+
+		m_emANIMAINSKILL(AN_NONE),
+		m_emANISUBSKILL(AN_SUB_NONE),
+
+		m_fLandBonusMSpeed(0.0f),
+
+		m_bUseArmSub(FALSE),
+		m_bVehicle(FALSE),
+		m_fVehicleSpeedRate( 0.0f ),
+		m_fVehicleSpeedVol( 0.0f ),
+		m_bSafeZone(false),
+		m_bBTGactivated(false),
+		m_fBTGAttackRate( 0.0f ),
+		m_fPkTimer (0.0f),
+		m_bAntiPot(false), //add antipot
+		m_bAntiSkill(false), //add antiskill
+		m_fCrit_Dmg(0.0f),//add critdmg
+		m_fBlow_Dmg(0.0f),//add blowdmg
+		m_fCrit_Dmg_Skill(0.0f),//add critdmgskill
+		m_fBlow_Dmg_Skill(0.0f),//add blowdmgskill
+		m_fCrit_Rate(0.0f),//add critrate
+		m_fCrit_Rate_Skill(0.0f),//add critrateskill
+		m_fBlow_Rate(0.0f),//add blowrate
+		m_fBlow_Rate_Skill(0.0f),//add blowrateskill
+		m_fIncR_MoveSpeed(0.0f),
+		m_fIncR_AtkSpeed(0.0f),
+		m_fInc_MoveSpeed(0.0f),
+		m_fInc_AtkSpeed(0.0f),
+		m_bImmune(false)
+	{
+		memset ( m_pITEMS, 0x00, sizeof(SITEM*)*SLOT_TSIZE );
+	}
+
+	~GLCHARLOGIC ()
+	{
+		DEL_PLAYHOSTILE_ALL();
+	}
+public:
+	float GetQuestionTime()			{ return m_sQITEMFACT.fTime; }
+
+public:
+	EMCROW GETCROW () const			{ return CROW_PC; }
+	WORD GETLEVEL () const			{ return m_wLevel; }
+
+	WORD GETSCHOOL () const			{ return m_wSchool; }
+
+	int GETREBORN () const		{ return m_nChaReborn; }
+	
+	DWORD GETHP () const			{ return m_sHP.dwNow; }
+	DWORD GETMAXHP () const			{ return m_sHP.dwMax; }
+
+	DWORD GETMP () const			{ return m_sMP.dwNow; }
+	DWORD GETMAXMP () const			{ return m_sMP.dwMax; }
+
+	DWORD GETSP () const			{ return m_sSP.dwNow; }
+	DWORD GETMAXSP () const			{ return m_sSP.dwMax; }
+
+	DWORD GETCP () const			{ return m_sCP.dwNow; } //add cp
+	DWORD GETMAXCP () const			{ return m_sCP.dwMax; }	//add cp
+
+	int GETHIT () const				{ return m_nSUM_HIT; }
+	int GETAVOID () const			{ return m_nSUM_AVOID; }
+	EMBRIGHT GETBRIGHT () const		{ if(m_nBright<0) return BRIGHT_DARK; return BRIGHT_LIGHT; }
+	int GETBRIGHTPER () const		{ return m_nBright; }
+	int GETFORCE_LOW () const		{ return m_gdDAMAGE_PHYSIC.dwLow; }
+	int GETFORCE_HIGH () const		{ return m_gdDAMAGE_PHYSIC.dwHigh; }
+	int GETDEFENSE () const			{ return m_nDEFENSE_SKILL; }
+	
+	float GETSUM_TARRANGE () const	{ return m_fSUM_TARRANGE; }		//	¿Â∞≈∏Æ π´±‚(Ω∫≈≥)ø°∏∏ ∞°ªÍ.
+	int GETSUM_PIERCE () const		{ return m_nSUM_PIERCE; }
+
+	WORD GETBODYRADIUS () const		{ return GLCONST_CHAR::wBODYRADIUS; }
+	WORD GETATTACKRANGE () const	{ return m_wSUM_ATTRANGE; }	
+
+	const SCHARSTATS& GETSTATS_ADD () const;
+	const SCHARSTATS& GETSTATS_ITEM () const;
+
+	void OptionMoveUp();
+	void OptionMoveDown();
+
+	void SetUseArmSub( BOOL bSub )	{ m_bUseArmSub = bSub; }
+	BOOL IsUseArmSub() const		{ return m_bUseArmSub; }
+
+	EMSLOT GetCurRHand();
+	EMSLOT GetCurLHand();
+
+	BOOL IsCurUseArm( EMSLOT emSlot );
+
+	bool IsDefenseSkill()				{ return m_sDefenseSkill.m_bActive; }
+	void SetDefenseSkill(bool bDefense)	{ m_sDefenseSkill.m_bActive = bDefense; }
+
+	void SetLandBonusMSpeed( float val )	{ m_fLandBonusMSpeed = val; }
+
+public:
+	void SLOT_ITEM ( const SITEMCUSTOM &sItemCustom, EMSLOT _slot );
+	void RELEASE_SLOT_ITEM ( EMSLOT _slot );
+
+	const SITEMCUSTOM& GET_SLOT_ITEM ( EMSLOT _slot )				{ return m_PutOnItems[_slot]; }
+	const SNATIVEID& GET_SLOT_NID ( EMSLOT _slot )					{ return m_PutOnItems[_slot].sNativeID; }
+	SITEM* GET_SLOT_ITEMDATA ( EMSLOT _slot )						{ return m_pITEMS[_slot]; }
+	BOOL VALID_SLOT_ITEM ( EMSLOT _slot );
+
+	void HOLD_ITEM ( const SITEMCUSTOM &sItemCustom );
+	void RELEASE_HOLD_ITEM ();
+	const SITEMCUSTOM& GET_HOLD_ITEM ()					{ return m_PutOnItems[SLOT_HOLD]; }
+	BOOL VALID_HOLD_ITEM ()								{ return GET_HOLD_ITEM().sNativeID!=NATIVEID_NULL(); }
+	
+	void HOLD_ARRAY( const SITEMCUSTOM &sItemCustom, int nIndex );
+	const SITEMCUSTOM& GET_HOLDARRAY_ITEM (int nIndex)					{ return m_pHoldArray[nIndex]; }
+	BOOL VALID_HOLDARRAY_ITEM (int nIndex)								{ return GET_HOLDARRAY_ITEM(nIndex).sNativeID!=NATIVEID_NULL(); }
+	void RELEASE_HOLDARRAY_ITEM (int nIndex);
+	void SetSortTimer();
+
+	BOOL ISLONGRANGE_ARMS ();
+
+	BOOL ISHAVEITEM ( SNATIVEID &sNID, DWORD *pNum=NULL );
+	BOOL ISREVIVE ();
+
+	SITEM* GET_ELMT_ITEM ();	//	øﬁº’, ø¿∏•º’ æ∆¿Ã≈€¡ﬂø°º≠ 'BLOW' º”º∫¿Ã ¿÷¥¬ æ∆¿Ã≈€¿ª π›»Ø.
+
+	WORD GETSKILLRANGE_TAR ( const GLSKILL &sSKILL ) const;
+	WORD GETSKILLRANGE_APPLY ( const GLSKILL &sSKILL, const WORD dwLEVEL ) const;
+
+public:
+	EMBEGINATTACK_FB BEGIN_ATTACK ( WORD wStrikeNum );
+	BOOL VALID_LEVELUP () const;
+	LONGLONG GET_LEVELUP_EXP () const;
+	void LEVLEUP ( bool bInitNowExp = TRUE );
+	void STATSUP ( EMSTATS emStats );
+	void STATSUP ( SCHARSTATS sStats );
+	void CP_UP( DWORD dwRCLvl , WORD wRCNum ); //add cp
+	void GETREWARD ( LONGLONG lnValue );
+	void STATSUP_CMD ( EMSTATS emStats, DWORD value);
+	//add pk
+	void PKWINUP ();
+	void PKLOSSUP ();
+	void PKSTREAK (); //add pk streak by njd
+
+	//void AllowBet( BOOL bAllowBet ); //add duel bet
+
+	//BOOL DuelWinReward ( LONGLONG llWin, WORD wType  ); //add duel bet
+	//BOOL DuelLossReward ( LONGLONG llLoss, WORD wType  ); //add duel bet
+
+	//BOOL IsCharCanBet() { return m_bAllowBet; } //add duel bet
+
+	bool RESET_STATS_SKILL ( const DWORD dwDIS_STAT=UINT_MAX );
+	bool RESET_SKILL ();
+	bool RESET_STATS ( const DWORD dwDIS=UINT_MAX );
+
+protected:
+	void SUM_ITEM ();
+	void SUM_PASSIVE ();
+	void SUM_ADDITION ( float fCONFT_POINT_RATE );
+
+public:
+	void INIT_NEW_CHAR ( const EMCHARINDEX _emCIndex, const DWORD dwUserID, const DWORD dwServerID, const char* szCharName,
+		const WORD _wSchool=0, const WORD wHair=0, const WORD wFace=0, const WORD _wHairColor=0, const WORD _wSex=0 );
+
+	BOOL INIT_DATA ( BOOL bNEW, BOOL bReGen, float fCONFT_POINT_RATE = 1.0f, bool bInitNowExp = TRUE );
+
+	void INIT_RECOVER ( int nRECOVER=30 );
+
+	void RESET_DATA ();
+
+public:
+	void UPDATE_DATA ( float fTime, float fElapsedTime, BOOL bClient=FALSE, float fCONFT_POINT_RATE=1.0f );
+	void UPDATE_MAX_POINT ( float fCONFT_POINT_RATE );
+	bool UPDATE_QITEMFACT ( float fElapsedTime );
+	float CHECK_QBOXTIME ( float fElapsedTime );//add qbox
+
+public:
+	BOOL CHECKSLOT_ITEM ( SNATIVEID sNativeID, EMSLOT emSlot );
+	BOOL ACCEPT_ITEM ( SNATIVEID sNativeID );
+	BOOL ACCEPT_ITEM ( SNATIVEID sNativeID, SNATIVEID sDisguiseID );
+	BOOL ISEMPTY_SLOT ( SNATIVEID sNativeID, EMSLOT emSlot );
+	DWORD CALC_ACCEPTP ( SNATIVEID sNativeID );
+	BOOL SIMPLE_CHECK_ITEM ( SNATIVEID sNativeID );
+	BOOL SIMPLE_CHECK_ITEM ( SNATIVEID sNativeID, SNATIVEID sDisguiseID );
+
+public:
+	BOOL CHECKHIT ( const STARGETID &cTargetID, const GLLandMan* pLandMan, const BOOL bLowSP );
+
+	/**
+	* ƒ≥∏Ø≈Õ∞° ∏˜¿ª ∞¯∞›«ﬂ¿ª∂ß µ•πÃ?E∞Ë?E∞¯Ωƒ
+	*/
+	DWORD CALCDAMAGE(
+		int &rResultDAMAGE,
+		const DWORD	dwGaeaID,
+		const STARGETID &cTargetID,
+		const GLLandMan* pLandMan,
+		const GLSKILL* pSkill=NULL,
+		const DWORD dwskill_lev=0,
+		const DWORD dwWeatherFlag=NULL,
+		const int dwDivCount=0);
+	
+	DWORD CALCDAMAGE_20060328(
+		int &rResultDAMAGE,
+		const DWORD	dwGaeaID,
+		const STARGETID &cTargetID,
+		const GLLandMan* pLandMan,
+		const GLSKILL* pSkill=NULL,
+		const DWORD dwskill_lev=0,
+		const DWORD dwWeatherFlag=NULL,
+		const int dwDivCount=0);
+
+	DWORD CALCDAMAGE_2004(
+		int &rResultDAMAGE,
+		const DWORD	dwGaeaID,
+		const STARGETID &cTargetID,
+		const GLLandMan* pLandMan,
+		const GLSKILL* pSkill=NULL,
+		const DWORD dwskill_lev=0,
+		const DWORD dwWeatherFlag=NULL,
+		const int dwDivCount=0);
+
+	
+
+	DWORD RECEIVE_DAMAGE ( const DWORD wDamage );
+
+public:
+	BOOL RECEIVE_QITEMFACT ( const SNATIVEID &nidITEM );
+	//	Memo :	¿Ã∫•∆Æ∑Œ ¿Œ«ÿ πﬁ¥¬ ?æ∆¿Ã≈€ »ø∞˙∏¶ º≥¡§«—¥Ÿ.
+	void RECEIVE_EVENTFACT_BEGIN ( const EMGM_EVENT_TYPE emType, const WORD wValue );
+	//	Memo :	¿Ã∫•∆Æ∑Œ ¿Œ«ÿ πﬁ¥¬ ?æ∆¿Ã≈€ »ø∞˙∏¶ «ÿ¡¶«—¥Ÿ.
+	void RECEIVE_EVENTFACT_END ( const EMGM_EVENT_TYPE emType );
+
+public:
+	BOOL ISLEARNED_SKILL ( SNATIVEID skill_id, WORD wLEVEL=0 );
+	BOOL ISMASTER_SKILL ( SNATIVEID skill_id );
+	SCHARSKILL* GETLEARNED_SKILL ( SNATIVEID skill_id );
+
+	EMSKILL_LEARNCHECK CHECKLEARNABLE_SKILL ( SNATIVEID skill_id );
+	void LEARN_SKILL ( SNATIVEID skill_id );
+	VOID LVLUP_SKILL ( SNATIVEID skill_id, WORD wToLevel );
+
+	bool LEARN_SKILL_QUEST ( SNATIVEID skill_id );
+
+public:
+	float GETATTVELO ();
+	float GETMOVEVELO ();
+	float GETATT_ITEM (); // ¿˝?E?¡ı∞°
+	float GETMOVE_ITEM (); // ¿˝?E?¡ı∞° % 
+
+	float GetBtgAddAttack ();//add btg attack
+	void SetBtgAddAttack ( BOOL bEnabled ,float AddAttackRate );//add btg attack
+
+public:
+	//	Note : ¿˚?E?µ˚”œ. ( pk ?E?),	true : Ω≈±‘ µ˚”œΩ√, false : ±‚¡∏ µ˚”œ ∞ªΩ≈Ω√.
+	bool ADD_PLAYHOSTILE ( DWORD dwCHARID, BOOL bBAD );
+	bool DEL_PLAYHOSTILE ( DWORD dwCHARID );
+	void DEL_PLAYHOSTILE_ALL ();
+
+public:
+	//	Note : ¿˚?E∏ÆΩ∫∆Æø° µ˚”œ µ«?E¿÷¥¬∞°?
+	bool IS_PLAYHOSTILE ( DWORD dwCHARID );
+	//	Note : ¿˚?E‡¿ß¿?
+	bool IS_HOSTILE_ACTOR ( DWORD dwCHARID );
+	//	Note : ¿⁄Ω≈¿Ã ?EÀ¿⁄¿Œ∞?
+	bool ISOFFENDER ();
+
+	bool ISPLAYKILLING ();
+
+public:
+	//	Note : «ˆ¡¶ pk ∑π∫ß¿ª æÀæ∆∫ª¥Ÿ. ( UINT_MAX ¿œ∞Ê?Epk «ÿ¥ÁªÁ«◊ æ¯¿Ω. )
+	DWORD GET_PK_LEVEL ();
+	DWORD CHAT_NORMAL_COLOR (); 
+ 	DWORD CHAT_PRIVATE_COLOR (); 
+ 	DWORD CHAT_GUILD_COLOR (); 
+ 	DWORD CHAT_TOALL_COLOR (); 
+ 	DWORD CHAT_PARTY_COLOR (); 
+ 	DWORD CHAT_ALLIANCE_COLOR (); 
+ 	DWORD CHAT_SYSTEM_COLOR (); 
+ 	DWORD CHAT_ADMIN_COLOR ();
+
+	//	Note : ¡◊¿ª∂ß ∞Ê«Ëƒ° ∞®º“ pk πË?E
+	float GET_PK_DECEXP_RATE ();
+	std::string GET_PK_NAME ();
+	DWORD GET_PK_COLOR ();
+	float GET_PK_SHOP2BUY ();
+	float GET_PK_SHOP2SALE ();
+
+	DWORD GET_PK_ITEMDROP_NUM ();
+	float GET_PK_ITEMDROP_RATE ();
+
+public:
+	BOOL DOGRINDING(SITEMCUSTOM &sCusItem, 
+					const SITEM *pHold, 
+					bool &bRESET, 
+					bool &bTERMINATE,
+					EMANTIDISAPPEAR &emANTIDISAPPEAR );
+    BOOL DOGRINDINGRESIST (	SITEMCUSTOM &sCusItem, 
+								const SITEM *pHold, 
+								bool &bRESET, 
+								bool &bTERMINATE,
+								bool &bUNDROPITEM, 
+								bool &bDROPITEM, 
+								EMANTIDISAPPEAR &emANTIDISAPPEAR );
+     BOOL DOPERFECTGRINDING(SITEMCUSTOM &sCusItem, 
+					const SITEM *pHold, 
+					bool &bRESET, 
+					bool &bTERMINATE, 
+					EMANTIDISAPPEAR &emANTIDISAPPEAR );
+
+public:
+	BOOL ISSTATEBLOW ()							{ return m_bSTATEBLOW; }
+	void DISABLESKEFF ( int i )					{ m_sSKILLFACT[i].RESET(); }
+	void DISABLEBLOW ( int i )					{ m_sSTATEBLOWS[i].emBLOW = EMBLOW_NONE; }
+	void RESETAGESKEFF ( int i )				{ m_sSKILLFACT[i].fAGE = 0.0f; }
+	void RESETAGEBLOW ( int i )					{ m_sSTATEBLOWS[i].fAGE = 0.0f; }
+
+	void DISABLEALLLANDEFF();
+	//fix fieldcrash landeffect bug - Eduj
+	void DISABLEALLLANDEFFCHAR()
+	{
+	     if( m_sLandEffectChar.vMinPos		 	 != D3DXVECTOR2( 0.0f, 0.0f ) &&
+		     m_sLandEffectChar.vMaxPos			 != D3DXVECTOR2( 0.0f, 0.0f ) &&
+		     m_sLandEffectChar.emLandEffectType  != EMLANDEFFECT_ATK_SPEED &&
+		     m_sLandEffectChar.fValue			 != 0.0f )
+	      {
+		    m_sLandEffectChar.vMinPos			 = D3DXVECTOR2( 0.0f, 0.0f );
+		    m_sLandEffectChar.vMaxPos			 = D3DXVECTOR2( 0.0f, 0.0f );
+		    m_sLandEffectChar.emLandEffectType   = EMLANDEFFECT_ATK_SPEED;
+		    m_sLandEffectChar.fValue			 = 0.0f;
+	      }
+	}
+	void ADDLANDEFF( SLANDEFFECT landEffect, int iNum );
+
+
+	void UPDATESKILLDELAY ( float fElapsedTime );
+
+	void SETACTIVESKILL ( SNATIVEID skill_id );
+	SNATIVEID GETACTIVESKILL ()					{ return m_idACTIVESKILL; }
+	EMSKILLCHECK CHECHSKILL ( SNATIVEID skill_id, WORD wStrikeNum, bool bNotLearn = false );
+	void ACCOUNTSKILL ( SNATIVEID skill_id, WORD wStrikeNum, bool bServer=false );
+	
+public:
+	virtual void ReSelectAnimation ()	{}
+};
+
+//	Note : ∫Ø?E√ﬂ∞°Ω√ø°. RESET_DATA() «‘ºˆø° ∫Ø?E√ ±‚»≠ ≥÷æ˚⁄ﬂµ .
+//
+struct GLCROWLOGIC
+{
+	SNATIVEID			m_sNativeID;					//	Crow NativeID.
+	PCROWDATA			m_pCrowData;					//	Crow ±‚∫ª ¡§∫∏.
+
+	float				m_fACTIONDELAY[SCROWDATA::EMMAXATTACK];	//	µø¿€ cool time;
+
+	SSKILLFACT			m_sSKILLFACT[SKILLFACT_SIZE];	//	Ω∫≈≥»ø∞˙?E
+
+	DWORD				m_dwHOLDBLOW;					//	ªÛ≈¬¿ÃªÛ¿Ã πÊ¡ˆµ .
+
+	SSTATEBLOW			m_sSTATEBLOWS[EMBLOW_MULTI];	//	ªÛ≈¬¿Ã?E
+	float				m_fSTATE_MOVE;					//	ªÛ≈¬ ¿Ã?E¿Ãµøº”µµ. ( 1.0f == 100% )
+	float				m_fSTATE_DELAY;					//	ªÛ≈¬ ¿Ã?EµÙ∑°¿Ã. ( 1.0f == 100% ) (+)
+	float				m_fSTATE_DAMAGE;				//	ªÛ≈¬ ¿Ã?E?EÃ¡ÅE¡ı∞°.
+	
+	bool				m_bSTATE_PANT;					//	ªÛ≈¬¿Ã?E«Ê∂±¿”.
+	bool				m_bSTATE_STUN;					//	ªÛ≈¬¿Ã?E±‚¿˝.
+	bool				m_bINVISIBLE;					//	≈ı?E
+	bool				m_bRECVISIBLE;					//	≈ı?E»Æ¿Œ.
+
+	float				m_fATTVELO;						//	∞¯∞›º”µµ.
+	float				m_fSKILL_MOVE;					//	Ω∫≈≥ ¿Ãµøº”µµ.
+
+
+	int					m_nSUM_HIT;						//	∏˙›ﬂ¿≤ + Ω∫≈≥»ø?E
+	int					m_nSUM_AVOID;					//	»∏««¿≤ + Ω∫≈≥»ø?E
+
+	int					m_nSUM_DEFENSE;					//	πÊæ˚”¬ ( DP + POW*∞Ë?E+ ITEM_DEF ) * ∞¯∞£¿˚¿¿ ∫∏¡§ + Ω∫≈≥.
+	int					m_nDX_DAMAGE;					//	±‚∫ª ∞¯∞›∑¬. + Ω∫≈≥»ø?E
+	
+	SRESIST				m_sSUMRESIST;					//	¿˙«◊∞™.
+
+	int					m_nSUM_PIERCE;					//	√ﬂ∞° ?EÅE¡§µµ.
+	float				m_fSUM_TARRANGE;				//	∞¯∞› ∞°¥…∞≈∏Æ «’?E
+
+	float				m_fDamageRate;					//	∞¯∞›∑¬ ∫Ø»≠¿≤.
+	float				m_fDefenseRate;					//	πÊæ˚”¬ ∫Ø»≠¿≤.
+
+	DAMAGE_SPEC			m_sDamageSpec;					//	µ•πÃ?E»˙?Eπ◊ π›?E
+	DEFENSE_SKILL		m_sDefenseSkill;				//  πﬂµø?EΩ∫≈≥
+
+	DWORD				m_dwAType;						//	∞¯∞› º”º∫ º¯?E
+	
+	DWORD				m_dwNowHP;						//	ª˝∏˙”Æ.
+	WORD				m_wNowMP;						//	¡§Ω≈∑Æ.
+	WORD				m_wNowSP;						//	¡§Ω≈∑Æ.
+
+	SNATIVEID			m_idACTIVESKILL;				//	»∞º∫ Ω∫≈≥.
+	WORD				m_wACTIVESKILL_LVL;				//	»∞º∫ Ω∫≈≥  ∑°∫ß.
+
+	//	Note : »∏∫πµ«¥¬ ºˆƒ° ?E‚øÅE¿”Ω√ ∫Ø?E
+	float				m_fIncHP;
+	float				m_fIncMP;
+	float				m_fIncSP;
+
+	WORD				m_wOWNER;
+	//	Note : ∫ØºÅE√ﬂ∞°Ω√ø°. RESET_DATA() «‘ºˆø° ∫ØºÅE√ ±‚»≠ ≥÷æ˚⁄ﬂµ .
+	DWORD				m_dwNowHPSG;
+	DWORD				m_dwNowHPMP;
+	DWORD				m_dwNowHPPHX;
+
+	SW_SCHOOL_DATA		m_emOWNER;
+	//
+	bool				m_bImmune;
+
+	GLCROWLOGIC () :
+		m_sNativeID(0,0),
+		m_pCrowData(NULL),
+
+		m_dwHOLDBLOW(NULL),
+		m_fSTATE_MOVE(1.0f),
+		m_fSTATE_DELAY(1.0f),
+		m_fSTATE_DAMAGE(1.0f),
+
+		m_bSTATE_PANT(false),
+		m_bSTATE_STUN(false),
+		m_bINVISIBLE(false),
+		m_bRECVISIBLE(false),
+
+		m_fATTVELO(0.0f),
+		m_fSKILL_MOVE(0.0f),
+
+		m_nSUM_HIT(0),
+		m_nSUM_AVOID(0),
+
+		m_nSUM_DEFENSE(0),
+		m_nDX_DAMAGE(0),
+
+		m_fSUM_TARRANGE(0),
+		m_nSUM_PIERCE(0),
+
+		m_fDamageRate(1.0f),
+		m_fDefenseRate(1.0f),
+
+		m_dwAType(0),
+
+		m_dwNowHP(0),
+		m_wNowMP(0),
+		m_wNowSP(0),
+		
+		m_idACTIVESKILL(false),
+		m_wACTIVESKILL_LVL(0),
+
+		m_fIncHP(0.0f),
+		m_fIncMP(0.0f),
+		m_fIncSP(0.0f),
+		m_wOWNER( CROW_OWNER_SCHOOL ),
+		m_dwNowHPSG(0),
+		m_dwNowHPMP(0),
+		m_dwNowHPPHX(0),
+		m_emOWNER( SW_SCHOOL_MAX ),
+		m_bImmune(false)
+	{
+		for ( int i=0; i< SCROWDATA::EMMAXATTACK; ++i )
+			m_fACTIONDELAY[i] = 0.0f;
+	}
+
+	void RESET_DATA ();
+
+	bool VALIDACTION ()
+	{
+		const SCROWATTACK *pAttack = m_pCrowData->m_sCrowAttack;
+		for ( int i=0; i<SCROWDATA::EMMAXATTACK; ++i )
+		{
+			if ( pAttack[i].bUsed )		return true;
+		}
+
+		return true;
+	}
+
+	bool VALIDSKILL ()
+	{
+		const SCROWATTACK *pAttack = m_pCrowData->m_sCrowAttack;
+		for ( int i=0; i<SCROWDATA::EMMAXATTACK; ++i )
+		{
+			if ( pAttack[i].bUsed && pAttack[i].skill_id!=SNATIVEID(false) )		return true;
+		}
+
+		return true;
+	}
+
+	bool VALIDATTACK ()
+	{
+		const SCROWATTACK *pAttack = m_pCrowData->m_sCrowAttack;
+		for ( int i=0; i<SCROWDATA::EMMAXATTACK; ++i )
+		{
+			if ( pAttack[i].bUsed && pAttack[i].skill_id==SNATIVEID(false) )		return true;
+		}
+
+		return true;
+	}
+
+	EMCROW GETCROW () const 	{ return m_pCrowData->m_emCrow; }
+	WORD GETLEVEL () const		{ return m_pCrowData->m_wLevel; }
+	const char* GETNAME ();
+	
+	DWORD GETHP () const		{ return m_dwNowHP; }
+	DWORD GETMAXHP () const		{ return m_pCrowData->m_dwHP; }
+
+	DWORD GETHPSG () const		{ return m_dwNowHPSG; }
+	DWORD GETHPMP () const		{ return m_dwNowHPMP; }
+	DWORD GETHPPHX () const		{ return m_dwNowHPPHX; }
+	int GETMP () const			{ return m_wNowMP; }
+	int GETMAXMP () const		{ return m_pCrowData->m_wMP; }
+
+	int GETSP () const			{ return m_wNowSP; }
+	int GETMAXSP () const		{ return m_pCrowData->m_wSP; }
+
+	int GETHIT () const			{ return m_nSUM_HIT; }
+	int GETAVOID () const		{ return m_nSUM_AVOID; }
+
+	EMBRIGHT GETBRIGHT () const	{ return m_pCrowData->m_emBright; }
+
+	int GETFORCE_LOW () const;
+	int GETFORCE_HIGH () const;
+	int GETDEFENSE () const			{ return m_nSUM_DEFENSE; }
+
+	float GETSUM_TARRANGE () const	{ return m_fSUM_TARRANGE; }		//	¿Â∞≈∏Æ π´?EΩ∫≈≥)ø°∏∏ ∞°?E
+	int GETSUM_PIERCE () const		{ return m_nSUM_PIERCE; }
+
+	WORD GETBODYRADIUS () const		{ return m_pCrowData->m_sAction.m_wBodyRadius; }
+	WORD GETATTACKRANGE () const	{ return m_pCrowData->m_sCrowAttack[m_dwAType].wRange; }
+
+	WORD GETSKILLRANGE_APPLY ( const GLSKILL &sSKILL, const WORD dwLEVEL ) const;
+
+	BOOL INIT_DATA ();
+
+	BOOL CHECKHIT ( const STARGETID &cTargetID, const GLLandMan* pLandMan );
+	DWORD CALCDAMAGE ( int& rResultDAMAGE, const DWORD dwGaeaID, const STARGETID &cTargetID, const GLLandMan* pLandMan,
+		const GLSKILL* pSkill=NULL, DWORD dwskill_lev=0, DWORD dwWeatherFlag=NULL, DWORD dwDivCount=0 );
+
+	DWORD RECEIVE_DAMAGE ( const DWORD wDamage );
+	DWORD RECEIVE_DAMAGE ( const DWORD dwDamage, const WORD wSchool );
+
+	void DISABLESKEFF ( int i )					{ m_sSKILLFACT[i].sNATIVEID = NATIVEID_NULL(); }
+	void DISABLEBLOW ( int i )					{ m_sSTATEBLOWS[i].emBLOW = EMBLOW_NONE; }
+
+	void UPDATE_DATA ( float fTime, float fElapsedTime, BOOL bClient=FALSE );
+
+	void SETACTIVESKILL ( SNATIVEID skill_id, WORD wLevel );
+	SNATIVEID GETACTIVESKILL ()						{ return m_idACTIVESKILL; }
+	EMSKILLCHECK CHECHSKILL ( DWORD dwAType, bool bNotLearn = false );
+	void ACCOUNTSKILL ( WORD wStrikeNum );
+
+	float GETATTVELO ();
+	float GETMOVEVELO ();
+
+	bool IsDefenseSkill()				{ return m_sDefenseSkill.m_bActive; }
+	void SetDefenseSkill(bool bDefense)	{ m_sDefenseSkill.m_bActive = bDefense; }
+};
+
+
+EMANI_SUBTYPE CHECK_ANISUB ( SITEM* pRHAND, SITEM* pLHAND );
+EMANI_SUBTYPE CHECK_ATTACK_ANISUB ( SITEM* pRHAND, SITEM* pLHAND );
+
+//! æ∆¿Ã≈€ »π?E±««—¿ª ¡÷±‚¿ß«—...
+//! µ•πÃ?E∑Œ±◊∏¶ ±‚∑œ«œ?E¿ß«— ±∏¡∂√º
+struct SDAMAGELOG
+{
+	DWORD dwUserID; ///< User ID
+	DWORD dwGaeaID; ///< ∞°¿Ãæ∆ ID
+	DWORD dwDamage; ///< ¡ÿ µ•πÃ?E
+
+	SDAMAGELOG () 
+		: dwUserID(0)
+		, dwGaeaID(0)
+		, dwDamage(0)
+	{
+	}
+
+	SDAMAGELOG ( DWORD dwuserid, DWORD dwgaeaid, DWORD dwdamage ) 
+		: dwUserID(dwuserid)
+		, dwGaeaID(dwgaeaid)
+		, dwDamage(dwdamage)
+	{
+	}
+};
+
+typedef stdext::hash_map<DWORD, SDAMAGELOG>	DAMAGELOG;
+typedef DAMAGELOG::iterator					DAMAGELOG_ITER;
+
+inline void AddDamageLog ( DAMAGELOG &cDamageLog, DWORD dwGaeaID, DWORD dwUserID, DWORD dwDamage )
+{
+	DAMAGELOG_ITER iter = cDamageLog.find ( dwUserID );
+	DAMAGELOG_ITER iter_end = cDamageLog.end();
+	
+	if ( iter != iter_end )
+	{
+		SDAMAGELOG &sDamageLog = (*iter).second;
+		if ( sDamageLog.dwUserID == dwUserID )	dwDamage += sDamageLog.dwDamage;
+	}
+	
+	cDamageLog[dwUserID] = SDAMAGELOG(dwUserID,dwGaeaID,dwDamage);
+}
+
+//! √ﬂ∞°:2006-04-12 Jgkim
+//! ∆ƒ∆º µ•πÃ?E∑Œ±◊±‚∑œ¿ª ¿ß«— ±∏¡∂√º
+struct SDAMAGELOGPARTY
+{
+	DWORD m_dwPartyID; ///< ∆ƒ∆º ∞˙‹Øπ¯»£
+	DWORD m_dwDamage; ///< ∆ƒ∆º∞° ¡ÿ µ•πÃ?E
+
+	SDAMAGELOGPARTY()
+		: m_dwPartyID(0)
+		, m_dwDamage(0)
+	{
+	}
+
+	SDAMAGELOGPARTY(DWORD dwPartyID, DWORD dwDamage)
+		: m_dwPartyID(dwPartyID)
+		, m_dwDamage(dwDamage)
+	{
+	}
+};
+typedef stdext::hash_map<DWORD, SDAMAGELOGPARTY>	DAMAGELOGPARTY;
+typedef DAMAGELOGPARTY::iterator					DAMAGELOGPARTY_ITER;
+
+inline void AddDamageLogParty(DAMAGELOGPARTY &cDamageLogParty, DWORD dwPartyID, DWORD dwDamage)
+{
+	if (dwPartyID == PARTY_NULL) return;
+
+	DAMAGELOGPARTY_ITER iter     = cDamageLogParty.find(dwPartyID);
+	DAMAGELOGPARTY_ITER iter_end = cDamageLogParty.end();
+	
+	if (iter != iter_end)
+	{
+		SDAMAGELOGPARTY &sDamageLogParty = (*iter).second;
+		if (sDamageLogParty.m_dwPartyID == dwPartyID)
+		{
+			dwDamage += sDamageLogParty.m_dwDamage;
+		}
+	}	
+	cDamageLogParty[dwPartyID] = SDAMAGELOGPARTY(dwPartyID, dwDamage);
+}
+
+inline bool CHECHSKILL_ITEM ( GLITEM_ATT emSKILL, GLITEM_ATT emITEM )
+{
+	if ( emSKILL==ITEMATT_SWORDSABER )
+	{
+		return ( emITEM==ITEMATT_SWORD || emITEM==ITEMATT_SABER );
+	}
+	else if ( emSKILL==ITEMATT_GUN )
+	{
+		return ( emITEM==ITEMATT_RAIL_GUN || emITEM==ITEMATT_PORTAL_GUN );
+	}
+	else if ( emSKILL==ITEMATT_EXTREMEFIST )
+	{
+		return ( emITEM==ITEMATT_SWORD || emITEM==ITEMATT_SABER  || emITEM == ITEMATT_SWORDSABER || 
+				 emITEM==ITEMATT_SPEAR || emITEM==ITEMATT_STICK || emITEM==ITEMATT_GAUNT || emITEM==ITEMATT_BOW || emITEM==ITEMATT_DUAL_GUN ||
+				 emITEM==ITEMATT_RAIL_GUN || emITEM==ITEMATT_PORTAL_GUN || emITEM==ITEMATT_DUALSPEAR || emITEM==ITEMATT_SHURIKEN || emITEM==ITEMATT_SCYTHE ||
+				 emITEM==ITEMATT_WAND || emITEM==ITEMATT_CUBE  || emITEM==ITEMATT_ROPE || emITEM==ITEMATT_EXTREMEFIST );
+	}
+
+	return (emITEM==emSKILL);
+}
+
+D3DXVECTOR3 UpdateSkillDirection ( const D3DXVECTOR3 &vMyPos, const D3DXVECTOR3 vMyDir, const SNATIVEID sSKILLID, const D3DXVECTOR3 vTARPOS, const STARID *pTARID );
+
+#endif // GLOGIXEX_H_

@@ -1,0 +1,428 @@
+#include "StdAfx.h"
+#include "minimapinfo.h"
+#include "../EngineLib/DxCommon/TextureManager.h"
+#include "StringFile.h"
+#include "STRINGUTILS.h"
+#include "DXLandMan.h"
+#include "GLGaeaClient.h"
+#include "DxRenderStates.h"
+#include "DxViewPort.h"
+#include "../EngineUILib/GUInterface/InterfaceCfg.h"
+#include "UITextControl.h"
+#include "../EngineLib/DxCommon/DxFontMan.h"
+#include "GLMapAxisInfo.h"
+#include "GameTextControl.h"
+#include "d3dfont.h"
+#include "../EngineUILib/GUInterface/BasicButton.h"
+
+#include "RANPARAM.h"
+#include "DxGlobalStage.h"
+#include "../EngineUILib/GUInterface/BasicTextBox.h"
+#include "GLPeriod.h"
+#include "GLItemMan.h"
+#include "../EngineUILib/GUInterface/BasicProgressBar.h"
+#include "DxClubMan.h"
+#include "InnerInterface.h"
+
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
+CMiniMapInfo::CMiniMapInfo()
+	: m_nMiniPosX(0)
+	, m_nMiniPosY(0)
+	, m_pChannelTextBox(NULL)
+	, m_pMinimapTextBox(NULL)
+	, m_pMinimapNameTextBox(NULL)
+	, m_pClubMark(NULL)
+	, m_pCTFSCHOOLDUMMY( NULL )
+	, m_pServerTimeText(NULL)
+{
+	for( int i=0; i<MINIMAP_CTF_SCHOOL; ++i )
+	{
+		m_pCTFSCHOOL[i] = NULL;
+	}
+}
+
+CMiniMapInfo::~CMiniMapInfo(void)
+{
+}
+
+void CMiniMapInfo::UpdatePostion ()
+{
+	CString strText;
+	CString strTextMapName;
+
+	if ( CInnerInterface::GetInstance().IsCHANNEL () )
+	{
+		strText.Format( "[%d]", DxGlobalStage::GetInstance().GetChannel() );
+		m_pChannelTextBox->SetOneLineText( strText, NS_UITEXTCOLOR::WHITE );
+
+		strTextMapName.Format ( "%s",m_strMapName );
+		m_pMinimapNameTextBox->SetOneLineText ( strTextMapName, NS_UITEXTCOLOR::GOLD );
+
+		strText.Format ( "%d/%d",m_nMiniPosX, m_nMiniPosY );
+		m_pMinimapTextBox->SetOneLineText ( strText, NS_UITEXTCOLOR::WHITE );
+	}
+	else
+	{
+		strTextMapName.Format ( "%s",m_strMapName );
+		m_pMinimapNameTextBox->SetOneLineText ( strTextMapName, NS_UITEXTCOLOR::GOLD );
+
+		strText.Format ( "%d/%d",m_nMiniPosX, m_nMiniPosY );
+		m_pMinimapTextBox->SetOneLineText ( strText, NS_UITEXTCOLOR::WHITE );
+	}
+}
+
+void CMiniMapInfo::SetMapPos ( float fCurX, float fCurY, int nMiniX, int nMiniY )
+{
+	if ( m_nMiniPosX != nMiniX || m_nMiniPosY != nMiniY )
+	{
+		m_nMiniPosX = nMiniX;
+		m_nMiniPosY = nMiniY;
+
+        UpdatePostion ();
+	}
+}
+
+void CMiniMapInfo::TranslateUIMessage ( UIGUID ControlID, DWORD dwMsg )
+{
+	CUIGroup::TranslateUIMessage ( ControlID, dwMsg );
+
+	switch ( ControlID )
+	{
+	case MINIMAP_CLUBMARK:
+		{
+			if ( CHECK_MOUSE_IN ( dwMsg ) )
+			{				
+				CInnerInterface::GetInstance().SHOW_COMMON_LINEINFO ( m_strClubName, NS_UITEXTCOLOR::DEFAULT );
+			}
+		}
+		break;
+	case MINIMAP_SCHOOL_MARK_NONE:
+		{
+			if ( CHECK_MOUSE_IN ( dwMsg ) )
+			{				
+				CInnerInterface::GetInstance().SHOW_COMMON_LINEINFO ( "No School Winner", NS_UITEXTCOLOR::DEFAULT );
+			}
+		}
+		break;
+	case MINIMAP_SCHOOL_MARK_0:
+		{
+			if ( CHECK_MOUSE_IN ( dwMsg ) )
+			{				
+				CInnerInterface::GetInstance().SHOW_COMMON_LINEINFO ( "SW Winner: Sacred Gate", NS_UITEXTCOLOR::DEFAULT );
+			}
+		}
+		break;
+	case MINIMAP_SCHOOL_MARK_1:
+		{
+			if ( CHECK_MOUSE_IN ( dwMsg ) )
+			{				
+				CInnerInterface::GetInstance().SHOW_COMMON_LINEINFO ( "SW Winner: Mystic Peak", NS_UITEXTCOLOR::DEFAULT );
+			}
+		}
+		break;
+	case MINIMAP_SCHOOL_MARK_2:
+		{
+			if ( CHECK_MOUSE_IN ( dwMsg ) )
+			{				
+				CInnerInterface::GetInstance().SHOW_COMMON_LINEINFO ( "SW Winner: Phoenix", NS_UITEXTCOLOR::DEFAULT );
+			}
+		}
+		break;
+	}
+}
+
+void CMiniMapInfo::Update ( int x, int y, BYTE LB, BYTE MB, BYTE RB, int nScroll, float fElapsedTime, BOOL bFirstControl )
+{	
+	CUIGroup::Update ( x, y, LB, MB, RB, nScroll, fElapsedTime, bFirstControl );
+	
+	// Player Position Update 
+	static D3DXVECTOR3 vPlayerPosBACK;
+	const D3DXVECTOR3 &vPlayerPos = GLGaeaClient::GetInstance().GetCharacterPos ();
+	if ( vPlayerPos != vPlayerPosBACK )
+	{
+		vPlayerPosBACK = vPlayerPos;
+
+		int nPosX(0), nPosY(0);
+		PLANDMANCLIENT pLandClient = GLGaeaClient::GetInstance().GetActiveMap();
+		if ( pLandClient )
+		{
+			GLMapAxisInfo &sMapAxisInfo = pLandClient->GetMapAxisInfo();
+			sMapAxisInfo.Convert2MapPos ( vPlayerPos.x, vPlayerPos.z, nPosX, nPosY );
+
+			SetMapPos ( vPlayerPos.x, vPlayerPos.z, nPosX, nPosY );
+		}
+	}
+
+		if ( m_pServerTimeText ) // Monster7j
+	{
+		CString strMonth, strTime;
+		CString strCombine;
+		{
+			int nMonth = (int) GLGaeaClient::GetInstance().GetCurrentTime().GetMonth ();
+			int nDay = (int) GLGaeaClient::GetInstance().GetCurrentTime().GetDay ();
+			int nYear = (int) GLGaeaClient::GetInstance().GetCurrentTime().GetYear ();
+			CString strMonthText;
+			switch(nMonth)
+			{
+			case 1: strMonthText = "January"; break;
+			case 2: strMonthText = "February"; break;
+			case 3: strMonthText = "March"; break;
+			case 4: strMonthText = "April"; break;
+			case 5: strMonthText = "May"; break;
+			case 6: strMonthText = "June"; break;
+			case 7: strMonthText = "July"; break;
+			case 8: strMonthText = "August"; break;
+			case 9: strMonthText = "September"; break;
+			case 10: strMonthText = "October"; break;
+			case 11: strMonthText = "November"; break;
+			case 12: strMonthText = "December"; break;
+			};
+
+			strMonth.Format ( "%s %d, %d", strMonthText, nDay, nYear );
+
+			int nHour = (int) GLGaeaClient::GetInstance().GetCurrentTime().GetHour ();
+			int nHour2;
+			CString strAMPM;
+			switch(nHour)
+			{
+			case 13: nHour2 = 1; break;
+			case 14: nHour2 = 2; break;
+			case 15: nHour2 = 3; break;
+			case 16: nHour2 = 4; break;
+			case 17: nHour2 = 5; break;
+			case 18: nHour2 = 6; break;
+			case 19: nHour2 = 7; break;
+			case 20: nHour2 = 8; break;
+			case 21: nHour2 = 9; break;
+			case 22: nHour2 = 10; break;
+			case 23: nHour2 = 11; break;
+			case 24: nHour2 = 12; break;
+			};
+			
+			int nMinute = (int) GLGaeaClient::GetInstance().GetCurrentTime().GetMinute();
+			static int nMinuteBACK;
+			if ( nMinute != nMinuteBACK )
+			{
+				nMinuteBACK = nMinute;
+				if ( nHour > 12 ) {
+					strAMPM = "PM";
+					strTime.Format ( "%02d:%02d %s", nHour2, nMinute, strAMPM );
+					strCombine.Format ("%s %s", strMonth, strTime );
+					m_pServerTimeText->SetOneLineText ( strCombine, NS_UITEXTCOLOR::WHITE );
+				} else {
+					strAMPM = "AM";
+					strTime.Format ( "%02d:%02d %s", nHour, nMinute, strAMPM );
+					strCombine.Format ("%s %s", strMonth, strTime );
+					m_pServerTimeText->SetOneLineText ( strCombine, NS_UITEXTCOLOR::WHITE );
+				}
+			}
+		}
+		/*CString strCombine;
+		const int nServerMonth = (int) GLGaeaClient::GetInstance().GetCurrentTime().GetMonth ();
+		const int nServerDay = (int) GLGaeaClient::GetInstance().GetCurrentTime().GetDay ();
+		const int nServerHour = (int) GLGaeaClient::GetInstance().GetCurrentTime().GetHour ();
+		const int nServerMinute = (int) GLGaeaClient::GetInstance().GetCurrentTime().GetMinute();
+		static int nServerMinuteBACK;
+		if ( nServerMinute != nServerMinuteBACK )
+		{
+			nServerMinuteBACK = nServerMinute;
+
+			strCombine.Format ( "%02d/%02d %02d:%02d", nServerMonth, nServerDay, nServerHour, nServerMinute );
+			m_pServerTimeText->SetOneLineText ( strCombine, NS_UITEXTCOLOR::WHITE );
+		}*/
+	}
+
+	const CBasicTextBox::STEXTPART & sTEXTPART = m_pMinimapNameTextBox->GetTextPart ( 0 );
+	INT nChannel = DxGlobalStage::GetInstance().GetChannel();
+	D3DXVECTOR2 vPos;
+
+	//	NOTE
+	//		클럽
+	PLANDMANCLIENT pLand = GLGaeaClient::GetInstance().GetActiveMap ();
+
+	DWORD dwWINNER = pLand->m_dwCTFWINNER;
+	if ( dwWINNER >= 3 )
+		dwWINNER = 3;
+
+	for( int i=0; i<MINIMAP_CTF_SCHOOL; ++i )
+	{
+		m_pCTFSCHOOL[i]->SetVisibleSingle( FALSE );
+	}
+
+	m_pCTFSCHOOL[dwWINNER]->SetVisibleSingle( TRUE );
+
+	vPos.x = sTEXTPART.m_rcPart.left; 
+	vPos.y = sTEXTPART.m_rcPart.top;
+
+	vPos.x = vPos.x - ( m_pCTFSCHOOLDUMMY->GetGlobalPos().sizeX +3.0f );
+
+	m_pCTFSCHOOLDUMMY->SetGlobalPos( vPos );
+	for( int i=0; i<MINIMAP_CTF_SCHOOL; ++i )
+	{
+		m_pCTFSCHOOL[i]->SetGlobalPos( vPos );;
+	}
+
+	if ( pLand && pLand->m_dwGuidClub!=CLUB_NULL )
+	{
+		m_dwVer = pLand->m_dwGuidClubMarkVer;
+		m_nID = pLand->m_dwGuidClub;
+		m_nServer = static_cast<int>(GLGaeaClient::GetInstance().GetCharacter()->m_dwServerID);
+		m_strClubName = pLand->m_szGuidClubName;
+
+		const UIRECT& rcGlobalPosClubMark = m_pClubMark->GetGlobalPos();
+		vPos.x = vPos.x - (rcGlobalPosClubMark.sizeX+3.0f);
+
+#if defined( VN_PARAM ) 
+		vPos.y = vPos.y + 2.0f;
+#else
+		vPos.y = vPos.y + 1.0f;
+#endif
+
+		m_pClubMark->SetGlobalPos ( vPos );
+		m_pClubMark->SetVisibleSingle ( TRUE );
+
+		if( nChannel != -1) // 채널
+		{
+			const CBasicTextBox::STEXTPART & sCTEXTPART = m_pChannelTextBox->GetTextPart ( 0 );
+
+			vPos.x = vPos.x - ( sCTEXTPART.m_rcPart.sizeX + 3.0f );
+			vPos.y = sCTEXTPART.m_rcPart.top;
+
+			m_pChannelTextBox->SetGlobalPos( vPos );
+			m_pChannelTextBox->SetVisibleSingle( TRUE );
+		}
+		else
+		{
+			m_pChannelTextBox->SetVisibleSingle( FALSE );
+		}
+	}
+	else
+	{
+		m_pClubMark->SetVisibleSingle ( FALSE );
+
+		if( nChannel != -1) // 채널
+		{
+			const CBasicTextBox::STEXTPART & sCTEXTPART = m_pChannelTextBox->GetTextPart ( 0 );
+
+			vPos.x = vPos.x - ( sCTEXTPART.m_rcPart.sizeX + 3.0f );
+			vPos.y = sTEXTPART.m_rcPart.top;
+
+			m_pChannelTextBox->SetGlobalPos( vPos );
+			m_pChannelTextBox->SetVisibleSingle( TRUE );
+		}
+		else
+		{
+			m_pChannelTextBox->SetVisibleSingle( FALSE );
+		}
+	}
+}
+
+HRESULT CMiniMapInfo::Render ( LPDIRECT3DDEVICEQ pd3dDevice )
+{
+	GASSERT( pd3dDevice );
+
+	HRESULT hr = S_OK;
+
+	BOOL bClubMarkVisible = m_pClubMark->IsVisible ();
+	BOOL bChannelVisible = m_pChannelTextBox->IsVisible();
+
+	m_pClubMark->SetVisibleSingle ( FALSE ); // MEMO
+	m_pChannelTextBox->SetVisibleSingle( FALSE );
+	{
+		hr = CUIGroup::Render ( pd3dDevice );
+		if ( FAILED ( hr ) ) return hr;
+	}
+	m_pClubMark->SetVisibleSingle ( bClubMarkVisible );
+	m_pChannelTextBox->SetVisibleSingle( bChannelVisible );
+	
+	if ( bClubMarkVisible )
+	{
+		const DxClubMan::DXDATA& sMarkData = DxClubMan::GetInstance().GetClubData ( pd3dDevice, m_nServer, m_nID, m_dwVer );
+
+		m_pClubMark->SetTexturePos ( 0, sMarkData.vTex_1_LU );
+		m_pClubMark->SetTexturePos ( 1, sMarkData.vTex_2_RU );
+		m_pClubMark->SetTexturePos ( 3, sMarkData.vTex_3_LD );
+		m_pClubMark->SetTexturePos ( 2, sMarkData.vTex_4_RD );
+		
+		m_pClubMark->SetTexture ( sMarkData.pddsTexture );
+		hr = m_pClubMark->Render ( pd3dDevice );
+		if ( FAILED ( hr ) ) return hr;
+	}
+
+	if( bChannelVisible )
+	{
+		hr = m_pChannelTextBox->Render ( pd3dDevice );
+		if ( FAILED ( hr ) ) return hr;
+	}
+
+	return S_OK;
+}
+
+void CMiniMapInfo::CreateSubControl ()
+{
+	CD3DFontPar* pFont = DxFontMan::GetInstance().LoadDxFont ( _DEFAULT_FONT, 9, TRUE, D3DFONT_SHADOW | D3DFONT_ASCII );
+
+	CBasicTextBox* pChannelTextBox = new CBasicTextBox;
+	pChannelTextBox->CreateSub( this, "MINIMAP_CHANNEL" );
+	pChannelTextBox->SetFont( pFont );
+	pChannelTextBox->SetTextAlign( TEXT_ALIGN_BOTH_X );
+	pChannelTextBox->SetUseRender( TRUE );
+	pChannelTextBox->SetDiffuseAlpha( 0 );
+	pChannelTextBox->SetVisibleSingle( FALSE );
+	RegisterControl( pChannelTextBox );
+	m_pChannelTextBox = pChannelTextBox;
+
+	CUIControl* pClubMark = new CUIControl;
+	pClubMark->CreateSub( this, "MINIMAP_CLUBMARK", UI_FLAG_DEFAULT, MINIMAP_CLUBMARK );
+	pClubMark->SetUseRender( TRUE );
+	pClubMark->SetVisibleSingle( FALSE );
+	RegisterControl( pClubMark );
+	m_pClubMark = pClubMark;
+
+	CBasicTextBox* pMinimapNameTextBox = new CBasicTextBox;
+	pMinimapNameTextBox->CreateSub ( this, "MINIMAP_NAME_TEXT" );
+	pMinimapNameTextBox->SetFont ( pFont );
+	pMinimapNameTextBox->SetTextAlign ( TEXT_ALIGN_RIGHT );
+	RegisterControl ( pMinimapNameTextBox );
+	m_pMinimapNameTextBox = pMinimapNameTextBox;
+
+	CBasicTextBox* pMinimapTextBox = new CBasicTextBox;
+	pMinimapTextBox->CreateSub ( this, "MINIMAP_POSITION" );
+	pMinimapTextBox->SetFont ( pFont );
+	pMinimapTextBox->SetTextAlign ( TEXT_ALIGN_RIGHT );
+	RegisterControl ( pMinimapTextBox );
+	m_pMinimapTextBox = pMinimapTextBox;
+
+	CBasicTextBox* pServerTimeText = new CBasicTextBox;
+	pServerTimeText->CreateSub ( this, "MINIMAP_SERVER_TIME_TEXT" );
+	pServerTimeText->SetFont ( pFont );
+	pServerTimeText->SetTextAlign ( TEXT_ALIGN_RIGHT );
+	RegisterControl ( pServerTimeText );
+	m_pServerTimeText = pServerTimeText;
+
+	m_pCTFSCHOOLDUMMY = new CUIControl;
+	m_pCTFSCHOOLDUMMY->CreateSub( this, "MINIMAP_CTFMARK", UI_FLAG_DEFAULT );
+	m_pCTFSCHOOLDUMMY->SetUseRender( TRUE );
+	m_pCTFSCHOOLDUMMY->SetVisibleSingle( TRUE );
+	RegisterControl( m_pCTFSCHOOLDUMMY );
+
+	std::string strSCHOOL[MINIMAP_CTF_SCHOOL] = 
+	{
+		"MINIMAP_CTFMARK_SCHOOL0",
+		"MINIMAP_CTFMARK_SCHOOL1",
+		"MINIMAP_CTFMARK_SCHOOL2",
+		"MINIMAP_CTFMARK_SCHOOL_NONE",
+	};
+
+	for( int i=0; i<MINIMAP_CTF_SCHOOL; ++i )
+	{
+		m_pCTFSCHOOL[i] = new CUIControl;
+		m_pCTFSCHOOL[i]->CreateSub( this, strSCHOOL[i].c_str(), UI_FLAG_DEFAULT, MINIMAP_SCHOOL_MARK_0 + i );
+		m_pCTFSCHOOL[i]->SetUseRender( TRUE );
+		m_pCTFSCHOOL[i]->SetVisibleSingle( FALSE );
+		RegisterControl( m_pCTFSCHOOL[i] );
+	}
+}

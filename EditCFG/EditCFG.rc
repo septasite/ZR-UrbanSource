@@ -1,0 +1,371 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#include ""res\\EditCFG.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "../res/basic_tool.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 235, 55
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "About EditCFG"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
+    LTEXT           "EditCFG Version 1.0",IDC_STATIC,40,10,119,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) 2012",IDC_STATIC,40,25,119,8
+    DEFPUSHBUTTON   "OK",IDOK,178,7,50,16,WS_GROUP
+END
+
+IDD_EDITCFG_DIALOG DIALOGEX 0, 0, 571, 349
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | 
+    WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "EditCFG"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    PUSHBUTTON      "Load CFG",IDC_BUTTON_LOAD,7,7,50,14
+    PUSHBUTTON      "Save CFG",IDC_BUTTON_SAVE,85,7,50,14
+    EDITTEXT        IDC_EDIT_NAME,70,26,111,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_SKELNAME,70,43,111,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_ANIM,247,94,20,14,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_EDIT_DWSTIME,50,77,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_DWETIME,131,77,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_DWETIMEORIG,227,77,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_DWUNITTIME,131,60,40,14,ES_AUTOHSCROLL
+    LTEXT           "Skeleton Name",IDC_STATIC,15,46,48,8
+    LTEXT           "Flags",IDC_STATIC,16,62,18,8
+    LTEXT           "Start Time",IDC_STATIC,15,79,34,8
+    LTEXT           "End Time",IDC_STATIC,96,80,30,8
+    LTEXT           "End Time Orig",IDC_STATIC,177,79,45,8
+    LTEXT           "Unit Time",IDC_STATIC,96,62,30,8
+    COMBOBOX        IDC_COMBO_PIECE0,44,156,74,152,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_ANISUB,69,109,176,137,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_DIVCOUNT,252,148,32,14,ES_AUTOHSCROLL
+    LTEXT           "Div Count",IDC_STATIC,252,135,32,8
+    LTEXT           "Ani Main Type",IDC_STATIC,15,96,46,8
+    LTEXT           "Ani Sub Type",IDC_STATIC,15,111,43,8
+    EDITTEXT        IDC_EDIT_DWFLAG,50,60,40,14,ES_AUTOHSCROLL | NOT 
+                    WS_TABSTOP
+    EDITTEXT        IDC_EDIT_ANIS,247,109,20,14,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_EDIT_DIV0,266,172,30,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_DIV1,266,188,30,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_DIV2,266,204,30,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_DIV3,266,220,30,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_DIV4,266,236,30,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_DIV5,266,252,30,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_DIV6,266,268,30,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_DIV7,266,284,30,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_DIV8,266,300,30,14,ES_AUTOHSCROLL
+    LTEXT           "Div 0",IDC_STATIC,247,174,17,8
+    LTEXT           "Div 1",IDC_STATIC,247,190,17,8
+    LTEXT           "Div 2",IDC_STATIC,247,206,17,8
+    LTEXT           "Div 3",IDC_STATIC,247,222,17,8
+    LTEXT           "Div 4",IDC_STATIC,247,238,17,8
+    LTEXT           "Div 5",IDC_STATIC,247,254,17,8
+    LTEXT           "Div 6",IDC_STATIC,247,270,17,8
+    LTEXT           "Div 7",IDC_STATIC,247,286,17,8
+    LTEXT           "Div 8",IDC_STATIC,247,302,17,8
+    GROUPBOX        "Sound Data",IDC_STATIC,301,123,193,219
+    GROUPBOX        "Strike Data",IDC_STATIC,8,123,233,219
+    EDITTEXT        IDC_EDIT_STRIKECOUNT,70,134,40,14,ES_AUTOHSCROLL
+    LTEXT           "Strike Count",IDC_STATIC,15,138,40,8
+    COMBOBOX        IDC_COMBO_PIECE1,44,172,74,152,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_PIECE2,44,188,74,152,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_PIECE3,44,204,74,152,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_PIECE4,44,220,74,152,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_PIECE5,44,236,74,152,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_PIECE6,44,252,74,152,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_PIECE7,44,268,74,152,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_PIECE8,44,284,74,152,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_PIECE9,44,300,74,152,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_EFF0,120,156,74,152,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_EFF1,120,172,74,152,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_EFF2,120,188,74,152,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_EFF3,120,204,74,152,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_EFF4,120,220,74,152,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_EFF5,120,236,74,152,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_EFF6,120,252,74,152,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_EFF7,120,268,74,152,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_EFF8,120,284,74,152,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_EFF9,120,300,74,152,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_SFRAME0,197,156,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_SFRAME1,197,172,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_SFRAME2,197,188,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_SFRAME3,197,204,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_SFRAME4,197,220,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_SFRAME5,197,236,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_SFRAME6,197,252,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_SFRAME7,197,268,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_SFRAME8,197,284,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_SFRAME9,197,300,40,14,ES_AUTOHSCROLL
+    LTEXT           "Strike 0",IDC_STATIC,16,158,25,8
+    LTEXT           "Strike 1",IDC_STATIC,16,174,25,8
+    LTEXT           "Strike 2",IDC_STATIC,16,190,25,8
+    LTEXT           "Strike 3",IDC_STATIC,16,206,25,8
+    LTEXT           "Strike 4",IDC_STATIC,16,222,25,8
+    LTEXT           "Strike 5",IDC_STATIC,16,238,25,8
+    LTEXT           "Strike 6",IDC_STATIC,16,254,25,8
+    LTEXT           "Strike 7",IDC_STATIC,16,270,25,8
+    LTEXT           "Strike 8",IDC_STATIC,16,286,25,8
+    LTEXT           "Strike 9",IDC_STATIC,16,302,25,8
+    COMBOBOX        IDC_COMBO_ANIMAIN,69,94,176,137,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Div Data",IDC_STATIC,243,123,56,219
+    EDITTEXT        IDC_EDIT_FRAMECOUNT,353,134,40,14,ES_AUTOHSCROLL
+    LTEXT           "Frame Count",IDC_STATIC,305,137,42,8
+    EDITTEXT        IDC_EDIT_SOUND0,334,156,76,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_SOUND1,334,172,76,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_SOUND2,334,188,76,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_SOUND3,334,204,76,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_SOUND4,334,220,76,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_SOUND5,334,236,76,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_SOUND6,334,252,76,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_SOUND7,334,268,76,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_SOUND8,334,284,76,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_SOUND9,334,300,76,14,ES_AUTOHSCROLL
+    LTEXT           "Sound 0",IDC_STATIC,305,158,27,8
+    LTEXT           "Sound 1",IDC_STATIC,305,174,27,8
+    LTEXT           "Sound 2",IDC_STATIC,305,190,27,8
+    LTEXT           "Sound 3",IDC_STATIC,305,206,27,8
+    LTEXT           "Sound 4",IDC_STATIC,305,222,27,8
+    LTEXT           "Sound 5",IDC_STATIC,305,238,27,8
+    LTEXT           "Sound 6",IDC_STATIC,305,254,27,8
+    LTEXT           "Sound 7",IDC_STATIC,305,270,27,8
+    LTEXT           "Sound 8",IDC_STATIC,305,286,27,8
+    LTEXT           "Sound 9",IDC_STATIC,305,302,27,8
+    CONTROL         "Loop",IDC_CHECK_LOOP0,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,413,158,31,10
+    CONTROL         "Loop",IDC_CHECK_LOOP1,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,413,174,31,10
+    CONTROL         "Loop",IDC_CHECK_LOOP2,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,413,190,31,10
+    CONTROL         "Loop",IDC_CHECK_LOOP3,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,413,206,31,10
+    CONTROL         "Loop",IDC_CHECK_LOOP4,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,413,222,31,10
+    CONTROL         "Loop",IDC_CHECK_LOOP5,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,413,238,31,10
+    CONTROL         "Loop",IDC_CHECK_LOOP6,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,413,254,31,10
+    CONTROL         "Loop",IDC_CHECK_LOOP7,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,413,270,31,10
+    CONTROL         "Loop",IDC_CHECK_LOOP8,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,413,286,31,10
+    CONTROL         "Loop",IDC_CHECK_LOOP9,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,413,302,31,10
+    EDITTEXT        IDC_EDIT_PFRAME0,444,156,44,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_PFRAME1,444,172,44,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_PFRAME2,444,188,44,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_PFRAME3,444,204,44,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_PFRAME4,444,220,44,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_PFRAME5,444,236,44,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_PFRAME6,444,252,44,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_PFRAME7,444,268,44,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_PFRAME8,444,284,44,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_PFRAME9,444,300,44,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_PFRAME10,444,319,44,14,ES_AUTOHSCROLL
+    LTEXT           "Frame",IDC_STATIC,453,141,21,8
+    LTEXT           "Cfg Name",IDC_STATIC,15,28,32,8
+    EDITTEXT        IDC_EDIT_NAME2,242,25,111,14,ES_AUTOHSCROLL
+    LTEXT           "Bin Name",IDC_STATIC,187,27,30,8
+    EDITTEXT        IDC_EDIT_NAME3,527,7,37,14,ES_AUTOHSCROLL
+    LTEXT           "Ver",IDC_STATIC,512,9,12,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904e4"
+        BEGIN
+            VALUE "CompanyName", "TODO: <Company name>"
+            VALUE "FileDescription", "TODO: <File description>"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "InternalName", "EditCFG.exe"
+            VALUE "LegalCopyright", "TODO: (c) <Company name>.  All rights reserved."
+            VALUE "OriginalFilename", "EditCFG.exe"
+            VALUE "ProductName", "TODO: <Product name>"
+            VALUE "ProductVersion", "1.0.0.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 228
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 48
+    END
+
+    IDD_EDITCFG_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 564
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 342
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// RT_MANIFEST
+//
+
+1                       RT_MANIFEST             "res\\manifest.xml"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_ABOUTBOX            "&About EditCFG..."
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#include "res\EditCFG.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

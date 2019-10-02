@@ -1,0 +1,496 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseD_Read|Win32">
+      <Configuration>ReleaseD_Read</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseD|Win32">
+      <Configuration>ReleaseD</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release_Read|Win32">
+      <Configuration>Release_Read</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Template|Win32">
+      <Configuration>Template</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{45165A02-8F74-4217-9739-B66FBB0DDB4D}</ProjectGuid>
+    <SccProjectName>SAK</SccProjectName>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccProvider>SAK</SccProvider>
+    <Keyword>MFCProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseD_Read|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Read|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseD|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseD_Read|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release_Read|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseD|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)/_DBuildData/ItemEdit\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)/_DBuildData/ItemEdit\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)/_RBuildData/ItemEdit\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)/_RBuildData/ItemEdit\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='ReleaseD|Win32'">$(SolutionDir)/_RDBuildData/ItemEdit\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='ReleaseD|Win32'">$(SolutionDir)/_RDBuildData/ItemEdit\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='ReleaseD|Win32'">false</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release_Read|Win32'">$(SolutionDir)/_RBuildData/ItemEdit_Read\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release_Read|Win32'">$(SolutionDir)/_RBuildData/ItemEdit_Read\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release_Read|Win32'">false</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='ReleaseD_Read|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='ReleaseD_Read|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='ReleaseD_Read|Win32'">false</LinkIncremental>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='ReleaseD_Read|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='ReleaseD_Read|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='ReleaseD_Read|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='ReleaseD|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='ReleaseD|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='ReleaseD|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release_Read|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release_Read|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release_Read|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Template|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Template|Win32'" />
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>../MfcExLib/;../MfcExLib/ExLibs/;../enginelib/;../enginelib/Common;../enginelib/G-Logic;../enginelib/DxOctree;../enginelib/DxFrame;../RanClientLib/;../RanClientLib/G-Logic;../engineLib/Meshs;../enginelib/DxSound;../enginelib/DxEffect/Char;../enginelib/DxEffect/;../enginelib/DxEffect/Single;../enginelib/DxCommon;../enginelib/DxCommon9;$(SolutionDir)enginelib/DxEffect/EffAni;../netclientLib;$(SolutionDir)/=include;$(SolutionDir)/=TbbLib/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>dsound.lib;dinput8.lib;dxerr9.lib;d3dx9.lib;d3d9.lib;d3dxof.lib;dxguid.lib;winmm.lib;imm32.lib;$(SolutionDir)/=Library/dbghelp.lib;$(SolutionDir)/=Library/ggsrvlib.lib;$(SolutionDir)/=Library/lzo2.lib;$(SolutionDir)/=Library/vorbisfile_static.lib;$(SolutionDir)/=Library/ogg_static.lib;$(SolutionDir)/=TbbLib/lib/tbb.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(SolutionDir)/_Bin/$(ProjectName)D.exe</OutputFile>
+      <IgnoreSpecificDefaultLibraries>libci.lib;libc.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+    </Midl>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>../MfcExLib/;../MfcExLib/ExLibs/;../enginelib/;../enginelib/Common;../enginelib/G-Logic;../enginelib/DxOctree;../enginelib/DxFrame;../RanClientLib/;../RanClientLib/G-Logic;../engineLib/Meshs;../enginelib/DxSound;../enginelib/DxEffect/Char;../enginelib/DxEffect/;../enginelib/DxEffect/Single;../enginelib/DxCommon;../enginelib/DxCommon9;$(SolutionDir)enginelib/DxEffect/EffAni;../netclientLib;$(SolutionDir)/=include;$(SolutionDir)/=TbbLib/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <MinimalRebuild>false</MinimalRebuild>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>dsound.lib;dinput8.lib;dxerr9.lib;d3dx9.lib;d3d9.lib;d3dxof.lib;dxguid.lib;winmm.lib;imm32.lib;$(SolutionDir)/=Library/dbghelp.lib;$(SolutionDir)/=Library/ggsrvlib.lib;$(SolutionDir)/=Library/lzo2.lib;$(SolutionDir)/=Library/vorbisfile_static.lib;$(SolutionDir)/=Library/ogg_static.lib;$(SolutionDir)/=TbbLib/lib/tbb.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(SolutionDir)/_Bin/$(ProjectName).exe</OutputFile>
+      <IgnoreSpecificDefaultLibraries>libci.lib;libc.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(SolutionDir)/_bin/map_pdb/ItemEdit.pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+    </Midl>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseD|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>../MfcExLib/;../MfcExLib/ExLibs/;../enginelib/;../enginelib/Common;../enginelib/G-Logic;../enginelib/DxOctree;../enginelib/DxFrame;../RanClientLib/;../RanClientLib/G-Logic;../engineLib/Meshs;../enginelib/DxSound;../enginelib/DxEffect/Char;../enginelib/DxEffect/;../enginelib/DxEffect/Single;../enginelib/DxCommon;../enginelib/DxCommon9;$(SolutionDir)enginelib/DxEffect/EffAni;../netclientLib;$(SolutionDir)/=include;$(SolutionDir)/=TbbLib/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <MinimalRebuild>false</MinimalRebuild>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>dsound.lib;dinput8.lib;dxerr9.lib;d3dx9.lib;d3d9.lib;d3dxof.lib;dxguid.lib;winmm.lib;imm32.lib;$(SolutionDir)/=Library/dbghelp.lib;$(SolutionDir)/=Library/ggsrvlib.lib;$(SolutionDir)/=Library/lzo2.lib;$(SolutionDir)/=Library/vorbisfile_static.lib;$(SolutionDir)/=Library/ogg_static.lib;$(SolutionDir)/=TbbLib/lib/tbb.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(SolutionDir)/_Bin/$(ProjectName)R.exe</OutputFile>
+      <IgnoreSpecificDefaultLibraries>libci.lib;libc.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(OutDir)$(ProjectName)R.pdb</ProgramDatabaseFile>
+      <GenerateMapFile>false</GenerateMapFile>
+      <MapExports>false</MapExports>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+    </Midl>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_Read|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>../MfcExLib/;../MfcExLib/ExLibs/;../enginelib/;../enginelib/Common;../enginelib/G-Logic;../enginelib/DxOctree;../enginelib/DxFrame;../RanClientLib/;../RanClientLib/G-Logic;../engineLib/Meshs;../enginelib/DxSound;../enginelib/DxEffect/Char;../enginelib/DxEffect/;../enginelib/DxEffect/Single;../enginelib/DxCommon;../enginelib/DxCommon9;$(SolutionDir)enginelib/DxEffect/EffAni;../netclientLib;$(SolutionDir)/=include;$(SolutionDir)/=TbbLib/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;READTOOL_PARAM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <MinimalRebuild>false</MinimalRebuild>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>dsound.lib;dinput8.lib;dxerr9.lib;d3dx9.lib;d3d9.lib;d3dxof.lib;dxguid.lib;winmm.lib;imm32.lib;$(SolutionDir)/=Library/dbghelp.lib;$(SolutionDir)/=Library/ggsrvlib.lib;$(SolutionDir)/=Library/lzo2.lib;$(SolutionDir)/=Library/vorbisfile_static.lib;$(SolutionDir)/=Library/ogg_static.lib;$(SolutionDir)/=TbbLib/lib/tbb.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(SolutionDir)/_Bin/$(ProjectName)_Read.exe</OutputFile>
+      <IgnoreSpecificDefaultLibraries>libci.lib;libc.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(SolutionDir)/_bin/map_pdb/ItemEdit_Read.pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+    </Midl>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseD_Read|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>../MfcExLib/;../MfcExLib/ExLibs/;../enginelib/;../enginelib/Common;../enginelib/G-Logic;../enginelib/DxOctree;../enginelib/DxFrame;../RanClientLib/;../RanClientLib/G-Logic;../engineLib/Meshs;../enginelib/DxSound;../enginelib/DxEffect/Char;../enginelib/DxEffect/;../enginelib/DxEffect/Single;../enginelib/DxCommon;../enginelib/DxCommon9;$(SolutionDir)enginelib/DxEffect/EffAni;../netclientLib;$(SolutionDir)/=include;$(SolutionDir)/=TbbLib/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;READTOOL_PARAM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <MinimalRebuild>false</MinimalRebuild>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>dsound.lib;dinput8.lib;dxerr9.lib;d3dx9.lib;d3d9.lib;d3dxof.lib;dxguid.lib;winmm.lib;imm32.lib;$(SolutionDir)/=Library/dbghelp.lib;$(SolutionDir)/=Library/ggsrvlib.lib;$(SolutionDir)/=Library/lzo2.lib;$(SolutionDir)/=Library/vorbisfile_static.lib;$(SolutionDir)/=Library/ogg_static.lib;$(SolutionDir)/=TbbLib/lib/tbb.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(SolutionDir)/_Bin/$(ProjectName)R_Read.exe</OutputFile>
+      <IgnoreSpecificDefaultLibraries>libci.lib;libc.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(OutDir)$(ProjectName)R_Read.pdb</ProgramDatabaseFile>
+      <GenerateMapFile>false</GenerateMapFile>
+      <MapExports>false</MapExports>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+    </Midl>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectReference Include="{C69DF8AC-CB70-412D-981A-9803C2556BBB}">
+      <Project>{c69df8ac-cb70-412d-981a-9803c2556bbb}</Project>
+      <IncludeIsGuid>true</IncludeIsGuid>
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="{6FAC775F-87A3-4C20-9EE6-4713C2C9A6E9}">
+      <Project>{6fac775f-87a3-4c20-9ee6-4713c2c9a6e9}</Project>
+      <IncludeIsGuid>true</IncludeIsGuid>
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="{E8CF1ADA-264A-4127-86C2-FD7057D3792C}">
+      <Project>{e8cf1ada-264a-4127-86c2-fd7057d3792c}</Project>
+      <IncludeIsGuid>true</IncludeIsGuid>
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="{ABDFE1DD-5722-49A8-BD1C-AD572EDE73CD}">
+      <Project>{abdfe1dd-5722-49a8-bd1c-ad572ede73cd}</Project>
+      <IncludeIsGuid>true</IncludeIsGuid>
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="{1B7E9F95-3027-4194-BCA6-DE1D940C12E9}">
+      <Project>{1b7e9f95-3027-4194-bca6-de1d940c12e9}</Project>
+      <IncludeIsGuid>true</IncludeIsGuid>
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="{DD642AD2-FD38-4171-9432-3EFE08EC7CAD}">
+      <Project>{dd642ad2-fd38-4171-9432-3efe08ec7cad}</Project>
+      <IncludeIsGuid>true</IncludeIsGuid>
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="{06500F3B-6B55-42FC-B009-4E525C25B404}">
+      <Project>{06500f3b-6b55-42fc-b009-4e525c25b404}</Project>
+      <IncludeIsGuid>true</IncludeIsGuid>
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="{AD074562-90AA-4AD3-B363-3A237D748620}">
+      <Project>{ad074562-90aa-4ad3-b363-3a237d748620}</Project>
+      <IncludeIsGuid>true</IncludeIsGuid>
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="{D7D4C861-3C19-43E5-8398-7B3A72CCCC9D}">
+      <Project>{d7d4c861-3c19-43e5-8398-7b3a72cccc9d}</Project>
+      <IncludeIsGuid>true</IncludeIsGuid>
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="{BCF775D2-831D-4647-ABD5-02B282CA0ACA}">
+      <Project>{bcf775d2-831d-4647-abd5-02b282ca0aca}</Project>
+      <IncludeIsGuid>true</IncludeIsGuid>
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="{49AB9727-9DEB-4B3E-889D-67A8810EB14C}">
+      <Project>{49ab9727-9deb-4b3e-889d-67a8810eb14c}</Project>
+      <IncludeIsGuid>true</IncludeIsGuid>
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="{EEEF5C61-30BB-4EEF-B94E-EDBBC930182C}">
+      <Project>{eeef5c61-30bb-4eef-b94e-edbbc930182c}</Project>
+      <IncludeIsGuid>true</IncludeIsGuid>
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="{299C0EC8-54E1-471A-8B44-871CE93835A9}">
+      <Project>{299c0ec8-54e1-471a-8b44-871ce93835a9}</Project>
+      <IncludeIsGuid>true</IncludeIsGuid>
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="{B0D7D4D5-5245-463D-8F76-9822AC752E71}">
+      <Project>{b0d7d4d5-5245-463d-8f76-9822ac752e71}</Project>
+      <IncludeIsGuid>true</IncludeIsGuid>
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="{0D444AD2-DAA6-405D-B28D-656AAF5093D5}">
+      <Project>{0d444ad2-daa6-405d-b28d-656aaf5093d5}</Project>
+      <IncludeIsGuid>true</IncludeIsGuid>
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="{51E0953A-983F-4C2F-BA4C-DEBAD030174E}">
+      <Project>{51e0953a-983f-4c2f-ba4c-debad030174e}</Project>
+      <IncludeIsGuid>true</IncludeIsGuid>
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="{4DF418D8-5A7A-4B88-9115-315E6217970D}">
+      <Project>{4df418d8-5a7a-4b88-9115-315e6217970d}</Project>
+      <IncludeIsGuid>true</IncludeIsGuid>
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="{36F1AF73-B733-41ED-9DC2-F35DA5A1D073}">
+      <Project>{36f1af73-b733-41ed-9dc2-f35da5a1d073}</Project>
+      <IncludeIsGuid>true</IncludeIsGuid>
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="{393C882A-748C-4AB7-809D-7B437FBB7AF3}">
+      <Project>{393c882a-748c-4ab7-809d-7b437fbb7af3}</Project>
+      <IncludeIsGuid>true</IncludeIsGuid>
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="{D0ED71D3-A803-4DAF-B9C9-22640CD54E1C}">
+      <Project>{d0ed71d3-a803-4daf-b9c9-22640cd54e1c}</Project>
+      <IncludeIsGuid>true</IncludeIsGuid>
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="{48A54452-58BC-4EBA-AA6C-38D92CEAD468}">
+      <Project>{48a54452-58bc-4eba-aa6c-38d92cead468}</Project>
+      <IncludeIsGuid>true</IncludeIsGuid>
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="{86A94370-086D-4EE1-B83A-165A8097C275}">
+      <Project>{86a94370-086d-4ee1-b83a-165a8097c275}</Project>
+      <IncludeIsGuid>true</IncludeIsGuid>
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="{72B17920-46D2-4A47-B4DB-45FD3BFD1CD7}">
+      <Project>{72b17920-46d2-4a47-b4db-45fd3bfd1cd7}</Project>
+      <IncludeIsGuid>true</IncludeIsGuid>
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="DlgItem.cpp" />
+    <ClCompile Include="ExceptionAttacher.cpp" />
+    <ClCompile Include="InputDataDlg.cpp" />
+    <ClCompile Include="ItemEdit.cpp" />
+    <ClCompile Include="ItemEditDlg.cpp" />
+    <ClCompile Include="LogDialog.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseD_Read|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseD|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_Read|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ItemParent.cpp" />
+    <ClCompile Include="ItemSuit.cpp" />
+    <ClCompile Include="ItemSuitTree.cpp" />
+    <ClCompile Include="ItemSuitTreeEx.cpp" />
+    <ClCompile Include="SearchDialog.cpp" />
+    <ClCompile Include="SheetWithTab.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="DlgItem.h" />
+    <ClInclude Include="InputDataDlg.h" />
+    <ClInclude Include="ItemEdit.h" />
+    <ClInclude Include="ItemEditDlg.h" />
+    <ClInclude Include="LogDialog.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="ItemParent.h" />
+    <ClInclude Include="ItemSuit.h" />
+    <ClInclude Include="ItemSuitTree.h" />
+    <ClInclude Include="SearchDialog.h" />
+    <ClInclude Include="SheetWithTab.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\ItemEdit.ico" />
+    <None Include="res\ItemEdit.rc2" />
+    <None Include="res\toolbar1.bmp" />
+    <None Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="res\ItemEdit.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ItemEdit.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="ItemEdit.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>
